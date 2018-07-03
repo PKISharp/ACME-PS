@@ -5,6 +5,6 @@ function Get-TermsOfService {
     #>
     [CmdletBinding()]
     param(
-        $acmeCertificateAuthority 
+        [string]$ca
     )
 }

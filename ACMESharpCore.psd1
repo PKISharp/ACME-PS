@@ -32,6 +32,8 @@
 
 	DotNetFrameworkVersion = '4.5'
 
+	DefaultCommandPrefix = 'ACME'
+	FunctionsToExport = @('Get-TermsOfService')
 
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 	PrivateData = @{
@@ -67,9 +69,6 @@
 
 	# Modules that must be imported into the global environment prior to importing this module
 	# RequiredModules = @()
-
-	# Assemblies that must be loaded prior to importing this module
-	# 
 
 	# Script files (.ps1) that are run in the caller's environment prior to importing this module.
 	# ScriptsToProcess = @()
