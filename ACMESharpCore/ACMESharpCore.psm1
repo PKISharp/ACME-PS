@@ -22,7 +22,7 @@ function Import-ModuleFile {
  
 $script:PSModuleRoot = $PSScriptRoot
 
-if ((Test-Path -Path "$script:PSModuleRoot\.git")) {
+if ((Test-Path -Path "$script:PSModuleRoot\..\.git")) {
     # All internal functions privately available within the toolset
     foreach ($function in (Get-ChildItem "$script:PSModuleRoot\internal\functions\*.ps1")) {
         . Import-ModuleFile $function.FullName
