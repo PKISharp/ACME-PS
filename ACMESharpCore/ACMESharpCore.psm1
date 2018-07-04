@@ -22,7 +22,7 @@ function Import-ModuleFile {
  
 $script:PSModuleRoot = $PSScriptRoot
 
-if ((Test-Path -Path "$script:PSModuleRoot\..\.git")) {
+if (!(Test-Path -Path "$script:PSModuleRoot\AllFunctions.ps1")) {
     # All internal functions privately available within the toolset
     foreach ($function in (Get-ChildItem "$script:PSModuleRoot\internal\functions\*.ps1")) {
         . Import-ModuleFile $function.FullName
@@ -34,5 +34,6 @@ if ((Test-Path -Path "$script:PSModuleRoot\..\.git")) {
     }
 }
 else {
+    # This is created by the build script and will improve module loading time
     . "$script:PSModuleRoot\AllFunctions.ps1"
 }
