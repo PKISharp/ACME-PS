@@ -33,7 +33,11 @@
 	DotNetFrameworkVersion = '4.5'
 
 	DefaultCommandPrefix = 'ACME'
-	FunctionsToExport = @('Get-TermsOfService')
+	FunctionsToExport = @(
+		'Initialize-Store',
+		'Get-ServiceDirectory'
+		'Get-TermsOfService'
+		)
 
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 	PrivateData = @{

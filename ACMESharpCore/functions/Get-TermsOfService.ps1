@@ -1,10 +1,19 @@
 function Get-TermsOfService {
     <#
+        .SYNOPSIS
+        Reads the TOS from the ACME-Server
+
         .DESCRIPTION
-            Retrieves the Terms of Service for an ACME CA.
+        Reads the TOS from the given ACME-Server
     #>
     [CmdletBinding()]
     param(
-        [string]$ca
+        [Parameter(ParameterSetName = "ByURL", Mandatory = $true)]
+        [string]$acmeServerTOSUrl,
+
+        [Parameter(ParameterSetName = "ByReg", Mandatory = $true)]
+        [object]$acmeRegistration
     )
+
+    { }
 }
