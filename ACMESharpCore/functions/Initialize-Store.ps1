@@ -8,7 +8,7 @@ function Initialize-Store {
 
         
     #>
-    [CmdletBinding(DefaultParameterSetName="ByName")]
+    [CmdletBinding(DefaultParameterSetName="ByName", SupportsShouldProcess=$true)]
     param(
         [Parameter(ParameterSetName="ByName")]
         [string]
@@ -19,7 +19,7 @@ function Initialize-Store {
         $ACMEDirectoryUrl,
 
         [Parameter(ParameterSetName="ByServiceDirectory", ValueFromPipeline=$true)]
-        [ACMESharp.Protocol.Resources.ServiceDirectory]
+        [ACMEServiceDirectory]
         $ACMEServiceDirectory,
 
         [Parameter(Mandatory=$true, Position = 0, ValueFromPipelineByPropertyName=$true)]
@@ -36,7 +36,7 @@ function Initialize-Store {
             throw "Initializing the store can only be done on a non exitent or empty directory."
         }
 
-        [ACMESharp.Protocol.Resources.ServiceDirectory]$serviceDirectory;
+        [ACMEServiceDirectory]$serviceDirectory;
 
         if($PSCmdlet.ParameterSetName -eq "ByName") {
             $serviceDirectory = Get-ServiceDirectory -ACMEEndpointName $ACMEEndpointName
@@ -55,7 +55,9 @@ function Initialize-Store {
         }
         
         $serviceDirectory.Directory | Out-File "$LiteralPath/.ACMESharpStore" -Encoding ASCII
-        Export-Clixml "$LiteralPath/ServiceDirectory.xml" -InputObject $serviceDirectory | Out-Null
+        if($PSCmdlet.ShouldProcess("$LiteralPath", "Store ServiceDirectory.xml")) {
+            Export-Clixml "$LiteralPath/ServiceDirectory.xml" -InputObject $serviceDirectory | Out-Null
+        }
 
         if($PassThrough) {
             return $serviceDirectory

@@ -10,10 +10,20 @@ function Get-TermsOfService {
     param(
         [Parameter()]
         [string]
-        $ACMEStorePath = "."
+        $ACMEStoreDir = ".",
+
+        [Switch]
+        $ShowTOS
     )
 
     process {
-        Validate-StorePath $ACMEStorePath
+        $serviceDirectory = Get-ServiceDirectory -ACMEStorePath $ACMEStoreDir;
+
+        #TODO: Make this independent of PDF
+        Invoke-WebRequest $serviceDirectory.Meta.TermsOfService -OutFile "$ACMEStoreDir/TOS.pdf";
+
+        if($ShowTOS) {
+            Start-Process "$ACMEStoreDir/TOS.pdf";
+        }
     }
 }
