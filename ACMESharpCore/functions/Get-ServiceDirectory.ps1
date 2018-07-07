@@ -32,6 +32,8 @@ function Get-ServiceDirectory {
 
     process {
         if($PSCmdlet.ParameterSetName -eq "FromPath") {
+            Validate-StorePath $ACMEStorePath
+
             $result = Import-Clixml -Path "$ACMEStorePath/.ServiceDirectory.xml"
             return $result;
         }

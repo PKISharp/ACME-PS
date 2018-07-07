@@ -8,12 +8,12 @@ function Get-TermsOfService {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(ParameterSetName = "ByURL", Mandatory = $true)]
-        [string]$acmeServerTOSUrl,
-
-        [Parameter(ParameterSetName = "ByReg", Mandatory = $true)]
-        [object]$acmeRegistration
+        [Parameter()]
+        [string]
+        $ACMEStorePath = "."
     )
 
-    { }
+    process {
+        Validate-StorePath $ACMEStorePath
+    }
 }

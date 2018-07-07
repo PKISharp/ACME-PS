@@ -25,10 +25,17 @@ function Initialize-Store {
         [Parameter(Mandatory=$true, Position = 0, ValueFromPipelineByPropertyName=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $LiteralPath
+        $LiteralPath,
+
+        [Switch]
+        $PassThrough
     )
 
     process {
+        if(Test-Path "$LiteralPath/*") {
+            throw "Initializing the store can only be done on a non exitent or empty directory."
+        }
+
         [ACMESharp.Protocol.Resources.ServiceDirectory]$serviceDirectory;
 
         if($PSCmdlet.ParameterSetName -eq "ByName") {
@@ -43,7 +50,15 @@ function Initialize-Store {
             throw "Either provide a well-known ACME service name, ACME service url or ServiceDirectory object."
         }            
 
-        New-Item "$LiteralPath" -ItemType Directory | Out-Null
-        Export-Clixml "$LiteralPath/.ServiceDirectory.xml" -InputObject $serviceDirectory | Out-Null
+        if(!(Test-Path $LiteralPath)) {
+            New-Item "$LiteralPath" -ItemType Directory | Out-Null
+        }
+        
+        $serviceDirectory.Directory | Out-File "$LiteralPath/.ACMESharpStore" -Encoding ASCII
+        Export-Clixml "$LiteralPath/ServiceDirectory.xml" -InputObject $serviceDirectory | Out-Null
+
+        if($PassThrough) {
+            return $serviceDirectory
+        }
     }
 }
