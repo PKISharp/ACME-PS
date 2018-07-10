@@ -41,4 +41,5 @@ class LocalStore
 
     [ACMESharp.Protocol.Resources.ServiceDirectory] $Directory;
     [ACMESharp.Crypto.JOSE.JwsExport] $AccountKey;
+    [ACMESharp.Protocol.Resources]
 }

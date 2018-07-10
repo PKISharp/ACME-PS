@@ -1,6 +1,6 @@
 function Create-SignedMessage {
     param(
-        [Parameter](Mandatory = $true)
+        [Parameter(Mandatory = $true)]
         [ValdiateNotNullOrEmpty]
         [string] $Url,
 
@@ -39,14 +39,14 @@ function Create-SignedMessage {
         $messagePayload = $Payload;
     }
 
-    $encoder = [System.Text.Encoding]::UTF8;
     $signedPayload = [ACMESharp.Crypto.JOSE.JwsSignedPayload]::new();
-    
-    #TODO: .. unfinished business here ..
 
     $signedPayload.Header = $null;
-    $signedPayload.Protected = $encoder.GetBytes($headers | ConvertTo-Json);
-    $signedPayload.Pay
+    $signedPayload.Protected = $headers | ConvertTo-Json | ConvertTo-UrlBase64;
+    $signedPayload.Payload = $messagePayload | ConvertTo-UrlBase64;
+
+    $signatureBytes = [System.Text.Encoding]::ASCII.GetBytes("$($signedPayload.Protected).$($signedPayload.Payload)");
+    $signedPayload.Signature = ConvertTo-UrlBase64 -InputBytes $jwsTool.Sign($signatureBytes);
 
     return $signedPayload | ConvertTo-Json
 }
