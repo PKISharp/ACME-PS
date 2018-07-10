@@ -16,7 +16,7 @@ function New-Registration {
 
     $serviceDirectory = [LocalStore]::Load($ACMEStoreDir);
 
-    $payload = [ACMECreateAccountMessage]::new();
+    $payload = [ACMESharp.Protocol.Messages.CreateAccountRequest]::new();
     $payload.TermsOfServiceAgreed = $AcceptTOS;
     $payload.Contacts = $EmailAddresses | ForEach-Object { "mail:$_" }
 

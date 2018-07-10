@@ -17,11 +17,7 @@ function Get-ServiceDirectory {
 
         [Parameter(ParameterSetName="ByUrl")]
         [Uri]
-        $ACMEDirectoryUrl,
-
-        [Parameter(ParameterSetName="FromStore")]
-        [string]
-        $ACMEStoreDir
+        $ACMEDirectoryUrl
     )
 
     begin {
@@ -32,13 +28,6 @@ function Get-ServiceDirectory {
     }
 
     process {
-        if($PSCmdlet.ParameterSetName -eq "FromStore") {
-            Validate-StorePath $ACMEStoreDir
-
-            $result = Import-Clixml -Path "$ACMEStoreDir/ServiceDirectory.xml"
-            return $result;
-        }
-
         [string]$directoryUrl;
 
         if($PSCmdlet.ParameterSetName -eq "ByName") {
@@ -56,7 +45,7 @@ function Get-ServiceDirectory {
         Write-Information "Calling $directoryUrl to get ACME Service Directory"
         $jsonDirectory = (Invoke-WebRequest $directoryUrl).Content | ConvertFrom-Json;
 
-        $result = [ACMEServiceDirectory]::new();
+        $result = [ACMESharp.Protocol.Resources.ServiceDirectory]::new();
         
         $result.Directory = $directoryUrl;
         $result.KeyChange = $jsonDirectory.KeyChange
@@ -66,7 +55,7 @@ function Get-ServiceDirectory {
         $result.NewOrder = $jsonDirectory.NewOrder;
         $result.RevokeCert = $jsonDirectory.RevokeCert;
 
-        $result.Meta = [ACMEDirectoryMeta]::new();
+        $result.Meta = [ACMESharp.Protocol.Resources.DirectoryMeta]::new();
         $result.Meta.TermsOfService = $jsonDirectory.Meta.TermsOfService;
         $result.Meta.Website = $jsonDirectory.Meta.Website;
         $result.Meta.CaaIdentities = $jsonDirectory.Meta.CaaIdentities;

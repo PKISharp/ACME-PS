@@ -50,17 +50,6 @@ function Initialize-Store {
             throw "Either provide a well-known ACME service name, ACME service url or ServiceDirectory object."
         }            
 
-        if(!(Test-Path $LiteralPath)) {
-            New-Item "$LiteralPath" -ItemType Directory | Out-Null
-        }
-        
-        $serviceDirectory.Directory | Out-File "$LiteralPath/.ACMESharpStore" -Encoding ASCII
-        if($PSCmdlet.ShouldProcess("$LiteralPath", "Store ServiceDirectory.xml")) {
-            Export-Clixml "$LiteralPath/ServiceDirectory.xml" -InputObject $serviceDirectory | Out-Null
-        }
-
-        if($PassThrough) {
-            return $serviceDirectory
-        }
+        [LocalStore]::Create($LiteralPath, $serviceDirectory)
     }
 }

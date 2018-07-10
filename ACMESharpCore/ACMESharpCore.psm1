@@ -23,14 +23,18 @@ function Import-ModuleFile {
 $script:PSModuleRoot = $PSScriptRoot
 
 if (!(Test-Path -Path "$script:PSModuleRoot\AllFunctions.ps1")) {
+    foreach ($class in (Get-ChildItem "$script:PSModuleRoot\internal\functions\*.ps1")) {
+        . Import-ModuleFile $class.FullName;
+    }
+
     # All internal functions privately available within the toolset
     foreach ($function in (Get-ChildItem "$script:PSModuleRoot\internal\functions\*.ps1")) {
-        . Import-ModuleFile $function.FullName
+        . Import-ModuleFile $function.FullName;
     }
     
     # All exported functions
     foreach ($function in (Get-ChildItem "$script:PSModuleRoot\functions\*.ps1")) {
-        . Import-ModuleFile $function.FullName
+        . Import-ModuleFile $function.FullName;
     }
 }
 else {
