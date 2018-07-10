@@ -31,6 +31,8 @@ class LocalStore
 
         $this.Path = $acmeStateDirectory;
 
+        this.DirectoryUri = Get-Content "$($this.Path)/.ACMESharpStore";
+
         $this.Directory = Import-Clixml -Path "$($this.Path)/ServiceDirectory.xml";
         $this.AccountKey = Import-Clixml -Path "$($this.Path)/AccountKey.xml";
     }

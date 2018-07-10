@@ -1,9 +1,18 @@
 function New-Registration {
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(DefaultParameterSetName="Store", SupportsShouldProcess=$true)]
     param(
-        [Parameter()]
+        [Parameter(ParameterSetName="Store")]
+        [ValidateNotNullOrEmpty]
         [string]
         $ACMEStoreDir = ".",
+
+        [Parameter(Mandatory=$true,ParameterSetName="Direct")]
+        [ValidateNotNullOrEmpty]
+        [ACMESharp.Crypto.JOSE.JwsExport] $JwsExport,
+
+        [Parameter(Mandatory=$true,ParameterSetName="Direct")]
+        [ValidateNotNullOrEmpty]
+        [uri] $ACMENewAccountUrl, 
 
         [Switch]
         $AcceptTOS,
@@ -14,15 +23,19 @@ function New-Registration {
         $EmailAddresses
     )
 
-    $serviceDirectory = [LocalStore]::Load($ACMEStoreDir);
+    if($PSCmdlet.ParameterSetName -eq "Store") {
+        $localStore = [LocalStore]::Load($ACMEStoreDir);
+        $ACMENewAccountUrl = $localStore.Directory.NewAccount;
+        $JwsExport = $localStore.AccountKey;
+    }
 
     $payload = [ACMESharp.Protocol.Messages.CreateAccountRequest]::new();
     $payload.TermsOfServiceAgreed = $AcceptTOS;
     $payload.Contacts = $EmailAddresses | ForEach-Object { "mail:$_" }
 
-    $request = Create-SignedMessage 
+    $request = Create-SignedMessage -Payload $payload -JwsExport $JwsExport
 
-    if($PSCmdlet.ShouldProcess("New-Registration", "Sending registration to ACME Server")) {
-        Invoke-WebRequest $serviceDirectory.NewAccount -Method POST -Body $request
+    if($PSCmdlet.ShouldProcess("New-Registration", "Sending registration to ACME Server $ACMENewAccountUrl")) {
+        Invoke-WebRequest $ACMENewAccountUrl -Method POST -Body $request
     }
 }
