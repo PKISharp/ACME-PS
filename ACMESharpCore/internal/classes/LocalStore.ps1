@@ -1,4 +1,4 @@
-class LocalStore
+<# class LocalStore
 {
     [LocalStore] Create([string] $acmeStateDirectory, [ACMESharp.Protocol.Resources.ServiceDirectory] $directory, [string] $jwsAlgorithm)
     {
@@ -41,5 +41,4 @@ class LocalStore
 
     [ACMESharp.Protocol.Resources.ServiceDirectory] $Directory;
     [ACMESharp.Crypto.JOSE.JwsExport] $AccountKey;
-    [ACMESharp.Protocol.Resources]
-}
+} #>
