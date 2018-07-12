@@ -13,7 +13,7 @@
 	ModuleVersion = '2.0.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 	
-	RequiredAssemblies = @('./bin/ACMESharp.dll')
+	RequiredAssemblies = @('./bin/ACMESharp.dll', './bin/Newtonsoft.Json.dll')
 
 	Author = 'https://github.com/PKISharp/ACMESharpCore-PowerShell/graphs/contributors'
 	CompanyName = 'https://github.com/PKISharp'
@@ -34,9 +34,13 @@
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
-		'Initialize-Store',
-		'Get-ServiceDirectory'
-		'Get-TermsOfService'
+		"Export-JwsAlgorithm",
+		"Get-JwsAlgorithm",
+		"Get-ServiceDirectory",
+		"Get-TermsOfService",
+		"Initialize-Store",
+		"New-Nonce",
+		"New-Registration"
 		)
 
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
