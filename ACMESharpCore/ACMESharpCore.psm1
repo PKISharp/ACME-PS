@@ -23,7 +23,7 @@ function Import-ModuleFile {
 $script:PSModuleRoot = $PSScriptRoot
 
 if (!(Test-Path -Path "$script:PSModuleRoot\AllFunctions.ps1")) {
-    foreach ($class in (Get-ChildItem "$script:PSModuleRoot\internal\functions\*.ps1")) {
+    foreach ($class in (Get-ChildItem "$script:PSModuleRoot\internal\classes\*.ps1")) {
         . Import-ModuleFile $class.FullName;
     }
 
