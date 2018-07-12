@@ -29,7 +29,7 @@ function New-SignedMessage {
     if($AccountKId) {
         $headers.Add("kid", $AccountKId);
     } else {
-        $header.Add("jwk", $JwsAlgorithm.ExportPublicJwk());
+        $header.Add("jwk", ($JwsAlgorithm.ExportPublicJwk() | ConvertTo-Json -Compress));
     }
 
     [string]$messagePayload;
@@ -46,5 +46,5 @@ function New-SignedMessage {
     $signedPayload.Payload = $messagePayload | ConvertTo-UrlBase64;
     $signedPayload.Signature = ConvertTo-UrlBase64 -InputBytes $JwsAlgorithm.Sign("$($signedPayload.Protected).$($signedPayload.Payload)");
 
-    return $signedPayload | ConvertTo-Json
+    return $signedPayload | ConvertTo-Json;
 }
