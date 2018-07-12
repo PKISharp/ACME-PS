@@ -1,11 +1,11 @@
 function ConvertTo-UrlBase64 {
     param(
-        [Parameter(Mandatory = $true, Position = 0, ParameterFromPipeline = $true, ParameterSetName="FromString")]
-        [ValidateNotNullOrEmpty]
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true, ParameterSetName="FromString")]
+        [ValidateNotNullOrEmpty()]
         [string] $InputText,
 
         [Parameter(Mandatory = $true, ParameterSetName="FromByteArray")]
-        [ValidateNotNullOrEmpty]
+        [ValidateNotNullOrEmpty()]
         [byte[]] $InputBytes
     )
 
@@ -15,7 +15,7 @@ function ConvertTo-UrlBase64 {
 
     $encoded = [System.Convert]::ToBase64String($InputBytes);
 
-    $encoded = $encoded.TrimRight('=');
+    $encoded = $encoded.TrimEnd('=');
     $encoded = $encoded.Replace('+', '-');
     $encoded = $encoded.Replace('/', '_');
 

@@ -1,20 +1,20 @@
 function New-SignedMessage {
     param(
         [Parameter(Mandatory = $true)]
-        [ValdiateNotNullOrEmpty]
+        [ValidateNotNullOrEmpty()]
         [string] $Url,
 
-        [Prameter(Mandatory = $true)]
-        [ValidateNotNull]
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
         [object] $Payload,
 
         [Parameter(Mandatory = $true)]
         [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
 
-        [Parameter]
+        [Parameter()]
         [string] $Nonce,
 
-        [Parameter]
+        [Parameter()]
         [string] $AccountKId
     )
 
@@ -29,7 +29,7 @@ function New-SignedMessage {
     if($AccountKId) {
         $headers.Add("kid", $AccountKId);
     } else {
-        $header.Add("jwk", ($JwsAlgorithm.ExportPublicJwk() | ConvertTo-Json -Compress));
+        $headers.Add("jwk", $JwsAlgorithm.ExportPublicJwk());
     }
 
     [string]$messagePayload;
@@ -39,12 +39,12 @@ function New-SignedMessage {
         $messagePayload = $Payload;
     }
 
-    $signedPayload = [ACMESharp.Crypto.JOSE.JwsSignedPayload]::new();
+    $signedPayload = @{};
 
-    $signedPayload.Header = $null;
-    $signedPayload.Protected = $headers | ConvertTo-Json | ConvertTo-UrlBase64;
-    $signedPayload.Payload = $messagePayload | ConvertTo-UrlBase64;
-    $signedPayload.Signature = ConvertTo-UrlBase64 -InputBytes $JwsAlgorithm.Sign("$($signedPayload.Protected).$($signedPayload.Payload)");
+    $signedPayload.add("header", $null);
+    $signedPayload.add("protected", ($headers | ConvertTo-Json | ConvertTo-UrlBase64));
+    $signedPayload.add("payload", ($messagePayload | ConvertTo-UrlBase64));
+    $signedPayload.add("signature", (ConvertTo-UrlBase64 -InputBytes $JwsAlgorithm.Sign("$($signedPayload.Protected).$($signedPayload.Payload)")));
 
     return $signedPayload | ConvertTo-Json;
 }
