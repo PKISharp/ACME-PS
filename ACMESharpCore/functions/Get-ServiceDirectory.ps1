@@ -1,15 +1,20 @@
 function Get-ServiceDirectory {
     <#
         .SYNOPSIS
-        Fetches the ServiceDirectory from an ACME Servers.
+            Fetches the ServiceDirectory from an ACME Servers.
 
         .DESCRIPTION
-        This will issue a web request to either the url or to a well-known ACME server.
+            This will issue a web request to either the url or to a well-known ACME server.
 
-        
+        .EXAMPLE
+            PS> Get-ServiceDirectory
+        .EXAMPLE
+            PS> Get-ServiceDirectory "LetsEncrypt"
+        .EXAMPLE
+            PS> Get-ServiceDirectory -ACMEDirectoryUrl "https://acme-staging-v02.api.letsencrypt.org"
     #>
     [CmdletBinding(DefaultParameterSetName="ByName")]
-    [OutputType([ACMEServiceDirectory])]
+    [OutputType("ACMEDirectory")]
     param(
         [Parameter(Position=0, ParameterSetName="ByName")]
         [string]
@@ -42,25 +47,9 @@ function Get-ServiceDirectory {
             $directoryUrl = $ACMEDirectoryUrl
         }
         
-        Write-Information "Calling $directoryUrl to get ACME Service Directory"
-        $jsonDirectory = (Invoke-WebRequest $directoryUrl).Content | ConvertFrom-Json;
+        Write-Verbose "Calling $directoryUrl to get ACME Service Directory"
+        $response = Invoke-WebRequest $directoryUrl;
 
-        $result = [ACMESharp.Protocol.Resources.ServiceDirectory]::new();
-        
-        $result.Directory = $directoryUrl;
-        $result.KeyChange = $jsonDirectory.KeyChange
-        $result.NewAccount = $jsonDirectory.NewAccount;
-        $result.NewAuthz = $jsonDirectory.NewAuthz;
-        $result.NewNonce = $jsonDirectory.NewNonce;
-        $result.NewOrder = $jsonDirectory.NewOrder;
-        $result.RevokeCert = $jsonDirectory.RevokeCert;
-
-        $result.Meta = [ACMESharp.Protocol.Resources.DirectoryMeta]::new();
-        $result.Meta.TermsOfService = $jsonDirectory.Meta.TermsOfService;
-        $result.Meta.Website = $jsonDirectory.Meta.Website;
-        $result.Meta.CaaIdentities = $jsonDirectory.Meta.CaaIdentities;
-        $result.Meta.ExternalAccountRequired = $jsonDirectory.Meta.ExternalAccountRequired;
-
-        return $result;
+        return [ACMEDirectory]::new(($response.Content | ConvertFrom-Json));
     }
 }
