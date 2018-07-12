@@ -1,19 +1,19 @@
 function New-Registration {
-    [CmdletBinding(DefaultParameterSetName="Store", SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true,ParameterSetName="Direct")]
-        [ValidateNotNullOrEmpty]
+        [ValidateNotNullOrEmpty()]
         [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
 
         [Parameter(Mandatory=$true,ParameterSetName="Direct")]
-        [ValidateNotNullOrEmpty]
+        [ValidateNotNullOrEmpty()]
         [uri] $ACMENewAccountUrl, 
 
         [Switch]
         $AcceptTOS,
 
         [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty]
+        [ValidateNotNullOrEmpty()]
         [string[]]
         $EmailAddresses
     )
