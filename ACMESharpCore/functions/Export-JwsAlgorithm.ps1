@@ -8,13 +8,15 @@ function Export-JwsAlgorithm {
         .EXAMPLE
             PS> Export-JwsAlgorithm $myAlgorithm
     #>
+    [CmdletBinding()]
     param(
         # The Algorithm to export
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByJWK")]
-        [ValidateNotNull]
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline=$true)]
+        [ValidateNotNull()]
         [ACMESharp.Crypto.JOSE.JwsAlgorithm]
         $JwsAlgorithm
     )
 
+    Write-Verbose "Exporting JwsAlgorithm $($JwsAlgorithm.JwsAlg) including it's private key parameters."
     return $JwsAlgorithm.Export();
 }
