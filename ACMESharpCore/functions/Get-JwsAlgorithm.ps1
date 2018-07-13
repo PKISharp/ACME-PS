@@ -10,10 +10,11 @@ function Get-JwsAlgorithm {
         .EXAMPLE
             PS> Get-JwsAlgorithm $myAlgoExport
     #>
+    [CmdletBinding()]
     param(
         # The name of the JWS Algorithm to create
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByName")]
-        [ValidateSet("ES256","ES374","ES512", "RS256", "RS374", "RS512")]
+        [ValidateSet("ES256","ES374","ES512", "RS256-2048", "RS374-2048", "RS512-2048")]
         [string] 
         $JwsAlgorithmName,
 
@@ -23,11 +24,13 @@ function Get-JwsAlgorithm {
         $JwsExport
     )
 
+    $factory = [ACMESharp.Crypto.JOSE.JwsAlgorithmFactory]::new();
+
     if($PSCmdlet.ParameterSetName -eq "ByJWK") {
-        return [ACMESharp.Crypto.JOSE.JwsAlgorithm]::new($JwsExport);
+        return $factory.Create($JwsExport);
     }
 
     if($PSCmdlet.ParameterSetName -eq "ByName") {
-        return [ACMESharp.Crypto.JOSE.JwsAlgorithm]::new($JwsAlgorithmName);
+        return $factory.Create($JwsAlgorithmName);
     } 
 }
