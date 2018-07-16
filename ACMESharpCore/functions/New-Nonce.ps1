@@ -18,5 +18,5 @@ function New-Nonce {
     )
 
     $response = Invoke-AcmeWebRequest $Uri -Method Head
-    return $response.Headers["replay-nonce"];
+    return $response.NextNonce
 }
