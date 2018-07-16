@@ -19,18 +19,29 @@ function Get-JwsAlgorithm {
         $JwsAlgorithmName,
 
         # Use the JwsAlgorithmExport to recreate the algorithm
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByJWK")]
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByJWKExport")]
         [ACMESharp.Crypto.JOSE.JwsAlgorithmExport]
-        $JwsExport
+        $JwsExport,
+
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByCliXml")]
+        [string]
+        $LiteralPath
     )
 
     $factory = [ACMESharp.Crypto.JOSE.JwsAlgorithmFactory]::new();
 
-    if($PSCmdlet.ParameterSetName -eq "ByJWK") {
-        return $factory.Create($JwsExport);
-    }
+    switch ($PSCmdlet.ParameterSetName) {
+        "ByCliXml" {
+            $export = [ACMESharp.Crypto.JOSE.JwsAlgorithmExport](Import-Clixml $LiteralPath);
+            return $factory.Create($export);
+        }
 
-    if($PSCmdlet.ParameterSetName -eq "ByName") {
-        return $factory.Create($JwsAlgorithmName);
-    } 
+        "ByJWKExport" { 
+            return $factory.Create($JwsExport);
+         }
+
+        "ByName" {
+            return $factory.Create($JwsAlgorithmName);
+        }
+    }
 }

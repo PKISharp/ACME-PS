@@ -14,9 +14,18 @@ function Export-JwsAlgorithm {
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline=$true)]
         [ValidateNotNull()]
         [ACMESharp.Crypto.JOSE.JwsAlgorithm]
-        $JwsAlgorithm
+        $JwsAlgorithm,
+
+        [Parameter(Position = 1)]
+        [string]
+        $Path
     )
 
-    Write-Verbose "Exporting JwsAlgorithm $($JwsAlgorithm.JwsAlg) including it's private key parameters."
-    return $JwsAlgorithm.Export();
+    if($Path) {
+        Write-Verbose "Exporting JwsAlgorithm to CliXML: $Filename";
+        $JwsAlgortihm.Export() | Export-Clixml -Path $Path
+        return Get-Item $Path;
+    } else {
+        return $JwsAlgorithm.Export();
+    }
 }
