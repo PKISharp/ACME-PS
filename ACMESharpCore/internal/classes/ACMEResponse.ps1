@@ -1,14 +1,22 @@
 class ACMEResponse {
-    ACMEResponse([Microsoft.PowerShell.Commands.WebResponseObject] $response) {
-        $this.NextNonce = $response.Headers["replay-nonce"];
-        $this.Content = $response.Content | ConvertFrom-Json;
-    }
+    ACMEResponse([System.Net.Http.HttpResponseMessage] $responseMessage, [string] $stringContent) {      
+        $this.NextNonce = $responseMessage.Headers.GetValues("Replay-Nonce")[0];
+        $this.StatusCode = $responseMessage.StatusCode;
 
-    ACMEResponse([System.Net.Http.HttpResponseMessage] $responseMessage, [string] $stringContent) {
-        $this.NextNonce = $responseMessage.Headers["replay-nonce"];
-        $this.Content = $stringContent | ConvertFrom-Json;
+        if($stringContent) {
+            $this.Content = $stringContent | ConvertFrom-Json;
+        }
+
+        $this.Headers = @{};
+        foreach($h in $responseMessage.Headers) {
+            $this.Headers.Add($h.Key, $h.Value);
+        }
     }
 
     [PSCustomObject] $Content;
+    [hashtable] $Headers;
+
     [string] $NextNonce;
+
+    [int] $StatusCode;
 }
