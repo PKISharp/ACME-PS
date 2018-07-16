@@ -1,6 +1,7 @@
 function Invoke-ACMEWebRequest {
     <#
     #>
+    [CmdletBinding()]
     param(
         # Parameter help description
         [Parameter(Mandatory = $true, Position = 0)]
@@ -10,7 +11,7 @@ function Invoke-ACMEWebRequest {
 
         # Parameter help description
         [Parameter(Position = 1)]
-        [ValidateNotNull]
+        [ValidateNotNull()]
         [string]
         $JsonBody,
 
@@ -22,19 +23,23 @@ function Invoke-ACMEWebRequest {
 
         # Parameter help description
         [Parameter()]
-        [ValidateNotNull]
+        [ValidateNotNull()]
         [hashtable]
         $Headers
     )
 
     $httpRequest = [System.Net.Http.HttpRequestMessage]::new($Method, $Uri);
+    Write-Verbose "Sending HttpRequest ($Method) to $Uri";
     
     foreach($header in $Headers) {
         $httpRequest.Headers.Add($header.Key, $header.Value)
     }
 
     if($Method -in @("POST", "PUT")) {
-        $httpRequest.Content = [System.Net.Http.StringContent]::new($JsonBody, [System.Text.Encoding]::UTF8, "application/jose+json");
+        $httpRequest.Content = [System.Net.Http.StringContent]::new($JsonBody, [System.Text.Encoding]::UTF8);
+        $httpRequest.Content.Headers.ContentType = "application/jose+json";
+
+        Write-Debug "The content of the request is $JsonBody";
     }
 
     #TODO: This should possibly swapped out to be something singleton-ish.
