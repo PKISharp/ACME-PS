@@ -27,21 +27,17 @@ function New-Account {
         $payload = @{ "onlyReturnExisting" = $true }
 
         $requestBody = New-SignedMessage -Url $Url -Payload $payload -JwsAlgorithm $JwsAlgorithm -Nonce $Nonce
+        $response = Invoke-AcmeWebRequest $Url $requestBody -Method "POST" -ErrorAction 'SilentlyContinue'
 
-        try {
-            $response = Invoke-AcmeWebRequest $Url -Method POST -Body $requestBody -ContentType "application/jose+json"
-        } catch {
-            $exResponse = $Error[0].Exception.Response;
-            if($Error[0].Exception.Response) {
-                $exResponse.StatusCode -eq 400
-            }
-            else {
-                Write-Error $Error;
-                return;
-            }
+        $Nonce = $response.NextNonce;
+        if($response.StatusCode -ne 400) {
+            Write-Information "Account exists. Loading from existing.";
+            $keyId = $response.Headers["Location"][0];
+
+            return Get-Account -Url $keyId -JwsAlgorithm $JwsAlgorithm -KeyId $keyId -Nonce $Nonce
+        } else {
+            Write-Information "Account does not exist. Creating new Account."
         }
-
-        return $response;
     }
 
     $payload = @{}
@@ -50,19 +46,19 @@ function New-Account {
 
     $requestBody = New-SignedMessage -Url $Url -Payload $payload -JwsAlgorithm $JwsAlgorithm -Nonce $Nonce
 
-    Write-Verbose "Prepared request body: $requestBody"
+    Write-Debug "Prepared request body: $requestBody"
     if($PSCmdlet.ShouldProcess("New-Registration", "Sending registration to ACME Server $Url")) {
-        $response = Invoke-AcmeWebRequest $Url -Method POST -Body $requestBody -ContentType "application/jose+json"
+        $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST
 
         if($response.StatusCode -eq 200) {
             Write-Warning "JWK had already been registered for an Account - trying to fetch account."
 
-            $newNonce = $response.Headers["Replay-Nonce"];
-            $keyId = $response.Headers["Location"];
+            $Nonce = $response.NextNonce;
+            $keyId = $response.Headers["Location"][0];
 
-            return Get-Account -Url $accountUrl -JwsAlgorithm $JwsAlgorithm -KeyId $keyId -Nonce $newNonce
+            return Get-Account -Url $keyId -JwsAlgorithm $JwsAlgorithm -KeyId $keyId -Nonce $Nonce
         }
 
-        return [ACMEResponse]::new($response);
+        return $response;
     }
 }

@@ -22,7 +22,7 @@ function New-SignedMessage {
         [string] $Nonce
     )
 
-    $headers = @{}
+    $headers = @{};
     $headers.Add("alg", $JwsAlgorithm.JwsAlg);
     $headers.Add("url", $Url);
 
@@ -36,18 +36,17 @@ function New-SignedMessage {
         $headers.Add("kid", $KeyId);
     }
 
-    if(!($KeyId) -or $IncludeJwk) {
-        Write-Debug "No KeyId present, addind JWK.";
+    if(-not ($KeyId) -or $IncludeJwk.IsPresent) {
+        Write-Debug "No KeyId present or force is set, addind JWK.";
         $headers.Add("jwk", $JwsAlgorithm.ExportPublicJwk());
     }
 
-    [string]$messagePayload;
-    if($Payload.GetType() -ne [string]) {
-        Write-Debug "Payload was object, converting to Json";
-        $messagePayload = $Payload | ConvertTo-Json -Compress;
-    } else {
+    if($Payload -is [string]) {
         Write-Debug "Payload was string, using without Conversion."
         $messagePayload = $Payload;
+    } else {
+        Write-Debug "Payload was object, converting to Json";
+        $messagePayload = $Payload | ConvertTo-Json -Compress;
     }
 
     $signedPayload = @{};
@@ -58,7 +57,7 @@ function New-SignedMessage {
     $signedPayload.add("signature", (ConvertTo-UrlBase64 -InputBytes $JwsAlgorithm.Sign("$($signedPayload.Protected).$($signedPayload.Payload)")));
 
     $result = $signedPayload | ConvertTo-Json;
-    Write-Verbose "Created signed message`n: $result";
+    Write-Debug "Created signed message`n: $result";
     
     return $result;
 }
