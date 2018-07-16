@@ -13,7 +13,7 @@ function Get-Account {
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [int] $KeyId,
+        [string] $KeyId,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -22,6 +22,6 @@ function Get-Account {
 
     $requestBody = New-SignedMessage -Url $Url -Payload @{} -JwsAlgorithm $JwsAlgorithm -KeyId $KeyId -Nonce $Nonce
 
-    $response = Invoke-WebRequest $Url -Method POST -Body $requestBody -ContentType "application/jose+json"
+    $response = Invoke-AcmeWebRequest $Url -Method POST -JsonBody $requestBody
     return [ACMEResponse]::new($response);
 }
