@@ -1,3 +1,7 @@
+param(
+    [Switch] $SkipAutoNonce
+)
+
 function Import-ModuleFile {
     <#
     .SYNOPSIS
