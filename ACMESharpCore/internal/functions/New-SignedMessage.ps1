@@ -13,7 +13,10 @@ function New-SignedMessage {
         [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
 
         [Parameter()]
-        [int] $KeyId,
+        [string] $KeyId,
+
+        [Parameter()]
+        [Switch] $IncludeJwk,
 
         [Parameter()]
         [string] $Nonce
@@ -31,7 +34,9 @@ function New-SignedMessage {
     if($KeyId) {
         Write-Debug "KeyId $KeyId will be used";
         $headers.Add("kid", $KeyId);
-    } else {
+    }
+
+    if(!($KeyId) -or $IncludeJwk) {
         Write-Debug "No KeyId present, addind JWK.";
         $headers.Add("jwk", $JwsAlgorithm.ExportPublicJwk());
     }
