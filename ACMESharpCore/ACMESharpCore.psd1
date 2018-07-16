@@ -13,8 +13,6 @@
 	ModuleVersion = '2.0.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 	
-	RequiredAssemblies = @('./bin/ACMESharp.dll', './bin/Newtonsoft.Json.dll')
-
 	Author = 'https://github.com/PKISharp/ACMESharpCore-PowerShell/graphs/contributors'
 	CompanyName = 'https://github.com/PKISharp'
 	Copyright = '(c) 2018 Eugene Bekker. All rights reserved.'	
@@ -31,6 +29,11 @@
 	PowerShellVersion = '3.0'
 
 	DotNetFrameworkVersion = '4.5'
+
+	RequiredAssemblies = @(
+		'./bin/ACMESharp.dll',
+		'./bin/Newtonsoft.Json.dll',
+		'System.Net.Http')
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
