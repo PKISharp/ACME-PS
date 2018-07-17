@@ -17,7 +17,7 @@ function Get-Account {
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $Nonce
+        [string] $Nonce = $Script:Nonce,
     )
 
     $requestBody = New-SignedMessage -Url $Url -Payload @{} -JwsAlgorithm $JwsAlgorithm -KeyId $KeyId -Nonce $Nonce

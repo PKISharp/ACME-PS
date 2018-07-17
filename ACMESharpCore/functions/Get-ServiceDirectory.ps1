@@ -50,6 +50,6 @@ function Get-ServiceDirectory {
         Write-Verbose "Calling $directoryUrl to get ACME Service Directory"
         $response = Invoke-WebRequest $directoryUrl;
 
-        return [ACMEDirectory]::new(($response.Content | ConvertFrom-Json));
+        return [AcmeDirectory]::new(($response.Content | ConvertFrom-Json));
     }
 }

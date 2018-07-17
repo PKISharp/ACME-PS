@@ -1,5 +1,5 @@
-class ACMEResponse {
-    ACMEResponse([System.Net.Http.HttpResponseMessage] $responseMessage, [string] $stringContent) {      
+class AcmeHttpResponse {
+    AcmeHttpResponse([System.Net.Http.HttpResponseMessage] $responseMessage, [string] $stringContent) {      
         $this.NextNonce = $responseMessage.Headers.GetValues("Replay-Nonce")[0];
         $this.StatusCode = $responseMessage.StatusCode;
 
@@ -13,10 +13,10 @@ class ACMEResponse {
         }
     }
 
+    [int] $StatusCode;
+
     [PSCustomObject] $Content;
     [hashtable] $Headers;
 
     [string] $NextNonce;
-
-    [int] $StatusCode;
 }

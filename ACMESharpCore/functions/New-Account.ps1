@@ -9,36 +9,15 @@ function New-Account {
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [string] $Nonce,
+        [string] $Nonce = $Script:Nonce,
 
         [Switch]
         $AcceptTOS,
 
         [Parameter(Mandatory = $true)]
         [string[]]
-        $EmailAddresses,
-
-        [Switch]
-        $SkipCheckForExistingAccount
+        $EmailAddresses
     )
-
-    if(!$SkipCheckForExistingAccount) {
-        Write-Verbose "Checking for existing account."
-        $payload = @{ "onlyReturnExisting" = $true }
-
-        $requestBody = New-SignedMessage -Url $Url -Payload $payload -JwsAlgorithm $JwsAlgorithm -Nonce $Nonce
-        $response = Invoke-AcmeWebRequest $Url $requestBody -Method "POST" -ErrorAction 'SilentlyContinue'
-
-        $Nonce = $response.NextNonce;
-        if($response.StatusCode -ne 400) {
-            Write-Information "Account exists. Loading from existing.";
-            $keyId = $response.Headers["Location"][0];
-
-            return Get-Account -Url $keyId -JwsAlgorithm $JwsAlgorithm -KeyId $keyId -Nonce $Nonce
-        } else {
-            Write-Information "Account does not exist. Creating new Account."
-        }
-    }
 
     $payload = @{}
     $payload.add("TermsOfServiceAgreed", $AcceptTOS.IsPresent);

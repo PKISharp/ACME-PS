@@ -1,5 +1,5 @@
-class ACMEDirectory {
-    ACMEDirectory([PSCustomObject] $obj) {
+class AcmeDirectory {
+    AcmeDirectory([PSCustomObject] $obj) {
         $this.NewAccount = $obj.NewAccount;
         $this.NewAuthz = $obj.NewAuthz;
         $this.NewNonce = $obj.NewNonce;
@@ -7,7 +7,7 @@ class ACMEDirectory {
         $this.KeyChange = $obj.KeyChange;
         $this.RevokeCert = $obj.RevokeCert;
 
-        $this.Meta = [ACMEDirectoryMeta]::new($obj.Meta);
+        $this.Meta = [AcmeDirectoryMeta]::new($obj.Meta);
     }
 
     [string] $NewAccount;
@@ -17,11 +17,11 @@ class ACMEDirectory {
     [string] $KeyChange;
     [string] $RevokeCert;
 
-    [ACMEDirectoryMeta] $Meta;
+    [AcmeDirectoryMeta] $Meta;
 }
 
-class ACMEDirectoryMeta {
-    ACMEDirectoryMeta([PSCustomObject] $obj) {
+class AcmeDirectoryMeta {
+    AcmeDirectoryMeta([PSCustomObject] $obj) {
         $this.CaaIdentites = $obj.CaaIdentities;
         $this.TermsOfService = $obj.TermsOfService;
         $this.Website = $obj.Website;
