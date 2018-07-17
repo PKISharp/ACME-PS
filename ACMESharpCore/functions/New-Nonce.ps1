@@ -14,9 +14,18 @@ function New-Nonce {
         # The Uri to send the new-nonce request to
         [Parameter(Mandatory = $true, Position = 0)]
         [uri]
-        $Uri
+        $Uri,
+
+        [Parameter()]
+        [Switch] $SkipModuleNonce
     )
 
     $response = Invoke-AcmeWebRequest $Uri -Method Head
+
+    if($Script:AutoNonce) {
+        $Script:NewNonce = $Uri
+        $Script:Nonce = $response.NextNonce;
+    }
+
     return $response.NextNonce
 }

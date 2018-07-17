@@ -37,6 +37,7 @@
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
+		"Test-Something",
 		"Export-JwsAlgorithm",
 		"Get-JwsAlgorithm",
 		"Get-ServiceDirectory",
@@ -100,7 +101,7 @@
 	# CmdletsToExport = '*'
 
 	# Variables to export from this module
-	# VariablesToExport = '*'
+	
 
 	# Aliases to export from this module
 	# AliasesToExport = '*'
