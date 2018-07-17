@@ -23,8 +23,16 @@ function Import-ModuleFile {
 $script:PSModuleRoot = $PSScriptRoot
 
 if (!(Test-Path -Path "$script:PSModuleRoot\AllFunctions.ps1")) {
-    foreach ($class in (Get-ChildItem "$script:PSModuleRoot\internal\classes\*.ps1")) {
-        . Import-ModuleFile $class.FullName;
+    $classPath = "$script:PSModuleRoot\internal\classes";
+    $classes = @(
+        "AcmeHttpResponse",
+        "AcmeObject",
+        "AcmeDirectory",
+        "AcmeAccount"
+    )
+
+    foreach ($class in $classes) {
+        . Import-ModuleFile "$classPath\$class.ps1";
     }
 
     # All internal functions privately available within the toolset
