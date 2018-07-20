@@ -16,9 +16,6 @@ function New-SignedMessage {
         [string] $KeyId,
 
         [Parameter()]
-        [Switch] $IncludeJwk,
-
-        [Parameter()]
         [string] $Nonce
     )
 
@@ -36,8 +33,8 @@ function New-SignedMessage {
         $headers.Add("kid", $KeyId);
     }
 
-    if(-not ($KeyId) -or $IncludeJwk.IsPresent) {
-        Write-Debug "No KeyId present or force is set, addind JWK.";
+    if(-not ($KeyId)) {
+        Write-Debug "No KeyId present, addind JWK.";
         $headers.Add("jwk", $JwsAlgorithm.ExportPublicJwk());
     }
 
