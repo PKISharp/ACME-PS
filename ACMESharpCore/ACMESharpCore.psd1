@@ -97,11 +97,11 @@
 	# Functions to export from this module
 	# FunctionsToExport = '*'
 
+	# Variables to export from this module
+	# VariablesToExport = '*'
+
 	# Cmdlets to export from this module
 	# CmdletsToExport = '*'
-
-	# Variables to export from this module
-	
 
 	# Aliases to export from this module
 	# AliasesToExport = '*'
