@@ -38,6 +38,6 @@ function New-Account {
             return Get-Account -Url $keyId -JwsAlgorithm $JwsAlgorithm -KeyId $keyId -Nonce $Nonce
         }
 
-        return $response;
+        return [AcmeAccount]::new($response, $response.Headers["Location"][0], $JwsAlgorithm);
     }
 }
