@@ -26,7 +26,7 @@ function Import-ModuleFile {
  
 $script:PSModuleRoot = $PSScriptRoot
 
-if (!(Test-Path -Path "$script:PSModuleRoot\AllFunctions.ps1")) {
+if (!(Test-Path -Path "$script:PSModuleRoot\FullModule.ps1")) {
     $classPath = "$script:PSModuleRoot\internal\classes";
     $classes = @(
         "AcmeHttpResponse",
@@ -35,9 +35,11 @@ if (!(Test-Path -Path "$script:PSModuleRoot\AllFunctions.ps1")) {
         "AcmeAccount"
     )
 
-    foreach ($class in $classes) {
-        . Import-ModuleFile "$classPath\$class.ps1";
-    }
+    Clear-Content "$classPath\..\AllClasses.ps1"
+    $classes | % { Get-Content "$classPath\$_.ps1" } | Set-Content "$classPath\..\AllClasses.ps1"
+
+    #TODO: This is a workaround for loading the functions. Needed it, because using a class inside the ctor of another class was not possible.
+    . Import-ModuleFile "$classPath\..\AllClasses.ps1";
 
     # All internal functions privately available within the toolset
     foreach ($function in (Get-ChildItem "$script:PSModuleRoot\internal\functions\*.ps1")) {
