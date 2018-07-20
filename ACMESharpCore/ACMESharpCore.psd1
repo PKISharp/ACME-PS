@@ -44,6 +44,7 @@
 		"Get-TermsOfService",
 		"New-Nonce",
 		"New-Account",
+		"New-JwsAlgorithm",
 		"Get-Account"
 		)
 

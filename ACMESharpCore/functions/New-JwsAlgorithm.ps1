@@ -1,4 +1,4 @@
-function Get-JwsAlgorithm {
+function New-JwsAlgorithm {
     <#
         .SYNOPSIS
             Creates a JWS-Algorithm
