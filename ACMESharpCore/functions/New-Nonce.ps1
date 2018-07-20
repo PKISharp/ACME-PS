@@ -12,20 +12,12 @@ function New-Nonce {
     [OutputType("String")]
     param(
         # The Uri to send the new-nonce request to
-        [Parameter(Mandatory = $true, Position = 0)]
+        [Parameter(Position = 0)]
+        [ValidateNotNullOrEmpty()]
         [uri]
-        $Uri,
-
-        [Parameter()]
-        [Switch] $SkipModuleNonce
+        $Url = $Script:NewNonceUrl
     )
 
-    $response = Invoke-AcmeWebRequest $Uri -Method Head
-
-    if($Script:AutoNonce) {
-        $Script:NewNonce = $Uri
-        $Script:Nonce = $response.NextNonce;
-    }
-
+    $response = Invoke-AcmeWebRequest $Url -Method Head 
     return $response.NextNonce
 }

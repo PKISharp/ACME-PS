@@ -5,6 +5,7 @@ function Get-ServiceDirectory {
 
         .DESCRIPTION
             This will issue a web request to either the url or to a well-known ACME server.
+            If not forbidden during Module loading, this will initialize the Automatic-Nonce-Handling as well.
 
         .EXAMPLE
             PS> Get-ServiceDirectory
@@ -50,6 +51,14 @@ function Get-ServiceDirectory {
         Write-Verbose "Calling $directoryUrl to get ACME Service Directory"
         $response = Invoke-WebRequest $directoryUrl;
 
-        return [AcmeDirectory]::new(($response.Content | ConvertFrom-Json));
+        $result = [AcmeDirectory]::new(($response.Content | ConvertFrom-Json));
+
+        if($Script:AutoNonce) {
+            $Script:NewNonceUrl = $result.NewNonce;
+
+            New-Nonce | Out-Null;
+        }
+
+        return $result;
     }
 }
