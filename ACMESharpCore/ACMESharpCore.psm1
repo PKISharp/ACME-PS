@@ -53,3 +53,5 @@ else {
     # This is created by the build script and will improve module loading time
     . "$script:PSModuleRoot\AllFunctions.ps1"
 }
+
+$Script:AutoNonce = (-not $SkipAutoNonce)
