@@ -10,6 +10,8 @@ class AcmeAccount : AcmeObject {
         $this.Contact = $httpResponse.Content.Contact;
         $this.InitialIp = $httpResponse.Content.InitialIp;
         $this.CreatedAt = $httpResponse.Content.CreatedAt;
+
+        $this.OrderListUrl = $httpResponse.Content.Orders;
     }
 
     [string] $KeyId;
@@ -21,4 +23,6 @@ class AcmeAccount : AcmeObject {
     [string[]] $Contact;
     [string] $InitialIp;
     [string] $CreatedAt;
+
+    [string] $OrderListUrl;
 }
