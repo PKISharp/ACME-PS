@@ -39,13 +39,14 @@
 	FunctionsToExport = @(
 		"Test-Something",
 		"Export-JwsAlgorithm",
+		"Get-Account",
 		"Get-JwsAlgorithm",
 		"Get-ServiceDirectory",
 		"Get-TermsOfService",
 		"New-Nonce",
 		"New-Account",
 		"New-JwsAlgorithm",
-		"Get-Account"
+		"Set-AccountKey"
 		)
 
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
