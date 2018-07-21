@@ -5,15 +5,9 @@ function Set-AccountKey {
         [ValidateNotNull()]
         [uri] $Url, 
 
-        
-
-        [Parameter(Mandatory = $true, Position = 1)]
+        [Parameter(Mandatory = $true, Position = 1, ValueFromPipeline = $true)]
         [ValidateNotNull()]
-        [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
-
-        [Parameter(Mandatory = $true, Position = 2)]
-        [ValidateNotNullOrEmpty()]
-        [string] $KeyId,
+        [AcmeAccount] $TargetAccount,
 
         [Parameter(Mandatory = $true, Position = 4)]
         [ValidateNotNullOrEmpty()]
@@ -24,7 +18,7 @@ function Set-AccountKey {
     )
 
     $innerPayload = @{
-        "account" = $KeyId;
+        "account" = $TargetAccount.$KeyId;
         "oldKey" = $JwsAlgorithm.ExportPuplicKey()
     };
 
@@ -33,5 +27,5 @@ function Set-AccountKey {
 
     $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST;
 
-    return Get-Account -Url $KeyId -JwsAlgorithm $NewJwsAlgorithm -KeyId $KeyId -Nonce $response.NextNonce
+    return Get-Account -Url $TargetAccount.ResourceUrl -JwsAlgorithm $NewJwsAlgorithm -KeyId $KeyId -Nonce $response.NextNonce
 }
