@@ -12,12 +12,6 @@ function Get-JwsAlgorithm {
     #>
     [CmdletBinding()]
     param(
-        # The name of the JWS Algorithm to create
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByName")]
-        [ValidateSet("ES256","ES374","ES512", "RS256-2048", "RS374-2048", "RS512-2048")]
-        [string] 
-        $JwsAlgorithmName,
-
         # Use the JwsAlgorithmExport to recreate the algorithm
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByJWKExport")]
         [ACMESharp.Crypto.JOSE.JwsAlgorithmExport]
@@ -38,10 +32,6 @@ function Get-JwsAlgorithm {
 
         "ByJWKExport" { 
             return $factory.Create($JwsExport);
-         }
-
-        "ByName" {
-            return $factory.Create($JwsAlgorithmName);
         }
     }
 }
