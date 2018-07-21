@@ -11,5 +11,5 @@ function New-Identifier {
         [string] $Value
     )
 
-    return @{"type" = $Type; "value" = $Value};
+    return [AcmeIdentifier]::new($Type, $Value);
 }

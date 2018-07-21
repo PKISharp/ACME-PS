@@ -37,6 +37,7 @@
 		"New-Identifier",
 		"New-JwsAlgorithm",
 		"New-Nonce",
+		"New-Order",
 		"Set-AccountKey"
 		)
 
