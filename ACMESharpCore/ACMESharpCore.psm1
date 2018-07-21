@@ -24,15 +24,9 @@ $script:PSModuleRoot = $PSScriptRoot
 
 if (!(Test-Path -Path "$script:PSModuleRoot\FullModule.ps1")) {
     $classPath = "$script:PSModuleRoot\internal\classes";
-    $classes = @(
-        "AcmeHttpResponse",
-        "AcmeObject",
-        "AcmeDirectory",
-        "AcmeAccount"
-    )
 
     Clear-Content "$classPath\..\AllClasses.ps1"
-    $classes | % { Get-Content "$classPath\$_.ps1" } | Set-Content "$classPath\..\AllClasses.ps1"
+    $classes | ForEach-Object { Get-Content "$classPath\$_.ps1" } | Set-Content "$classPath\..\AllClasses.ps1"
 
     #TODO: This is a workaround for loading the functions. Needed it, because using a class inside the ctor of another class was not possible.
     . Import-ModuleFile "$classPath\..\AllClasses.ps1";

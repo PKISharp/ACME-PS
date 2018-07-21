@@ -19,17 +19,6 @@
 	
 	Description = "PowerShell client module for the ACME protocol"
 
-	## As a nested module, this will inherit the prefix of the outer root module
-	# Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
-	# DefaultCommandPrefix = 'ACME'
-
-	## Minimum version of the Windows PowerShell engine required by this module
-	## This does not appear to be enforce for versions > 2.0 as per
-	##    https://technet.microsoft.com/en-us/library/dd878297(v=vs.85).aspx
-	PowerShellVersion = '3.0'
-
-	DotNetFrameworkVersion = '4.5'
-
 	RequiredAssemblies = @(
 		'./bin/ACMESharp.dll',
 		'./bin/Newtonsoft.Json.dll',
@@ -37,16 +26,17 @@
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
-		"Test-Something",
+		#"Test-Something",
 		"Export-JwsAlgorithm",
 		"Get-Account",
 		"Get-JwsAlgorithm",
 		"Get-Nonce",
 		"Get-ServiceDirectory",
 		"Get-TermsOfService",
-		"New-Nonce",
 		"New-Account",
+		"New-Identifier",
 		"New-JwsAlgorithm",
+		"New-Nonce",
 		"Set-AccountKey"
 		)
 
