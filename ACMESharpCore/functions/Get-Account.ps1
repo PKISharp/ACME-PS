@@ -3,19 +3,19 @@ function Get-Account {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [uri] $Url, 
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
         [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 2)]
         [ValidateNotNullOrEmpty()]
         [string] $KeyId,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 4)]
         [ValidateNotNullOrEmpty()]
         [string] $Nonce = $Script:Nonce
     )

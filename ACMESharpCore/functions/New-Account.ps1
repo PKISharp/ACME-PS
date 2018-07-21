@@ -1,13 +1,13 @@
 function New-Account {
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, Position = 0)]
         [uri] $Url, 
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, Position = 1)]
         [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
 
-        [Parameter()]
+        [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]
         [string] $Nonce = $Script:Nonce,
 

@@ -1,22 +1,22 @@
 function New-SignedMessage {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string] $Url,
 
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [object] $Payload,
-
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 1)]
         [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
 
-        [Parameter()]
+        [Parameter(Position = 2)]
         [string] $KeyId,
 
-        [Parameter()]
-        [string] $Nonce
+        [Parameter(Position = 3)]
+        [string] $Nonce,
+
+        [Parameter(Mandatory = $true, Position = 4)]
+        [ValidateNotNull()]
+        [object] $Payload
     )
 
     $headers = @{};
