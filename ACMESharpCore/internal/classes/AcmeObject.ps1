@@ -2,8 +2,8 @@ class AcmeObject {
     AcmeObject() {}
 
     AcmeObject([AcmeHttpResponse] $httpResponse) {
-        $this.NextNonce = $httpResponse.NextNonce
+        $this.ResourceUri = $httpResponse.RequestUri;
     }
 
-    [string] $NextNonce
+    [string] $ResourceUri;
 }

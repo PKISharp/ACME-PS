@@ -41,6 +41,7 @@
 		"Export-JwsAlgorithm",
 		"Get-Account",
 		"Get-JwsAlgorithm",
+		"Get-Nonce",
 		"Get-ServiceDirectory",
 		"Get-TermsOfService",
 		"New-Nonce",

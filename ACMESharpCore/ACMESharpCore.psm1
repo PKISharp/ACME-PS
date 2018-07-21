@@ -1,7 +1,3 @@
-param(
-    [Switch] $SkipAutoNonce
-)
-
 function Import-ModuleFile {
     <#
     .SYNOPSIS
@@ -56,4 +52,4 @@ else {
     . "$script:PSModuleRoot\AllFunctions.ps1"
 }
 
-$Script:AutoNonce = (-not $SkipAutoNonce)
+$Script:AutoNonce = $true
