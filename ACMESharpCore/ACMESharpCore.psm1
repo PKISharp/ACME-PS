@@ -15,7 +15,7 @@ function Import-ModuleFile {
     Param (
         $Path
     )
-    
+
     if ($script:doDotSource) { . $Path }
     else { $ExecutionContext.InvokeCommand.InvokeScript($false, ([scriptblock]::Create([io.file]::ReadAllText($Path))), $null, $null) }
 }
@@ -30,9 +30,11 @@ if (!(Test-Path -Path "$script:PSModuleRoot\FullModule.ps1")) {
         "AcmeDirectory",
         "AcmeAccount",
         "AcmeIdentifier",
-        "AcmeOrder"
+        "AcmeChalenge",
+        "AcmeOrder",
+        "AcmeAuthorization"
     )
-    
+
     $classMergeFile = "$classPath\..\AllClasses.ps1";
     if(Test-Path $classMergeFile) {
         Clear-Content "$classPath\..\AllClasses.ps1"
@@ -47,7 +49,7 @@ if (!(Test-Path -Path "$script:PSModuleRoot\FullModule.ps1")) {
     foreach ($function in (Get-ChildItem "$script:PSModuleRoot\internal\functions\*.ps1")) {
         . Import-ModuleFile $function.FullName;
     }
-    
+
     # All exported functions
     foreach ($function in (Get-ChildItem "$script:PSModuleRoot\functions\*.ps1")) {
         . Import-ModuleFile $function.FullName;
