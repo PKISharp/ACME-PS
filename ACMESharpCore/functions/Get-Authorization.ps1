@@ -13,10 +13,10 @@ function Get-Authorization {
 
     switch ($PSCmdlet.ParameterSetName) {
         "FromOrder" {
-            $Order.AuthorizationUrls | Get-Authorization -Url $_
+            $Order.AuthorizationUrls | ForEach-Object { Get-Authorization -Url $_ }
         }
         Default {
-            $response = Invoke-AcmeWebRequest -Url $Url -Method GET;
+            $response = Invoke-AcmeWebRequest $Url -Method GET;
             return [AcmeAuthorization]::new($response);
         }
     }

@@ -7,35 +7,37 @@ function Show-Challenge {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [JwsAlgorithm] $JwsAlgorithm
+        [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm
     )
 
-    $content = $($Challenge.token)+"."+$(ConvertTo-UrlBase64 -InputBytes $JwsAlgorithm.JwsThumbprint)
+    process {
+        $content = $($Challenge.token)+"."+$(ConvertTo-UrlBase64 -InputBytes $JwsAlgorithm.JwsThumbprint)
 
-    switch($Challenge.type) {
-        "http-01" {
-            $relativePath = "/.well-known/acme-challenges/$($Challenge.token)"
+        switch($Challenge.type) {
+            "http-01" {
+                $relativePath = "/.well-known/acme-challenges/$($Challenge.token)"
 
-            @{
-                "type" = "http-01";
-                "token" = $Challenge.token;
-                "relativePath" = $relativePath;
-                "fqdn" = "$($Challenge.Identifier.value)$relativePath"
-                "content" = $content;
+                @{
+                    "type" = "http-01";
+                    "token" = $Challenge.token;
+                    "relativePath" = $relativePath;
+                    "fqdn" = "$($Challenge.Identifier.value)$relativePath"
+                    "content" = $content;
+                }
             }
-        }
 
-        "dns-01" {
-            @{
-                "type" = "dns-01";
-                "token" = $Challenge.token;
-                "txtRecord" = "_acme-challenge.$($Challenge.Identifier.value)";
-                "content" = $content;
+            "dns-01" {
+                @{
+                    "type" = "dns-01";
+                    "token" = $Challenge.token;
+                    "txtRecord" = "_acme-challenge.$($Challenge.Identifier.value)";
+                    "content" = $content;
+                }
             }
-        }
 
-        Default {
-            Write-Error "Cannot show how to resolve challange"
+            Default {
+                Write-Error "Cannot show how to resolve challange of type $($Challenge.type)"
+            }
         }
     }
 }

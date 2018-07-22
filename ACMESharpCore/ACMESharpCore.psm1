@@ -26,11 +26,10 @@ if (!(Test-Path -Path "$script:PSModuleRoot\FullModule.ps1")) {
     $classPath = "$script:PSModuleRoot\internal\classes";
     $classes = @(
         "AcmeHttpResponse",
-        "AcmeObject",
         "AcmeDirectory",
         "AcmeAccount",
         "AcmeIdentifier",
-        "AcmeChalenge",
+        "AcmeChallenge",
         "AcmeOrder",
         "AcmeAuthorization"
     )

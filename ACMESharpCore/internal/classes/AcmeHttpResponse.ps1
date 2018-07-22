@@ -10,10 +10,10 @@ class AcmeHttpResponse {
         $this.Headers = @{};
         foreach($h in $responseMessage.Headers) {
             $this.Headers.Add($h.Key, $h.Value);
-        }
 
-        if($nonces = $responseMessage.Headers["Replay-Nonce"]) {
-            $this.NextNonce = $nonces[0];
+            if($h.Key -eq "Replay-Nonce") {
+                $this.NextNonce = $h.Value[0];
+            }
         }
     }
 

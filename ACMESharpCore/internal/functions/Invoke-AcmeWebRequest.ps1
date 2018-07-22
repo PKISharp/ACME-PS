@@ -6,8 +6,8 @@ function Invoke-ACMEWebRequest {
         # Parameter help description
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [uri]
-        $Uri,
+        [Alias("Url")]
+        [uri] $Uri,
 
         # Parameter help description
         [Parameter(Position = 1)]
@@ -45,7 +45,7 @@ function Invoke-ACMEWebRequest {
     if($httpRequest.StatusCode -lt 500) {
         $result = [AcmeHttpResponse]::new($httpResponse, $response);
 
-        if($result.NextNonce -and $Script:AutoNonce) {
+        if($null -ne $result.NextNonce -and $Script:AutoNonce) {
             Write-Verbose "Setting Module Nonce to $($result.NextNonce)";
             $Script:Nonce = $result.NextNonce;
         }

@@ -11,10 +11,10 @@ class AcmeAccount {
         $this.CreatedAt = $httpResponse.Content.CreatedAt;
 
         $this.OrderListUrl = $httpResponse.Content.Orders;
-        $this.ResourceUri = $KeyId;
+        $this.ResourceUrl = $KeyId;
     }
 
-    [string] $ResourceUri;
+    [string] $ResourceUrl;
 
     [string] $KeyId;
     [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm;

@@ -1,5 +1,5 @@
-class AcmeAuthroization {
-    AcmeAuthroization([AcmeHttpResponse] $httpResponse)
+class AcmeAuthorization {
+    AcmeAuthorization([AcmeHttpResponse] $httpResponse)
     {
         $this.status = $httpResponse.Content.status;
         $this.expires = $httpResponse.Content.expires;
@@ -8,10 +8,10 @@ class AcmeAuthroization {
         $this.challenges = @($httpResponse.Content.challenges | ForEach-Object { [AcmeChallenge]::new($_, $this.identifier) });
 
         $this.wildcard = $httpResponse.Content.wildcard;
-        $this.ResourceUri = $httpResponse.RequestUri;
+        $this.ResourceUrl = $httpResponse.RequestUri;
     }
 
-    [string] $ResourceUri;
+    [string] $ResourceUrl;
 
     [string] $status;
     [System.DateTimeOffset] $expires;

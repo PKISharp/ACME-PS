@@ -14,8 +14,10 @@ class AcmeOrder {
 
         $this.CertificateUrl = $httpResponse.Content.Certificate;
 
-        $this.ResourceUri = $httpResponse.Headers.Location[0];
+        $this.ResourceUrl = $httpResponse.Headers.Location[0];
     }
+
+    [string] $ResourceUrl;
 
     [string] $Status;
     [System.DateTimeOffset] $Expires;
@@ -27,4 +29,6 @@ class AcmeOrder {
 
     [string[]] $AuthorizationUrls;
     [string] $FinalizeUrl;
+
+    [string] $CertificateUrl;
 }
