@@ -4,6 +4,11 @@ class AcmeIdentifier {
         $this.Value = $value;
     }
 
-    [string] $Type;
-    [string] $Value;
+    AcmeIdentifier([PsCustomObject] $obj) {
+        $this.type = $obj.type;
+        $this.value = $obj.Value;
+    }
+
+    [string] $type;
+    [string] $value;
 }
