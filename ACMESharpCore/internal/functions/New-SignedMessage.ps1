@@ -46,10 +46,15 @@ function New-SignedMessage {
         $messagePayload = $Payload | ConvertTo-Json -Compress;
     }
 
+    $jsonHeaders = $headers | ConvertTo-Json -Compress 
+
+    Write-Debug "Payload is now: $messagePayload";
+    Write-Debug "Headers are: $jsonHeaders"
+
     $signedPayload = @{};
 
     $signedPayload.add("header", $null);
-    $signedPayload.add("protected", ($headers | ConvertTo-Json -Compress | ConvertTo-UrlBase64));
+    $signedPayload.add("protected", ($jsonHeaders | ConvertTo-UrlBase64));
     $signedPayload.add("payload", ($messagePayload | ConvertTo-UrlBase64));
     $signedPayload.add("signature", (ConvertTo-UrlBase64 -InputBytes $JwsAlgorithm.Sign("$($signedPayload.Protected).$($signedPayload.Payload)")));
 
