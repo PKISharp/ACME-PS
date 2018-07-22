@@ -3,7 +3,7 @@ function New-Order {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [uri] $Url, 
+        [uri] $Url,
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
@@ -13,7 +13,7 @@ function New-Order {
         [ValidateNotNullOrEmpty()]
         [string] $KeyId,
 
-        [Parameter(Mandatory = $true, Position = 4)]
+        [Parameter(Position = 4)]
         [ValidateNotNullOrEmpty()]
         [string] $Nonce = $Script:Nonce,
 
@@ -28,7 +28,7 @@ function New-Order {
     )
 
     $payload = @{
-        "identifiers" = $Identifiers | Select-Object @{N="type";E={$_.Type}}, @{N="value";E={$_.Value}}
+        "identifiers" = @($Identifiers | Select-Object @{N="type";E={$_.Type}}, @{N="value";E={$_.Value}})
     };
 
     if($NotBefore -and $NotAfter) {
