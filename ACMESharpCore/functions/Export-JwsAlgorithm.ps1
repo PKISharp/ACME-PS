@@ -23,7 +23,7 @@ function Export-JwsAlgorithm {
 
     if($Path) {
         Write-Verbose "Exporting JwsAlgorithm to CliXML: $Filename";
-        $JwsAlgortihm.Export() | Export-Clixml -Path $Path
+        $JwsAlgorithm.Export() | Export-Clixml -Path $Path
         return Get-Item $Path;
     } else {
         return $JwsAlgorithm.Export();
