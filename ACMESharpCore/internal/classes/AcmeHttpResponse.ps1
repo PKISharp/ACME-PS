@@ -1,8 +1,6 @@
 class AcmeHttpResponse {
-    AcmeHttpResponse([System.Net.Http.HttpResponseMessage] $responseMessage, [string] $stringContent) {   
+    AcmeHttpResponse([System.Net.Http.HttpResponseMessage] $responseMessage, [string] $stringContent) {
         $this.RequestUri = $responseMessage.RequestMessage.RequestUri;
-        
-        $this.NextNonce = $responseMessage.Headers.GetValues("Replay-Nonce")[0];
         $this.StatusCode = $responseMessage.StatusCode;
 
         if($stringContent) {
@@ -12,6 +10,10 @@ class AcmeHttpResponse {
         $this.Headers = @{};
         foreach($h in $responseMessage.Headers) {
             $this.Headers.Add($h.Key, $h.Value);
+        }
+
+        if($nonces = $responseMessage.Headers["Replay-Nonce"]) {
+            $this.NextNonce = $nonces[0];
         }
     }
 
