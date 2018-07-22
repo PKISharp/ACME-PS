@@ -1,6 +1,5 @@
-class AcmeAccount : AcmeObject {
+class AcmeAccount {
     AcmeAccount([AcmeHttpResponse] $httpResponse, [string] $KeyId, [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm)
-        : base($httpResponse)
     {
         $this.KeyId = $KeyId;
         $this.JwsAlgorithm = $JwsAlgorithm;
@@ -12,7 +11,10 @@ class AcmeAccount : AcmeObject {
         $this.CreatedAt = $httpResponse.Content.CreatedAt;
 
         $this.OrderListUrl = $httpResponse.Content.Orders;
+        $this.ResourceUri = $KeyId;
     }
+
+    [string] $ResourceUri;
 
     [string] $KeyId;
     [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm;
