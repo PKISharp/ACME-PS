@@ -14,6 +14,9 @@ function New-Account {
         [Switch]
         $AcceptTOS,
 
+        [Switch]
+        $ExistingAccountIsError,
+
         [Parameter(Mandatory = $true)]
         [string[]]
         $EmailAddresses
@@ -21,7 +24,7 @@ function New-Account {
 
     $payload = @{}
     $payload.add("TermsOfServiceAgreed", $AcceptTOS.IsPresent);
-    $payload.add("Contact", @($EmailAddresses | ForEach-Object { "mailto:$_" }));
+    $payload.add("Contact", @($EmailAddresses | ForEach-Object { if($_.StartsWith("mailto:")) { $_ } else { "mailto:$_" } }));
 
     $requestBody = New-SignedMessage -Url $Url -Payload $payload -JwsAlgorithm $JwsAlgorithm -Nonce $Nonce
 
@@ -30,13 +33,17 @@ function New-Account {
         $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST
 
         if($response.StatusCode -eq 200) {
-            Write-Warning "JWK had already been registered for an Account - trying to fetch account."
+            if(-not $ExistingAccountIsError) {
+                Write-Warning "JWK had already been registered for an account - trying to fetch account."
 
-            $Nonce = $response.NextNonce;
-            $keyId = $response.Headers["Location"][0];
+                $Nonce = $response.NextNonce;
+                $keyId = $response.Headers["Location"][0];
 
-            return Get-Account -Url $keyId -JwsAlgorithm $JwsAlgorithm -KeyId $keyId -Nonce $Nonce
-        }
+                return Get-Account -Url $keyId -JwsAlgorithm $JwsAlgorithm -KeyId $keyId -Nonce $Nonce
+            } else {
+                Write-Error "JWK had already been registiered for an account."
+            }
+        } 
 
         return [AcmeAccount]::new($response, $response.Headers["Location"][0], $JwsAlgorithm);
     }

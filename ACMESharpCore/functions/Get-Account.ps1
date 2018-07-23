@@ -15,7 +15,7 @@ function Get-Account {
         [ValidateNotNullOrEmpty()]
         [string] $KeyId,
 
-        [Parameter(Mandatory = $true, Position = 4)]
+        [Parameter(Mandatory = $true, Position = 3)]
         [ValidateNotNullOrEmpty()]
         [string] $Nonce = $Script:Nonce
     )

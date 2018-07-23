@@ -28,6 +28,7 @@
 	FunctionsToExport = @(
 		#"Test-Something",
 		"Export-JwsAlgorithm",
+		"Find-Account",
 		"Get-Account",
 		"Get-Authorization",
 		"Get-Nonce",
