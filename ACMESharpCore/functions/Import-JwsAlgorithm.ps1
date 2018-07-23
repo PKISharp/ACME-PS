@@ -6,7 +6,7 @@ function Import-JwsAlgorithm {
             Imports a JWS-Algorithm by an existing JwsAlgorithmExport from an object or an export-file created with Export-JwsAlgorithm.
 
         .EXAMPLE
-            PS> Get-JwsAlgorithm -Path C:\Temp\JwsExport.xml
+            PS> Get-JwsAlgorithm -LiteralPath C:\Temp\JwsExport.xml
         .EXAMPLE
             PS> Get-JwsAlgorithm $exportedAlgo
     #>
@@ -20,7 +20,7 @@ function Import-JwsAlgorithm {
         # Import the algorithm from this file in Clixml format.
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByCliXml")]
         [string]
-        $Path
+        $LiteralPath
     )
 
     process {
@@ -28,7 +28,7 @@ function Import-JwsAlgorithm {
 
         switch ($PSCmdlet.ParameterSetName) {
             "ByCliXml" {
-                $export = [ACMESharp.Crypto.JOSE.JwsAlgorithmExport](Import-Clixml $LiteralPath);
+                $export = [ACMESharp.Crypto.JOSE.JwsAlgorithmExport](Import-Clixml -LiteralPath $LiteralPath);
                 return $factory.Create($export);
             }
 
