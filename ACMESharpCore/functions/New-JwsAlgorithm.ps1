@@ -3,17 +3,19 @@ function New-JwsAlgorithm {
         .SYNOPSIS
             Creates a JWS-Algorithm
         .DESCRIPTION
-            Create a JWS-Algorithm by either its name.
-            The Name is no JwsAlg Name, but is a name, which is parsable by the ACMESharpCore JwsAlgorithmFactory
+            Create a JWS-Algorithm by its name.
+            The name is no JwsAlg name, but one which is used by the ACMESharpCore JwsAlgorithmFactory
 
         .EXAMPLE
             PS> New-JwsAlgorithm "ES256"
+        .EXAMPLE
+            PS> New-JwsAlgorithm "RS256-2048"
     #>
     [CmdletBinding()]
     param(
         # The name of the JWS Algorithm to create
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByName")]
-        [ValidateSet("ES256","ES374","ES512", "RS256-2048", "RS374-2048", "RS512-2048")]
+        [ValidateSet("ES256","ES384","ES512", "RS256-2048", "RS384-2048", "RS512-2048")]
         [string] 
         $JwsAlgorithmName
     )
