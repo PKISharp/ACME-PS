@@ -12,7 +12,7 @@ function Show-Challenge {
         [ValidateNotNull()]
         [AcmeChallenge] $Challenge,
 
-        [Parameter(Mandatory = $true, Position = 1, ParameterSetName="ByChallenge")]
+        [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
         [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm
     )

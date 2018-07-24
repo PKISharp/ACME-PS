@@ -23,6 +23,7 @@ function Find-Account {
 
         return Get-Account -Url $keyId -JwsAlgorithm $JwsAlgorithm -KeyId $keyId -Nonce $Nonce
     } else {
-        Write-Error "JWK had already been registiered for an account."
+        Write-Error "JWK seems not to be registered for an account."
+        return $null;
     }
 }

@@ -41,6 +41,7 @@
 		"New-Nonce",
 		"New-Order",
 		"Set-AccountKey",
+		"Set-Challenge",
 		"Show-Challenge"
 		)
 
