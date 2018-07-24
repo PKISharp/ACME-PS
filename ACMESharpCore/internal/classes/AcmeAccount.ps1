@@ -1,8 +1,7 @@
 class AcmeAccount {
-    AcmeAccount([AcmeHttpResponse] $httpResponse, [string] $KeyId, [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm)
+    AcmeAccount([AcmeHttpResponse] $httpResponse, [string] $KeyId)
     {
         $this.KeyId = $KeyId;
-        $this.JwsAlgorithm = $JwsAlgorithm;
 
         $this.Status = $httpResponse.Content.Status;
         $this.Id = $httpResponse.Content.Id;
@@ -17,7 +16,6 @@ class AcmeAccount {
     [string] $ResourceUrl;
 
     [string] $KeyId;
-    [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm;
 
     [string] $Status;
 

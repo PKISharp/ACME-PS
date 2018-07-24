@@ -20,7 +20,7 @@ function Show-Challenge {
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
             if($type) {
-                return ($Authorization.challenges | where { $_.type -eq $type } | Show-Challenge $JwsAlgorithm);
+                return ($Authorization.challenges | Where-Object { $_.type -eq $type } | Show-Challenge $JwsAlgorithm);
             } else {
                 return ($Authorization.challenges | Show-Challenge $JwsAlgorithm);
             }

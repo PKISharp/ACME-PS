@@ -15,7 +15,7 @@ function New-JwsAlgorithm {
     param(
         # The name of the JWS Algorithm to create
         [Parameter(Mandatory = $true, Position = 0)]
-        [ValidateSet("ES256","ES384","ES512", "RS256-2048", "RS384-2048", "RS512-2048")]
+        [ValidateSet("ES256","ES384","ES512", "RS256-2048", "RS256-3072", "RS256-4096")]
         [string] 
         $JwsAlgorithmName
     )

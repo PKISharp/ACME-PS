@@ -45,6 +45,6 @@ function New-Account {
             }
         } 
 
-        return [AcmeAccount]::new($response, $response.Headers["Location"][0], $JwsAlgorithm);
+        return [AcmeAccount]::new($response, $response.Headers["Location"][0]);
     }
 }
