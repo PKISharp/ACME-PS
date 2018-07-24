@@ -26,6 +26,8 @@ function Set-Challenge {
 
     process {
         if($PSCmdlet.ParameterSetName -eq "CompleteChallenge" -and $CompleteChallenge) {
+            $payload = @{};
+
             $requestBody = New-SignedMessage -Url $Url -JwsAlgorith $JwsAlgorithm -KeyId $KeyId -Nonce $Nonce -Payload $payload;
             $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST;
 
