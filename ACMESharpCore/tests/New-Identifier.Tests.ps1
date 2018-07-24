@@ -15,7 +15,7 @@ Describe "UnitTesting $CommandName" -Tag "UnitTest" {
         $identifier.Value | Should -Be "Value";
     }
 
-    Context "Identifier Creation (Parameter From Pipeline)" {
+    It "Creates an Identifier (Parameter From Pipeline)" {
         $tmp = New-AcmeIdentifier "Type" "Value";
         $identifier = $tmp | New-AcmeIdentifier;
 
