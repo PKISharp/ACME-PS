@@ -1,16 +1,31 @@
 function Show-Challenge {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0, ParameterSetName="ByAuthorization")]
+        [ValidateNotNull()]
+        [AcmeAuthorization] $Authorization,
+
+        [Parameter(ParameterSetName="ByAuthorization")]
+        [string] $type,
+
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0, ParameterSetName="ByChallenge")]
         [ValidateNotNull()]
         [AcmeChallenge] $Challenge,
 
-        [Parameter(Mandatory = $true, Position = 1)]
+        [Parameter(Mandatory = $true, Position = 1, ParameterSetName="ByChallenge")]
         [ValidateNotNull()]
         [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm
     )
 
     process {
+        if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
+            if($type) {
+                return ($Authorization.challenges | where { $_.type -eq $type } | Show-Challenge $JwsAlgorithm);
+            } else {
+                return ($Authorization.challenges | Show-Challenge $JwsAlgorithm);
+            }
+        }
+
         $content = $($Challenge.token)+"."+$(ConvertTo-UrlBase64 -InputBytes $JwsAlgorithm.JwsThumbprint)
 
         switch($Challenge.type) {
@@ -18,20 +33,20 @@ function Show-Challenge {
                 $relativePath = "/.well-known/acme-challenges/$($Challenge.token)"
 
                 @{
-                    "type" = "http-01";
-                    "token" = $Challenge.token;
-                    "relativePath" = $relativePath;
-                    "fqdn" = "$($Challenge.Identifier.value)$relativePath"
-                    "content" = $content;
+                    "Type" = "http-01";
+                    "Token" = $Challenge.token;
+                    "RelativePath" = $relativePath;
+                    "FullQualifiedDomainName" = "$($Challenge.Identifier.value)$relativePath"
+                    "Content" = $content;
                 }
             }
 
             "dns-01" {
                 @{
-                    "type" = "dns-01";
-                    "token" = $Challenge.token;
-                    "txtRecord" = "_acme-challenge.$($Challenge.Identifier.value)";
-                    "content" = $content;
+                    "Type" = "dns-01";
+                    "Token" = $Challenge.token;
+                    "TxtRecordName" = "_acme-challenge.$($Challenge.Identifier.value)";
+                    "Content" = $content;
                 }
             }
 

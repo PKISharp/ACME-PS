@@ -14,7 +14,7 @@ function New-JwsAlgorithm {
     [CmdletBinding()]
     param(
         # The name of the JWS Algorithm to create
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByName")]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateSet("ES256","ES384","ES512", "RS256-2048", "RS384-2048", "RS512-2048")]
         [string] 
         $JwsAlgorithmName

@@ -6,10 +6,12 @@ function New-Identifier {
         [string] $Type,
 
         # Parameter help description
-        [Parameter(Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [string] $Value
     )
 
-    return [AcmeIdentifier]::new($Type, $Value);
+    process {
+        return [AcmeIdentifier]::new($Type, $Value);
+    }
 }
