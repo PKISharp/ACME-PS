@@ -49,13 +49,6 @@ $args = @("publish", "`"$BinSourcePath`"", "-o", "`"$binOutPath`"")
 <# Publish the module #>
 
 if($PublishModule) {
-    if(Test-Path $ModuleOutPath) {
-        Write-Information "Deleting $ModuleOutPath/*.ps*";
-        Get-ChildItem "$ModuleOutPath/*.ps*" | Remove-Item -Force | Out-Null
-    } else {
-        New-Item $ModuleOutPath -ItemType Directory
-    }
-
     Import-Module "$PSScriptRoot/ACMESharpCore" -Force -ErrorAction 'Stop'
 
     Copy-Item -LiteralPath "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/ACMESharpCore.psd1";
