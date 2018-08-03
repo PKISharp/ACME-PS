@@ -1,46 +1,70 @@
 [CmdletBinding()]
 param(
-    [Parameter(ParameterSetName = "Publish")]
+    [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string] $OutPath = "./publish",
+    [string] $ModuleOutPath = "./publish",
 
-    [Parameter(ParameterSetName = "Publish")]
-    [Switch] $PublishModule,
-
-
-    [Parameter(ParameterSetName = "BuildDeps")]
-    [Switch] $BuildDependencies,
-    
-    [Switch] $Clean
+    [Parameter()]
+    [Switch] $PublishModule
 )
 
+$ErrorActionPreference = 'Stop';
 $InformationPreference = 'Continue';
 
-if($PSCmdlet.ParameterSetName -eq "BuildDeps") {
-    $SourcePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore.Crypto"));
-    $OutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore/bin/ACMESharpCore.Crypto"));
+$ModuleSourcePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore"));
+$BinSourcePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore.Crypto"));
 
-    if($Clean -and (Test-Path $OutPath)) {
-        Write-Information "Deleting $OutPath/*";
-        Get-ChildItem "$OutPath/*" | Remove-Item -Force | Out-Null
-    }
+$ModuleOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $ModuleOutPath));
+$BinOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore/bin/ACMESharpCore.Crypto"));
 
-    if($BuildDependencies) {
-        Write-Information "Calling dotnet publish $SourcePath -o $Outpath";
-        $args = @("publish", "`"$SourcePath`"", "-o", "`"$Outpath`"")
-        & "dotnet.exe" $args
+if($PublishModule) {
+    $binOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "$ModuleOutPath/bin/ACMESharpCore.Crypto"));
+}
+
+<# Clean Publish folder #>
+
+if($PublishModule) {
+    if(Test-Path $ModuleOutPath) {
+        Write-Information "Deleting $ModuleOutPath/*";
+        Get-ChildItem "$ModuleOutPath/*" | Remove-Item -Force -Recurse | Out-Null
+    } else {
+        New-Item $ModuleOutPath -ItemType Directory
     }
 }
 
-if($PSCmdlet.ParameterSetName -eq "Publish") {
-    $OutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $OutPath));
+<# Building the dependencies #>
+    
+if(Test-Path $binOutPath) {
+    Remove-Module "ACMESharpCore" -Force -ErrorAction 'Continue'
 
-    if($Clean -and (Test-Path $OutPath)) {
-        Write-Information "Deleting $OutPath/*";
-        Get-ChildItem "$OutPath/*" | Remove-Item -Force | Out-Null
+    Write-Information "Deleting $binOutPath/*";
+    Get-ChildItem "$binOutPath/*" | Remove-Item -Force -Recurse | Out-Null
+}
+
+Write-Information "Calling dotnet publish $BinSourcePath -o $binOutPath";
+$args = @("publish", "`"$BinSourcePath`"", "-o", "`"$binOutPath`"")
+& "dotnet.exe" $args
+
+
+<# Publish the module #>
+
+if($PublishModule) {
+    if(Test-Path $ModuleOutPath) {
+        Write-Information "Deleting $ModuleOutPath/*.ps*";
+        Get-ChildItem "$ModuleOutPath/*.ps*" | Remove-Item -Force | Out-Null
+    } else {
+        New-Item $ModuleOutPath -ItemType Directory
     }
 
-    if($PublishModule) {
-        <# Define Publish Process here #>
-    }
+    Import-Module "$PSScriptRoot/ACMESharpCore" -Force -ErrorAction 'Stop'
+
+    Copy-Item -LiteralPath "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/ACMESharpCore.psd1";
+    
+    $ModuleFiles = @(
+        "internal/AllClasses.ps1",
+        "internal/AllFunctions.ps1",
+        "AllFunctions.ps1"
+    )
+
+    $ModuleFiles | ForEach-Object { Get-Content "$ModuleSourcePath/$_" } | Set-Content "$ModuleOutPath/ACMESharpCore.psm1";
 }
