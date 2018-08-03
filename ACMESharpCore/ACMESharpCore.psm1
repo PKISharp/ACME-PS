@@ -22,7 +22,7 @@ function Import-ModuleFile {
  
 $script:PSModuleRoot = $PSScriptRoot
 
-if (!(Test-Path -Path "$script:PSModuleRoot\FullModule.ps1")) {
+if ((Test-Path -Path "$script:PSModuleRoot\internal\classes")) {
     $classPath = "$script:PSModuleRoot\internal\classes";
     $classes = @(
         "AcmeHttpResponse",
@@ -56,7 +56,7 @@ if (!(Test-Path -Path "$script:PSModuleRoot\FullModule.ps1")) {
 }
 else {
     # This is created by the build script and will improve module loading time
-    . "$script:PSModuleRoot\AllFunctions.ps1"
+    . "$script:PSModuleRoot\FullModule.ps1"
 }
 
 $Script:AutoNonce = $true
