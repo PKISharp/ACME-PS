@@ -15,7 +15,7 @@
 	
 	Author = 'https://github.com/PKISharp/ACMESharpCore-PowerShell/graphs/contributors'
 	CompanyName = 'https://github.com/PKISharp'
-	Copyright = '(c) 2018 Eugene Bekker. All rights reserved.'	
+	Copyright = '(c) 2018 Thomas Glatzer. All rights reserved.'	
 	
 	Description = "PowerShell client module for the ACME protocol"
 
