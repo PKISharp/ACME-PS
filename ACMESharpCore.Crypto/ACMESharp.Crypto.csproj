@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- To be compatible with PS Core, we need to use that version. -->
+    <!-- To be compatible with PS Core, we need to use that specific version. -->
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
   </ItemGroup>
 </Project>

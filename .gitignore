@@ -1,4 +1,9 @@
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-ACMESharpCore/internal/AllClasses.ps1
+# build.ps1 -BuildDependencies will create this
+/ACMESharpCore/bin/ACMESharpCore.Crypto/
+/ACMESharpCore/internal/AllClasses.ps1
+
+/ACMESharpCore.Crypto/bin/
+/ACMESharpCore.Crypto/obj/
