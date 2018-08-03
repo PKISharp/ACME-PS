@@ -38,6 +38,7 @@ function New-Nonce {
     )
 
     if($Directory) {
+        Write-Verbose "Using new nonce Url from service directory. "
         $Url = $Directory.NewNonce;
     }
 

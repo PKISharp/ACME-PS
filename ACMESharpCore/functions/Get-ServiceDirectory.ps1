@@ -8,10 +8,10 @@ function Get-ServiceDirectory {
             Alternatively the directory can be loaded from a path, when it has been stored with Export-CliXML or as Json.
 
         
-        .PARAMETER ACMEEndointName
+        .PARAMETER EndpointName
             The Name of an Well-Known ACME-Endpoint.
         
-        .PARAMETER ACMEDirectoryUrl
+        .PARAMETER DirectoryUrl
             Url of an ACME Directory.
         
         .PARAMETER Path
@@ -35,18 +35,18 @@ function Get-ServiceDirectory {
             PS> Get-ServiceDirectory "LetsEncrypt" -EnableModuleUrlHandling -EnableModuleNonceHandling
 
         .EXAMPLE
-            PS> Get-ServiceDirectory -ACMEDirectoryUrl "https://acme-staging-v02.api.letsencrypt.org"
+            PS> Get-ServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org"
     #>
     [CmdletBinding(DefaultParameterSetName="FromName")]
     [OutputType("ACMEDirectory")]
     param(
-        [Parameter(Mandatory=$true, Position=0, ParameterSetName="FromName")]
+        [Parameter(Position=0, ParameterSetName="FromName")]
         [string]
-        $ACMEEndpointName = "LetsEncrypt-Staging",
+        $EndpointName = "LetsEncrypt-Staging",
 
         [Parameter(Mandatory=$true, ParameterSetName="FromUrl")]
         [Uri]
-        $ACMEDirectoryUrl,
+        $DirectoryUrl,
 
         [Parameter(Mandatory=$true, ParameterSetName="FromPath")]
         [ValidateNotNullOrEmpty()]
@@ -72,19 +72,19 @@ function Get-ServiceDirectory {
     process {
         if($PSCmdlet.ParameterSetName -in @("FromName", "FormUrl")) {
             if($PSCmdlet.ParameterSetName -eq "FromName") {
-                $acmeBaseUrl = $KnownEndpoints[$ACMEEndpointName];
+                $acmeBaseUrl = $KnownEndpoints[$EndpointName];
                 if($acmeBaseUrl -eq $null) {
                     $knownNames = $KnownEndpoints.Keys -join ", "
-                    throw "The Name ACME-Enpoint-Name $ACMEEndpointName is not known. Known names are $knownNames."
+                    throw "The Name ACME-Enpoint-Name $EndpointName is not known. Known names are $knownNames."
                 }
 
-                $directoryUrl = "$acmeBaseUrl/directory"
+                $serviceDirectoryUrl = "$acmeBaseUrl/directory"
             } elseif ($PSCmdlet.ParameterSetName -eq "FromUrl") {
-                $directoryUrl = $ACMEDirectoryUrl
+                $serviceDirectoryUrl = $DirectoryUrl
             }
             
-            Write-Verbose "Calling $directoryUrl to get ACME Service Directory"
-            $response = Invoke-WebRequest $directoryUrl;
+            Write-Verbose "Calling $serviceDirectoryUrl to get ACME Service Directory"
+            $response = Invoke-WebRequest $serviceDirectoryUrl;
 
             $result = [AcmeDirectory]::new(($response.Content | ConvertFrom-Json));
         }
@@ -98,10 +98,14 @@ function Get-ServiceDirectory {
         }
 
         if($EnableModuleUrlHandling) {
+            Write-Verbose "Enable automatic service directory handling."
+
             $Script:ServiceDirectory = $result;
         }
 
         if($EnableModuleNonceHandling) {
+            Write-Verbose "Enable automatic nonce handling."
+
             $Script:AutoNonce = $true;
             $Script:NewNonceUrl = $result.NewNonce;
             New-Nonce | Out-Null;
