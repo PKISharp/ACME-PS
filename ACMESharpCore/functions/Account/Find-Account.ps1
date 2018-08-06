@@ -5,7 +5,7 @@ function Find-Account {
         [uri] $Url, 
 
         [Parameter(Mandatory=$true, Position = 1)]
-        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
+        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $AccountKey,
 
         [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -14,14 +14,14 @@ function Find-Account {
 
     $payload = @{"onlyReturnExisting" = $true};
 
-    $requestBody = New-SignedMessage -Url $Url -Payload $payload -JwsAlgorithm $JwsAlgorithm -Nonce $Nonce
+    $requestBody = New-SignedMessage -Url $Url -Payload $payload -AccountKey $AccountKey -Nonce $Nonce
     $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST
 
     if($response.StatusCode -eq 200) {
         $Nonce = $response.NextNonce;
         $keyId = $response.Headers["Location"][0];
 
-        return Get-Account -Url $keyId -JwsAlgorithm $JwsAlgorithm -KeyId $keyId -Nonce $Nonce
+        return Get-Account -Url $keyId -AccountKey $AccountKey -KeyId $keyId -Nonce $Nonce
     } else {
         Write-Error "JWK seems not to be registered for an account."
         return $null;

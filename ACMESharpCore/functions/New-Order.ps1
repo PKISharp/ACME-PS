@@ -7,7 +7,7 @@ function New-Order {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
+        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $AccountKey,
 
         [Parameter(Mandatory = $true, Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -36,7 +36,7 @@ function New-Order {
         $payload.Add("notAfter", $NotAfter.ToString("o"));
     }
 
-    $requestBody = New-SignedMessage -Url $Url -JwsAlgorith $JwsAlgorithm -KeyId $KeyId -Nonce $Nonce -Payload $payload;
+    $requestBody = New-SignedMessage -Url $Url -JwsAlgorith $AccountKey -KeyId $KeyId -Nonce $Nonce -Payload $payload;
     $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST;
 
     return [AcmeOrder]::new($response);

@@ -14,19 +14,19 @@ function Show-Challenge {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm
+        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $AccountKey
     )
 
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
             if($type) {
-                return ($Authorization.challenges | Where-Object { $_.type -eq $type } | Show-Challenge $JwsAlgorithm);
+                return ($Authorization.challenges | Where-Object { $_.type -eq $type } | Show-Challenge $AccountKey);
             } else {
-                return ($Authorization.challenges | Show-Challenge $JwsAlgorithm);
+                return ($Authorization.challenges | Show-Challenge $AccountKey);
             }
         }
 
-        $content = $($Challenge.token)+"."+$(ConvertTo-UrlBase64 -InputBytes $JwsAlgorithm.JwsThumbprint)
+        $content = $($Challenge.token)+"."+$(ConvertTo-UrlBase64 -InputBytes $AccountKey.JwsThumbprint)
 
         switch($Challenge.type) {
             "http-01" {

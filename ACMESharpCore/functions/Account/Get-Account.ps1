@@ -9,7 +9,7 @@ function Get-Account {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
+        [ACMESharpCore.Crypto.IAccountKey] $AccountKey,
 
         [Parameter(Mandatory = $true, Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -20,7 +20,7 @@ function Get-Account {
         [string] $Nonce = $Script:Nonce
     )
 
-    $requestBody = New-SignedMessage -Url $Url -Payload @{} -JwsAlgorithm $JwsAlgorithm -KeyId $KeyId -Nonce $Nonce
+    $requestBody = New-SignedMessage -Url $Url -Payload @{} -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce
 
     $response = Invoke-AcmeWebRequest $Url -Method POST -JsonBody $requestBody
     return [AcmeAccount]::new($response, $KeyId);

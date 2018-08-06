@@ -25,22 +25,27 @@
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
+		"Enable-AccountHandling",
+		"Find-Account",
+		"Get-Account",
+		"New-Account",
+
 		"Enable-AccountKeyHandling",
 		"Export-AccountKey",
 		"Import-AccountKey",
 		"New-AccountKey",
 
-		"Find-Account",
-		"Get-Account",
-		"Get-Authorization",
+		"Enable-NonceHandling",
 		"Get-Nonce",
-		"Get-ServiceDirectory",
-		"Get-TermsOfService",
-		"Import-JwsAlgorithm",
-		"New-Account",
-		"New-Identifier",
-		"New-JwsAlgorithm",
 		"New-Nonce",
+
+		"Enable-ServiceDirectoryHandling",
+		"Get-ServiceDirectory",
+
+		"Get-Authorization",
+		
+		"Get-TermsOfService",
+		"New-Identifier",
 		"New-Order",
 		"Set-AccountKey",
 		"Set-Challenge",

@@ -1,6 +1,6 @@
 <# class LocalStore
 {
-    [LocalStore] Create([string] $acmeStateDirectory, [ACMESharp.Protocol.Resources.ServiceDirectory] $directory, [string] $jwsAlgorithm)
+    [LocalStore] Create([string] $acmeStateDirectory, [ACMESharp.Protocol.Resources.ServiceDirectory] $directory, [string] $AccountKey)
     {
         if(Test-Path "$acmeStateDirectory/*") {
             throw "Initializing the store can only be done on a non exitent or empty directory.";
@@ -14,7 +14,7 @@
         $directory.Directory | Out-File "$acmeStateDirectory/.ACMESharpStore" -Encoding ASCII;
         Export-Clixml "$acmeStateDirectory/ServiceDirectory.xml" -InputObject $directory;
 
-        $jwsTool = [ACMESharpCore.Crypto.JOSE.JwsTool]::new($jwsAlgorithm);
+        $jwsTool = [ACMESharpCore.Crypto.JOSE.JwsTool]::new($AccountKey);
         Export-Clixml "$acmeStateDirectory/AccountKey.xml" -InputObject ($jwsTool.Export());
 
         return [LocalStore]::new($acmeStateDirectory);

@@ -19,13 +19,13 @@ function Set-AccountKey {
 
     $innerPayload = @{
         "account" = $TargetAccount.$KeyId;
-        "oldKey" = $JwsAlgorithm.ExportPuplicKey()
+        "oldKey" = $AccountKey.ExportPuplicKey()
     };
 
-    $payload = New-SignedMessage -Url $Url -JwsAlgorithm $NewJwsAlgorithm -Payload $innerPayload;
-    $requestBody = New-SignedMessage -Url $Url -JwsAlgorithm $JwsAlgorithm -KeyId $KeyId -Nonce $Nonce -Payload $payload;
+    $payload = New-SignedMessage -Url $Url -AccountKey $NewJwsAlgorithm -Payload $innerPayload;
+    $requestBody = New-SignedMessage -Url $Url -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce -Payload $payload;
 
     $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST;
 
-    return Get-Account -Url $TargetAccount.ResourceUrl -JwsAlgorithm $NewJwsAlgorithm -KeyId $KeyId -Nonce $response.NextNonce
+    return Get-Account -Url $TargetAccount.ResourceUrl -AccountKey $NewJwsAlgorithm -KeyId $KeyId -Nonce $response.NextNonce
 }
