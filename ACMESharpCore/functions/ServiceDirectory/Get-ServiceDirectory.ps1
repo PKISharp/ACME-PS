@@ -17,7 +17,7 @@ function Get-ServiceDirectory {
         .PARAMETER Path
             Path to load the Directory from. The given file needs to be .json or .xml (CLI-Xml)
         
-        .PARAMETER AutomaticUrlHandling
+        .PARAMETER AutomaticDirectoryHandling
             If set, the loaded service collection will be set as Module-Scoped variable. 
             Other functions needing Urls from the service collection will be able to determine them automatically.
         
@@ -32,7 +32,7 @@ function Get-ServiceDirectory {
             PS> Get-ServiceDirectory "LetsEncrypt"
 
         .EXAMPLE
-            PS> Get-ServiceDirectory "LetsEncrypt" -AutomaticUrlHandling -AutomaticNonceHandling
+            PS> Get-ServiceDirectory "LetsEncrypt" -AutomaticDirectoryHandling -AutomaticNonceHandling
 
         .EXAMPLE
             PS> Get-ServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org"
@@ -55,7 +55,7 @@ function Get-ServiceDirectory {
 
         [Parameter()]
         [Switch]
-        $AutomaticUrlHandling,
+        $AutomaticDirectoryHandling,
 
         [Parameter()]
         [Switch]
@@ -96,19 +96,13 @@ function Get-ServiceDirectory {
             }
         }
 
-        if($AutomaticUrlHandling) {
-            Write-Verbose "Enable automatic service directory handling."
-
-            $Script:AutoDirectory = $true;
-            $Script:ServiceDirectory = $result;
+        if($AutomaticDirectoryHandling) {
+            Enable-ServiceDirectoryHandling -ServiceDirectory $result;
         }
 
         if($AutomaticNonceHandling) {
-            Write-Verbose "Enable automatic nonce handling."
-
-            $Script:AutoNonce = $true;
-            $Script:NewNonceUrl = $result.NewNonce;
-            New-Nonce | Out-Null;
+            $nonce = New-Nonce -Directory $result;
+            Enable-NonceHandling -Nonce $nonce -NewNonceUrl $result.NewNonce;
         }
 
         return $result;
