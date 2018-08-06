@@ -1,10 +1,10 @@
 function Enable-AccountKeyHandling {
     <#
         .SYNOPSIS  
-            Enables automatic account handling.
+            Enables automatic account key handling.
     
         .DESCRIPTION
-            Enables automatic account handling with the given account key. 
+            Enables automatic account key handling with the given account key. 
             This will set module-scoped variables, so other cmdlets of this module will be able to just use the account key, without explicitly passing it.
 
 
