@@ -13,8 +13,9 @@ function New-Nonce {
         .PARAMETER Directory
             Request a new nonce by using the ACME-Directory
 
-        .PARAMETER ForceAutoNonce
-            If automatic nonce handling is enabled and service directory handling is disabled, you might need to enforce AutoNonce usage
+        .PARAMETER ForceAutoNonceUsage
+            If automatic nonce handling is enabled and service directory handling is disabled, 
+            you might need to enforce AutoNonceUrl usage instead of DirectoryUrl usage
 
         .EXAMPLE
             PS> New-Nonce -Uri "https://acme-staging-v02.api.letsencrypt.org/acme/new-nonce"
@@ -29,7 +30,7 @@ function New-Nonce {
 
         [Parameter(ParameterSetName="UseUrl")]
         [Switch]
-        $ForceAutoNonce,
+        $ForceAutoNonceUsage,
 
         [Parameter(Position = 0, ParameterSetName="UseDirectory")]
         [ValidateNotNull()]

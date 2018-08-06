@@ -35,7 +35,7 @@ if($PublishModule) {
 <# Building the dependencies #>
     
 if(Test-Path $binOutPath) {
-    Remove-Module "ACMESharpCore" -Force -ErrorAction 'SilentlyContinue'
+    Remove-Module "ACMESharpCore" -Force -ErrorAction 'Ignore'
 
     Write-Information "Deleting $binOutPath/*";
     Get-ChildItem "$binOutPath/*" | Remove-Item -Force -Recurse | Out-Null
