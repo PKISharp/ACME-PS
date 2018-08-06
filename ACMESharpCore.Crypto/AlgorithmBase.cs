@@ -1,7 +1,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace ACMESharp.Crypto
+namespace ACMESharpCore.Crypto
 {
     public abstract class AlgorithmBase
     {

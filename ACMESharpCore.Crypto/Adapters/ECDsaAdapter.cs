@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
-namespace ACMESharp.Crypto
+namespace ACMESharpCore.Crypto
 {
     public sealed class ECDsaAdapter : HashedAlgorithmBase, ICertificateRequest, IAccountKey
     {

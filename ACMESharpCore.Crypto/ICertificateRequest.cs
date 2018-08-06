@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ACMESharp.Crypto
+namespace ACMESharpCore.Crypto
 {
     public interface ICertificateRequest
     {

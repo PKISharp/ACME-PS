@@ -20,6 +20,6 @@ function New-JwsAlgorithm {
         $JwsAlgorithmName
     )
 
-    $factory = [ACMESharp.Crypto.JOSE.JwsAlgorithmFactory]::new();
+    $factory = [ACMESharpCore.Crypto.JOSE.JwsAlgorithmFactory]::new();
     return $factory.Create($JwsAlgorithmName);
 }

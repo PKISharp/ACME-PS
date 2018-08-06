@@ -14,7 +14,7 @@ function Set-AccountKey {
         [string] $Nonce = $Script:Nonce,
 
         [Parameter(Mandatory = $true)]
-        [ACMESharp.Crypto.JOSE.JwsAlgorithm] $NewJwsAlgorithm
+        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $NewJwsAlgorithm
     )
 
     $innerPayload = @{

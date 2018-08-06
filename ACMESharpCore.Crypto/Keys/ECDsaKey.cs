@@ -1,4 +1,4 @@
-namespace ACMESharp.Crypto
+namespace ACMESharpCore.Crypto
 {
     public class ECDsaKey : AlgorithmKey
     {

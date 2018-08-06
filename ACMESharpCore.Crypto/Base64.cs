@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace ACMESharp.Crypto
+namespace ACMESharpCore.Crypto
 {
     /// <summary>
     /// Collection of convenient crypto operations working

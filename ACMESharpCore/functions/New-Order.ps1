@@ -7,7 +7,7 @@ function New-Order {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
+        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
 
         [Parameter(Mandatory = $true, Position = 2)]
         [ValidateNotNullOrEmpty()]

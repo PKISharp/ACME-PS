@@ -5,7 +5,7 @@ function Find-Account {
         [uri] $Url, 
 
         [Parameter(Mandatory=$true, Position = 1)]
-        [ACMESharp.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
+        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $JwsAlgorithm,
 
         [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]

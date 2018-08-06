@@ -16,7 +16,7 @@ function Export-JwsAlgorithm {
         # The Algorithm to export
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline=$true)]
         [ValidateNotNull()]
-        [ACMESharp.Crypto.JOSE.JwsAlgorithm]
+        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm]
         $JwsAlgorithm,
 
         # The path where the export should be saved. This will use Export-Clixml.

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ACMESharp.Crypto
+namespace ACMESharpCore.Crypto
 {
     public static class AlgorithmFactory
     {
@@ -37,10 +37,8 @@ namespace ACMESharp.Crypto
         }
 
 
-        public static IAccountKey CreateSigner() => (IAccountKey)Create();
-        public static IAccountKey CreateSigner(AlgorithmKey keyParameters) => (IAccountKey)Create(keyParameters);
+        public static IAccountKey CreateAccountKey(AlgorithmKey keyParameters) => (IAccountKey)Create(keyParameters);
 
-        public static ICertificateRequest CreateCertificateKey() => (ICertificateRequest)Create();
         public static ICertificateRequest CreateCertificateKey(AlgorithmKey keyParameters) => (ICertificateRequest)Create(keyParameters);
     }
 }

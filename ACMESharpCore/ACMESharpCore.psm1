@@ -42,7 +42,7 @@ function Merge-ModuleFiles {
     }
 
     if($PSCmdlet.ParameterSetName -eq "Path") {
-        $Files = Get-Item -Path $Path
+        $Files = Get-ChildItem -Path $Path -Recurse -Include "*.ps1"
     }
 
     $Files | ForEach-Object { Get-Content $_ } | Set-Content $OutFile
@@ -67,8 +67,8 @@ $internalFunctions = "$script:PSModuleRoot\internal\AllFunctions.ps1"
 $exportedFunctions = "$script:PSModuleRoot\AllFunctions.ps1"
 
 Merge-ModuleFiles -Files @($classes | ForEach-Object { "$classPath\$_.ps1" }) -OutFile $classMergeFile
-Merge-ModuleFiles -Path "$script:PSModuleRoot\internal\functions\*.ps1" -OutFile $internalFunctions
-Merge-ModuleFiles -Path "$script:PSModuleRoot\functions\*.ps1" -OutFile $exportedFunctions
+Merge-ModuleFiles -Path "$script:PSModuleRoot\internal\functions\*" -OutFile $internalFunctions
+Merge-ModuleFiles -Path "$script:PSModuleRoot\functions\*" -OutFile $exportedFunctions
 
 $classes | ForEach-Object { Get-Content "$classPath\$_.ps1" } | Set-Content $classMergeFile
 

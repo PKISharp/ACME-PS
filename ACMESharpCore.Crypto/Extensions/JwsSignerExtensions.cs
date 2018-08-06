@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ACMESharp.Crypto.Extensions
+namespace ACMESharpCore.Crypto.Extensions
 {
     public static class JwsSignerExtensions
     {

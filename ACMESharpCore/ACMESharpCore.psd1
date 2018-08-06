@@ -25,8 +25,11 @@
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
-		#"Test-Something",
-		"Export-JwsAlgorithm",
+		"Enable-AccountKeyHandling",
+		"Export-AccountKey",
+		"Import-AccountKey",
+		"New-AccountKey",
+
 		"Find-Account",
 		"Get-Account",
 		"Get-Authorization",
@@ -42,7 +45,11 @@
 		"Set-AccountKey",
 		"Set-Challenge",
 		"Show-Challenge"
-		)
+	)
+
+	AliasesToExport = @(
+		"Import-AccountKey"
+	)
 
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 	PrivateData = @{

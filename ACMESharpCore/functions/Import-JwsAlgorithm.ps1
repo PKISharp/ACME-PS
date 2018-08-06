@@ -14,7 +14,7 @@ function Import-JwsAlgorithm {
     param(
         # Use this JwsAlgorithmExport to recreate the algorithm
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName="ByJWKExport")]
-        [ACMESharp.Crypto.JOSE.JwsAlgorithmExport]
+        [ACMESharpCore.Crypto.JOSE.JwsAlgorithmExport]
         $JwsExport,
 
         # Import the algorithm from this file in Clixml format.
@@ -24,11 +24,11 @@ function Import-JwsAlgorithm {
     )
 
     process {
-        $factory = [ACMESharp.Crypto.JOSE.JwsAlgorithmFactory]::new();
+        $factory = [ACMESharpCore.Crypto.JOSE.JwsAlgorithmFactory]::new();
 
         switch ($PSCmdlet.ParameterSetName) {
             "ByCliXml" {
-                $export = [ACMESharp.Crypto.JOSE.JwsAlgorithmExport](Import-Clixml -LiteralPath $LiteralPath);
+                $export = [ACMESharpCore.Crypto.JOSE.JwsAlgorithmExport](Import-Clixml -LiteralPath $LiteralPath);
                 return $factory.Create($export);
             }
 

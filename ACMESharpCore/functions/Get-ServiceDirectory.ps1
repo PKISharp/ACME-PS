@@ -17,11 +17,11 @@ function Get-ServiceDirectory {
         .PARAMETER Path
             Path to load the Directory from. The given file needs to be .json or .xml (CLI-Xml)
         
-        .PARAMETER EnableModuleUrlHandling
+        .PARAMETER AutomaticUrlHandling
             If set, the loaded service collection will be set as Module-Scoped variable. 
             Other functions needing Urls from the service collection will be able to determine them automatically.
         
-        .PARAMETER EnableModuleNonceHandling
+        .PARAMETER AutomaticNonceHandling
             If set, the nonce will be initialized and handled by the module. You can access the current Nonce by calling Get-Nonce.
 
 
@@ -32,7 +32,7 @@ function Get-ServiceDirectory {
             PS> Get-ServiceDirectory "LetsEncrypt"
 
         .EXAMPLE
-            PS> Get-ServiceDirectory "LetsEncrypt" -EnableModuleUrlHandling -EnableModuleNonceHandling
+            PS> Get-ServiceDirectory "LetsEncrypt" -AutomaticUrlHandling -AutomaticNonceHandling
 
         .EXAMPLE
             PS> Get-ServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org"
@@ -55,11 +55,11 @@ function Get-ServiceDirectory {
 
         [Parameter()]
         [Switch]
-        $EnableModuleUrlHandling,
+        $AutomaticUrlHandling,
 
         [Parameter()]
         [Switch]
-        $EnableModuleNonceHandling
+        $AutomaticNonceHandling
     )
 
     begin {
@@ -83,7 +83,6 @@ function Get-ServiceDirectory {
                 $serviceDirectoryUrl = $DirectoryUrl
             }
             
-            Write-Verbose "Calling $serviceDirectoryUrl to get ACME Service Directory"
             $response = Invoke-WebRequest $serviceDirectoryUrl;
 
             $result = [AcmeDirectory]::new(($response.Content | ConvertFrom-Json));
@@ -97,13 +96,14 @@ function Get-ServiceDirectory {
             }
         }
 
-        if($EnableModuleUrlHandling) {
+        if($AutomaticUrlHandling) {
             Write-Verbose "Enable automatic service directory handling."
 
+            $Script:AutoDirectory = $true;
             $Script:ServiceDirectory = $result;
         }
 
-        if($EnableModuleNonceHandling) {
+        if($AutomaticNonceHandling) {
             Write-Verbose "Enable automatic nonce handling."
 
             $Script:AutoNonce = $true;
