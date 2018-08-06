@@ -34,7 +34,7 @@ function New-AccountKey {
             Choose if you want to export CLIXML (default) or JSON.
 
         .PARAMETER AutomaticAccountKeyHandling
-            If set, the module will be initialized to automatically pass the account key, where neccessary.
+            If set, the module will be initialized to automatically provide the account key, where neccessary.
 
         
         .EXAMPLE

@@ -4,11 +4,38 @@ function New-Account {
             Registers your account key with a new ACME-Account.
 
         .DESCRIPTION
-            Registers the given account key with an ACME server to retreive an account that enables you to
-            communicate with the ACME server.
+            Registers the given account key with an ACME service to retreive an account that enables you to
+            communicate with the ACME service.
 
         
         .PARAMETER Directory
+            The service directory of the ACME service. Can be handled by the module, if enabled.
+
+        .PARAMETER AccountKey
+            Your account key for JWS Signing. Can be handled by the module, if enabled.
+        
+        .PARAMETER Nonce
+            Replay nonce from ACME service. Can be handled by the module, if enabled.
+
+        .PARAMETER AcceptTOS
+            If you set this, you accepted the Terms-of-service.
+
+        .PARAMETER ExistingAccountIsError
+            If set, the script will throw an error, if the key has already been registered.
+            If not set, the script will try to fetch the account associated with the account key.
+
+        .PARAMETER EmailAddresses
+            Contact adresses for certificate expiration mails and similar.
+
+        .PARAMETER AutomaticAccountHandling
+             If set, the module will be initialized to automatically provide the account, where neccessary.
+
+            
+        .EXAMPLE
+            PS> New-Account -AcceptTOS -EmailAddresses "mail@example.com" -AutomaticAccountHandling
+
+        .EXAMPLE
+            PS> New-Account $myServiceDirectory $myAccountKey $myNonce -AcceptTos -EmailAddresses @(...) -ExistingAccountIsError
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -19,7 +46,7 @@ function New-Account {
 
         [Parameter(Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey,
+        [ACMESharpCore.Crypto.IAccountKey] $AccountKey = $Script:AccountKey,
 
         [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -60,13 +87,14 @@ function New-Account {
                 $Nonce = $response.NextNonce;
                 $keyId = $response.Headers["Location"][0];
 
-                return Get-Account -Url $keyId -AccountKey $AccountKey -KeyId $keyId -Nonce $Nonce
+                return Get-Account -Url $keyId -AccountKey $AccountKey -KeyId $keyId -Nonce $Nonce -AutomaticAccountHandling:$AutomaticAccountHandling
             } else {
                 Write-Error "JWK had already been registiered for an account."
             }
         } 
 
         $result = [AcmeAccount]::new($response, $response.Headers["Location"][0]);
+
         if($AutomaticAccountHandling) {
             Enable-AccountHandling -Account $result;
         }
