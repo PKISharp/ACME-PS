@@ -6,7 +6,6 @@ namespace ACMESharpCore.Crypto
         object ExportPublicJwk();
         
         byte[] Sign(byte[] inputBytes);
-
-        
+        byte[] Sign(string inputString);
     }
 }

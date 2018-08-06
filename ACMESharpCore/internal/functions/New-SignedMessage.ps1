@@ -20,7 +20,7 @@ function New-SignedMessage {
     )
 
     $headers = @{};
-    $headers.Add("alg", $AccountKey.JwsAlg);
+    $headers.Add("alg", $AccountKey.JwsAlgorithmName);
     $headers.Add("url", $Url);
 
     if($Nonce) {

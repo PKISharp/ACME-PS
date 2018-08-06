@@ -95,6 +95,11 @@ namespace ACMESharpCore.Crypto
         {
             return Algorithm.SignData(inputBytes, HashAlgorithmName, RSASignaturePadding.Pkcs1);
         }
+        
+        public byte[] Sign(string inputString)
+        {
+            return Sign(System.Text.Encoding.UTF8.GetBytes(inputString));
+        }
         #endregion
 
         #region Factory-Method
