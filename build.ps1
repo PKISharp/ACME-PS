@@ -35,7 +35,7 @@ if($PublishModule) {
 <# Building the dependencies #>
     
 if(Test-Path $binOutPath) {
-    Remove-Module "ACMESharpCore" -Force -ErrorAction 'Continue'
+    Remove-Module "ACMESharpCore" -Force -ErrorAction 'SilentlyContinue'
 
     Write-Information "Deleting $binOutPath/*";
     Get-ChildItem "$binOutPath/*" | Remove-Item -Force -Recurse | Out-Null
@@ -51,7 +51,7 @@ $args = @("publish", "`"$BinSourcePath`"", "-o", "`"$binOutPath`"")
 if($PublishModule) {
     Import-Module "$PSScriptRoot/ACMESharpCore" -Force -ErrorAction 'Stop'
 
-    Copy-Item -LiteralPath "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/ACMESharpCore.psd1";
+    Copy-Item -LiteralPath "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/ACMESharpCore.psd1" -Force;
     
     $ModuleFiles = @(
         "internal/AllClasses.ps1",
