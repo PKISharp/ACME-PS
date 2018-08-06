@@ -1,7 +1,12 @@
+using System;
+
 namespace ACMESharpCore.Crypto
 {
+    [Serializable]
     public class RSAKey : AlgorithmKey
     {
+        public override string TypeName { get => this.GetType().FullName; set {} }
+
         public int HashSize { get; set; }
 
         public byte[] Modulus { get; set; }
