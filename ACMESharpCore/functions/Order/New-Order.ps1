@@ -1,19 +1,20 @@
 function New-Order {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, Position = 0)]
+        [Parameter(Position = 0)]
         [ValidateNotNull()]
-        [uri] $Url,
+        [AcmeDirectory]
+        $Directory = $Script:ServiceDirectory,
 
-        [Parameter(Mandatory = $true, Position = 1)]
+        [Parameter(Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.JOSE.JwsAlgorithm] $AccountKey,
+        [ACMESharpCore.Crypto.IAccountKey] $AccountKey = $Script:AccountKey,
 
-        [Parameter(Mandatory = $true, Position = 2)]
+        [Parameter(Position = 2, ParameterSetName="GetAccount")]
         [ValidateNotNullOrEmpty()]
-        [string] $KeyId,
+        [string] $KeyId = $Script:KeyId,
 
-        [Parameter(Position = 4)]
+        [Parameter(Position = 3)]
         [ValidateNotNullOrEmpty()]
         [string] $Nonce = $Script:Nonce,
 

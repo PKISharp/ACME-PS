@@ -29,6 +29,7 @@
 		"Find-Account",
 		"Get-Account",
 		"New-Account",
+		"Set-Account",
 
 		"Enable-AccountKeyHandling",
 		"Export-AccountKey",
@@ -47,7 +48,6 @@
 		
 		"New-Identifier",
 		"New-Order",
-		"Set-AccountKey",
 		"Set-Challenge",
 		"Show-Challenge"
 	)

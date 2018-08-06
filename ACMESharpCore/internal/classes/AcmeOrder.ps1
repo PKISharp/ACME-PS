@@ -1,6 +1,8 @@
 class AcmeOrder {
     AcmeOrder([AcmeHttpResponse] $httpResponse)
     {
+        $this.HttpResponse = $httpResponse;
+
         $this.Status = $httpResponse.Content.Status;
         $this.Expires  = $httpResponse.Content.Expires;
 
@@ -17,6 +19,7 @@ class AcmeOrder {
         $this.ResourceUrl = $httpResponse.Headers.Location[0];
     }
 
+    [AcmeHttpResponse] $HttpResponse;
     [string] $ResourceUrl;
 
     [string] $Status;
