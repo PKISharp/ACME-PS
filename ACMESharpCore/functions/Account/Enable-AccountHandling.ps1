@@ -28,5 +28,6 @@ function Enable-AccountHandling {
 
         $Script:AutoAccount = $true;
         $Script:Account = $Account;
+        $Script:KeyId = $Account.KeyId;
     }
 }

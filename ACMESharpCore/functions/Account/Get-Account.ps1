@@ -3,25 +3,57 @@ function Get-Account {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, Position = 0)]
+        [Parameter(Position = 0, ParameterSetName="FindAccount")]
         [ValidateNotNull()]
-        [uri] $Url, 
+        [AcmeDirectory]
+        $Directory = $Script:ServiceDirectory,
 
-        [Parameter(Mandatory = $true, Position = 1)]
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName="GetAccount")]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey,
+        [uri] $AccountUrl, 
 
-        [Parameter(Mandatory = $true, Position = 2)]
-        [ValidateNotNullOrEmpty()]
-        [string] $KeyId,
+        [Parameter(Position = 1)]
+        [ValidateNotNull()]
+        [ACMESharpCore.Crypto.IAccountKey] $AccountKey = $Script:AccountKey,
 
-        [Parameter(Mandatory = $true, Position = 3)]
+        [Parameter(Position = 2, ParameterSetName="GetAccount")]
         [ValidateNotNullOrEmpty()]
-        [string] $Nonce = $Script:Nonce
+        [string] $KeyId = $Script:KeyId,
+
+        [Parameter(Position = 3)]
+        [ValidateNotNullOrEmpty()]
+        [string] $Nonce = $Script:Nonce,
+
+        [Parameter()]
+        [switch]
+        $AutomaticAccountHandling
     )
 
-    $requestBody = New-SignedMessage -Url $Url -Payload @{} -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce
+    if($PSCmdlet.ParameterSetName -eq "FindAccount") {
+        $payload = @{"onlyReturnExisting" = $true};
+
+        $requestBody = New-SignedMessage -Url $Url -Payload $payload -AccountKey $AccountKey -Nonce $Nonce
+        $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST
+    
+        if($response.StatusCode -eq 200) {
+            $Nonce = $response.NextNonce;
+            $KeyId = $response.Headers["Location"][0];
+            
+            $AccountUrl = $KeyId;
+        } else {
+            Write-Error "JWK seems not to be registered for an account."
+            return $null;
+        }
+    } 
+
+    $requestBody = New-SignedMessage -Url $AccountUrl -Payload @{} -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce
 
     $response = Invoke-AcmeWebRequest $Url -Method POST -JsonBody $requestBody
-    return [AcmeAccount]::new($response, $KeyId);
+    $result = [AcmeAccount]::new($response, $KeyId);
+
+    if($AutomaticAccountHandling) {
+        Enable-AccountHandling -Account $result;
+    }
+
+    return $result;
 }

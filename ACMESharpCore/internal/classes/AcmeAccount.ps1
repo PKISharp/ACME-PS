@@ -1,6 +1,7 @@
 class AcmeAccount {
     AcmeAccount([AcmeHttpResponse] $httpResponse, [string] $KeyId)
     {
+        $this.HttpResponse = $httpResponse;
         $this.KeyId = $KeyId;
 
         $this.Status = $httpResponse.Content.Status;
@@ -13,6 +14,7 @@ class AcmeAccount {
         $this.ResourceUrl = $KeyId;
     }
 
+    [AcmeHttpResponse] $HttpResponse
     [string] $ResourceUrl;
 
     [string] $KeyId;

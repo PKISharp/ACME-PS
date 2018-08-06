@@ -33,7 +33,11 @@ function New-Account {
 
         [Parameter(Mandatory = $true)]
         [string[]]
-        $EmailAddresses
+        $EmailAddresses,
+
+        [Parameter()]
+        [switch]
+        $AutomaticAccountHandling
     )
 
     $Contacts = @($EmailAddresses | ForEach-Object { if($_.StartsWith("mailto:")) { $_ } else { "mailto:$_" } });
@@ -62,6 +66,11 @@ function New-Account {
             }
         } 
 
-        return [AcmeAccount]::new($response, $response.Headers["Location"][0]);
+        $result = [AcmeAccount]::new($response, $response.Headers["Location"][0]);
+        if($AutomaticAccountHandling) {
+            Enable-AccountHandling -Account $result;
+        }
+
+        return $result;
     }
 }
