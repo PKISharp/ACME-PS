@@ -1,6 +1,6 @@
 namespace ACMESharp.Crypto
 {
-    public interface IJwsSigner
+    public interface IAccountKey
     {
         string JwsAlgorithmName { get; }
         object ExportPublicJwk();

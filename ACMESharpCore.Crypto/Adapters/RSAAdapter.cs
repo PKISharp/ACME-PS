@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace ACMESharp.Crypto
 {
-    public sealed class RSAAdapter : HashedAlgorithmBase, ICertificateRequest, IJwsSigner
+    public sealed class RSAAdapter : HashedAlgorithmBase, ICertificateRequest, IAccountKey
     {
         private static readonly int[] _allowedHashSizes = new[] { 256 };
         private static readonly int[] _allowedKeySizes = new[] { 2048, 2560, 3072, 3584, 4096 };
@@ -73,7 +73,7 @@ namespace ACMESharp.Crypto
         }
         #endregion
 
-        #region IJwsSigner
+        #region IAccountKey
         public string JwsAlgorithmName => $"RS{HashSize}";
         public object ExportPublicJwk()
         {

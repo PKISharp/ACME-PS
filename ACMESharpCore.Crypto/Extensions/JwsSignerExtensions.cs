@@ -11,7 +11,7 @@ namespace ACMESharp.Crypto.Extensions
         /// as per <see href="https://tools.ietf.org/html/rfc7638">RFC 7638</see>,
         /// JSON Web Key (JWK) Thumbprint.
         /// </summary>
-        public static byte[] ComputeThumbprint(this IJwsSigner jwsSigner, HashAlgorithm hashAlgorithm)
+        public static byte[] ComputeThumbprint(this IAccountKey jwsSigner, HashAlgorithm hashAlgorithm)
         {
             // As per RFC 7638 Section 3, we export the JWK in a canonical form
             // and then produce a JSON object with no whitespace or line breaks
@@ -30,7 +30,7 @@ namespace ACMESharp.Crypto.Extensions
         /// <see href="https://tools.ietf.org/html/draft-ietf-acme-acme-01#section-7.1"
         /// >ACME specification, section 7.1</see>.
         /// </summary>
-        public static string ComputeKeyAuthorization(this IJwsSigner signer, string token)
+        public static string ComputeKeyAuthorization(this IAccountKey signer, string token)
         {
             using (var sha = SHA256.Create())
             {
@@ -44,7 +44,7 @@ namespace ACMESharp.Crypto.Extensions
         /// ACME Key Authorization</see> as required by some of the ACME Challenge
         /// responses.
         /// </summary>
-        public static string ComputeKeyAuthorizationDigest(this IJwsSigner signer, string token)
+        public static string ComputeKeyAuthorizationDigest(this IAccountKey signer, string token)
         {
             using (var sha = SHA256.Create())
             {

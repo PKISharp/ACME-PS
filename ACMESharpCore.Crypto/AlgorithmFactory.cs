@@ -37,8 +37,8 @@ namespace ACMESharp.Crypto
         }
 
 
-        public static IJwsSigner CreateSigner() => (IJwsSigner)Create();
-        public static IJwsSigner CreateSigner(AlgorithmKey keyParameters) => (IJwsSigner)Create(keyParameters);
+        public static IAccountKey CreateSigner() => (IAccountKey)Create();
+        public static IAccountKey CreateSigner(AlgorithmKey keyParameters) => (IAccountKey)Create(keyParameters);
 
         public static ICertificateRequest CreateCertificateKey() => (ICertificateRequest)Create();
         public static ICertificateRequest CreateCertificateKey(AlgorithmKey keyParameters) => (ICertificateRequest)Create(keyParameters);
