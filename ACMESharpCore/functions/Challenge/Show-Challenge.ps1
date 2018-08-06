@@ -50,6 +50,10 @@ function Show-Challenge {
                 }
             }
 
+            "sni-anmc-01" {
+                @{}
+            }
+
             Default {
                 Write-Error "Cannot show how to resolve challange of type $($Challenge.type)"
             }
