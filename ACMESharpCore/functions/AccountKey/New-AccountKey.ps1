@@ -105,6 +105,6 @@ function New-AccountKey {
         return $accountKey;
     }
 
-    Export-AccountKey -AccountKey $accountKey -Path $Path -ErrorAction 'Stop'
+    Export-AccountKey -AccountKey $accountKey -Path $Path -ErrorAction 'Stop' | Out-Null
     return Import-AccountKey -Path $Path -AutomaticAccountKeyHandling:$AutomaticAccountKeyHandling -ErrorAction 'Stop'
 }

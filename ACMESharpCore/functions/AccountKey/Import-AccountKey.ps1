@@ -19,7 +19,7 @@ function Import-AccountKey {
         [string]
         $Path,
 
-        [Parameter]
+        [Parameter()]
         [switch]
         $AutomaticAccountKeyHandling
     )
@@ -27,10 +27,9 @@ function Import-AccountKey {
     $ErrorActionPreference = 'Stop'
 
     if($Path -like "*.json") {
-        
-        $imported = (Get-Content $Path) | ConvertFrom-NSJson -TargetType [ACMESharpCore.Crypto.AlgorithmKey];
+        $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertFrom-Import;
     } else {
-        $imported = (Import-Clixml $Path)
+        $imported = Import-Clixml $Path | ConvertFrom-Import
     }
 
     $accountKey = [AcmeSharpCore.Crypto.AlgorithmFactory]::CreateAccountKey($imported);
