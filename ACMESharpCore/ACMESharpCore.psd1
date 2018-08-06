@@ -41,10 +41,10 @@
 
 		"Enable-ServiceDirectoryHandling",
 		"Get-ServiceDirectory",
+		"Get-TermsOfService",
 
 		"Get-Authorization",
 		
-		"Get-TermsOfService",
 		"New-Identifier",
 		"New-Order",
 		"Set-AccountKey",
