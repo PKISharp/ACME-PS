@@ -2,9 +2,9 @@ using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ACMESharpCore.Crypto.Extensions
+namespace ACMESharpCore.Crypto
 {
-    public static class JwsSignerExtensions
+    public static class IAccountKeyExtensions
     {
         /// <summary>
         /// Computes a thumbprint of the JWK using the argument Hash Algorithm
