@@ -36,7 +36,7 @@ function Export-AccountKey {
         }
 
         if($Path -like "*.json") {
-            $AccountKey.ExportKey() | ConvertTo-Json | Out-File $Path -Encoding utf8
+            $AccountKey.ExportKey() | ConvertTo-Json -Compress | Out-File $Path -Encoding utf8
             Write-Verbose "Exported account key as JSON to $Path";
         } else {
             $AccountKey.ExportKey() | Export-Clixml -Path $Path

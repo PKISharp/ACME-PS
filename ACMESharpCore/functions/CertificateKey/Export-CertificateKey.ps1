@@ -36,7 +36,7 @@ function Export-CertificateKey {
         }
 
         if($Path -like "*.json") {
-            $CertificateKey.ExportKey() | ConvertTo-Json | Out-File $Path -Encoding utf8
+            $CertificateKey.ExportKey() | ConvertTo-Json -Compress | Out-File $Path -Encoding utf8
             Write-Verbose "Exported certificate key as JSON to $Path";
         } else {
             $CertificateKey.ExportKey() | Export-Clixml -Path $Path
