@@ -1,15 +1,15 @@
 class AcmeChallenge {
     AcmeChallenge([PSCustomObject] $obj, [AcmeIdentifier] $identifier) {
-        $this.type = $obj.type;
-        $this.url = $obj.url;
-        $this.token = $obj.token;
+        $this.Type = $obj.type;
+        $this.Url = $obj.url;
+        $this.Token = $obj.token;
 
-        $this.identifier = $identifier;
+        $this.Identifier = $identifier;
     }
 
-    [string] $type;
-    [string] $url;
-    [string] $token;
+    [string] $Type;
+    [string] $Url;
+    [string] $Token;
 
-    [AcmeIdentifier] $identifier;
+    [AcmeIdentifier] $Identifier;
 }
