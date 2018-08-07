@@ -20,7 +20,11 @@ class AcmeOrder {
 
         $this.CertificateUrl = $httpResponse.Content.Certificate;
 
-        $this.ResourceUrl = $httpResponse.Headers.Location[0];
+        if($httpResponse.Headers.Location) {
+            $this.ResourceUrl = $httpResponse.Headers.Location[0];
+        } else {
+            $this.ResourceUrl = $httpResponse.RequestUri;
+        }
     }
 
     [AcmeHttpResponse] $HttpResponse;

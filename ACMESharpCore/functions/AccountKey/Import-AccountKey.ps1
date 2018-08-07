@@ -32,7 +32,7 @@ function Import-AccountKey {
         $imported = Import-Clixml $Path | ConvertFrom-Import
     }
 
-    $accountKey = [AcmeSharpCore.Crypto.AlgorithmFactory]::CreateAccountKey($imported);
+    $accountKey = [AcmeSharpCore.Crypto.IAccountKey][AcmeSharpCore.Crypto.AlgorithmFactory]::CreateAccountKey($imported);
     
     if($AutomaticAccountKeyHandling) {
         Enable-AccountKeyHandling $accountKey;

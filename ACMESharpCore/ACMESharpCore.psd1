@@ -1,13 +1,3 @@
-
-## For a reference of this file's elements, see:
-##    https://technet.microsoft.com/library/hh849709.aspx
-##    https://technet.microsoft.com/en-us/library/dd878297(v=vs.85).aspx
-
-## 64-bit:
-##    %SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe
-## 32-bit:
-##    %SystemRoot%\syswow64\WindowsPowerShell\v1.0\powershell.exe
-
 @{
 	RootModule = 'ACMESharpCore.psm1'
 	ModuleVersion = '2.0.0'
@@ -36,24 +26,28 @@
 		"Import-AccountKey",
 		"New-AccountKey",
 
-		"Enable-NonceHandling",
-		"Get-Nonce",
-		"New-Nonce",
-
-		"Enable-ServiceDirectoryHandling",
-		"Get-ServiceDirectory",
-		"Get-TermsOfService",
-
 		"Get-Authorization",
+
+		"Export-CertificateKey",
+		"Import-CertificateKey",
+		"New-CertificateKey",
 		
 		"Complete-Challenge",
 		"Get-Challenge",
 		"Show-Challenge",
 
+		"Enable-NonceHandling",
+		"Get-Nonce",
+		"New-Nonce",
+
 		"Get-Order",
 		"New-Identifier",
 		"New-Order",
 		"Update-Order"
+
+		"Enable-ServiceDirectoryHandling",
+		"Get-ServiceDirectory",
+		"Get-TermsOfService",
 
 		"Initialize-AutomaticHandlers"
 	)
