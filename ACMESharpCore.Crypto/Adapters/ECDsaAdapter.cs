@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace ACMESharpCore.Crypto
 {
-    public sealed class ECDsaAdapter : HashedAlgorithmBase, ICertificateRequest, IAccountKey
+    public sealed class ECDsaAdapter : HashedAlgorithmBase, ICertificateKey, IAccountKey
     {
         private static readonly int[] _allowedHashSizes = new [] { 256, 384, 512 };
 
@@ -59,7 +59,17 @@ namespace ACMESharpCore.Crypto
             return keys;
         }
 
-        #region ICertificateRequest
+        #region ICertificateKey
+        public byte[] ExportPfx(byte[] acmeCertificate, string password = null) {
+            var certifiate = new X509Certificate2(acmeCertificate, password, X509KeyStorageFlags.Exportable);
+            certifiate.PrivateKey = Algorithm;
+
+            if(string.IsNullOrEmpty(password))
+                return certifiate.Export(X509ContentType.Pkcs12);
+            else
+                return certifiate.Export(X509ContentType.Pkcs12, password);
+        }
+        
         public byte[] GenerateCsr(IList<string> dnsNames)
         {
             if (!dnsNames?.Any() ?? false)

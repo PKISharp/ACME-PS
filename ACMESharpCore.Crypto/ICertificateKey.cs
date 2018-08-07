@@ -2,8 +2,10 @@ using System.Collections.Generic;
 
 namespace ACMESharpCore.Crypto
 {
-    public interface ICertificateRequest
+    public interface ICertificateKey
     {
+        
+
         byte[] GenerateCsr(IList<string> dnsNames);
     }
 }

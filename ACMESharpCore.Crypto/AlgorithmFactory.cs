@@ -38,6 +38,6 @@ namespace ACMESharpCore.Crypto
 
 
         public static IAccountKey CreateAccountKey(AlgorithmKey keyParameters) => (IAccountKey)Create(keyParameters);
-        public static ICertificateRequest CreateCertificateKey(AlgorithmKey keyParameters) => (ICertificateRequest)Create(keyParameters);
+        public static ICertificateKey CreateCertificateKey(AlgorithmKey keyParameters) => (ICertificateKey)Create(keyParameters);
     }
 }
