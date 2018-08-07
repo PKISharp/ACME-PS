@@ -37,13 +37,25 @@ function Export-PfxCertificate {
 
         [Parameter()]
         [string]
-        $Passsword
+        $Passsword,
+
+        [Parameter()]
+        [switch]
+        $Force
     )
 
     $ErrorActionPreference = 'Stop'
 
+    if(Test-Path $Path) {
+        if($Force) {
+            Clear-Content $Path;
+        } else {
+            Write-Error "$Path did already exist."
+        }
+    }
+
     $response = Invoke-WebRequest $Order.CertificateUrl -UseBasicParsing;
     $certicate = [byte[]]$response.Content;
 
-    $CertificateKey.ExportPfx($certicate, $Passsword) | Out-File $Path -Encoding utf8
+    $CertificateKey.ExportPfx($certicate, $Passsword) | Set-Content $Path -AsByteStream
 }
