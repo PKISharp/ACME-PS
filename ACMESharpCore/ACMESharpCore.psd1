@@ -28,6 +28,8 @@
 
 		"Get-Authorization",
 
+		"Export-Certificate",
+
 		"Export-CertificateKey",
 		"Import-CertificateKey",
 		"New-CertificateKey",

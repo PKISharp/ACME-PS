@@ -5,7 +5,10 @@ param(
     [string] $ModuleOutPath = "./publish",
 
     [Parameter()]
-    [Switch] $PublishModule
+    [Switch] $PublishModule,
+
+    [Parameter()]
+    [Switch] $SignModule
 )
 
 $ErrorActionPreference = 'Stop';
@@ -60,4 +63,11 @@ if($PublishModule) {
     )
 
     $ModuleFiles | ForEach-Object { Get-Content "$ModuleSourcePath/$_" } | Set-Content "$ModuleOutPath/ACMESharpCore.psm1";
+
+    if($SignModule) {
+        $files = "$ModuleOutPath/ACMESharpCore.ps*"
+        $cert = Get-Item Cert:\CurrentUser\My\017E67F53FCB161D63E7881F1F96A8452859200D
+
+        Set-AuthenticodeSignature -FilePath $files -Certificate $cert
+    }
 }
