@@ -13,11 +13,11 @@ class AcmeAuthorization {
 
     [string] $ResourceUrl;
 
-    [string] $status;
-    [System.DateTimeOffset] $expires;
+    [string] $Status;
+    [System.DateTimeOffset] $Expires;
 
-    [AcmeIdentifier] $identifier;
-    [AcmeChallenge[]] $challenges;
+    [AcmeIdentifier] $Identifier;
+    [AcmeChallenge[]] $Challenges;
 
-    [bool] $wildcard;
+    [bool] $Wildcard;
 }

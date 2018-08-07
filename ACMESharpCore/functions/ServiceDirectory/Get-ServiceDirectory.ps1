@@ -42,7 +42,7 @@ function Get-ServiceDirectory {
     param(
         [Parameter(Position=0, ParameterSetName="FromName")]
         [string]
-        $EndpointName = "LetsEncrypt-Staging",
+        $ServiceName = "LetsEncrypt-Staging",
 
         [Parameter(Mandatory=$true, ParameterSetName="FromUrl")]
         [Uri]
@@ -72,10 +72,10 @@ function Get-ServiceDirectory {
     process {
         if($PSCmdlet.ParameterSetName -in @("FromName", "FormUrl")) {
             if($PSCmdlet.ParameterSetName -eq "FromName") {
-                $acmeBaseUrl = $KnownEndpoints[$EndpointName];
+                $acmeBaseUrl = $KnownEndpoints[$ServiceName];
                 if($acmeBaseUrl -eq $null) {
                     $knownNames = $KnownEndpoints.Keys -join ", "
-                    throw "The Name ACME-Enpoint-Name $EndpointName is not known. Known names are $knownNames."
+                    throw "The ACME-Service-Name $ServiceName is not known. Known names are $knownNames."
                 }
 
                 $serviceDirectoryUrl = "$acmeBaseUrl/directory"

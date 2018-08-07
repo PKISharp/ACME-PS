@@ -20,11 +20,11 @@ function New-Identifier {
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $Type,
+        [string] $Value,
 
-        [Parameter(Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Position = 1, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $Value
+        [string] $Type = "dns"
     )
 
     process {

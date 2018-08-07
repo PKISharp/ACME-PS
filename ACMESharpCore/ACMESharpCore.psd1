@@ -46,10 +46,16 @@
 
 		"Get-Authorization",
 		
+		"Complete-Challenge",
+		"Get-Challenge",
+		"Show-Challenge",
+
+		"Get-Order",
 		"New-Identifier",
 		"New-Order",
-		"Set-Challenge",
-		"Show-Challenge"
+		"Update-Order"
+
+		"Initialize-AutomaticHandlers"
 	)
 
 	AliasesToExport = @(

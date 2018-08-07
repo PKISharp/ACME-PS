@@ -1,6 +1,10 @@
 class AcmeOrder {
     AcmeOrder([AcmeHttpResponse] $httpResponse)
     {
+        $this.UpdateOrder($httpResponse)
+    }
+
+    [void] UpdateOrder([AcmeHttpResponse] $httpResponse) {
         $this.HttpResponse = $httpResponse;
 
         $this.Status = $httpResponse.Content.Status;

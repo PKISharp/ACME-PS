@@ -87,6 +87,13 @@ function New-AccountKey {
         $SkipKeyExport
     )
 
+    if(-not $SkipKeyExport) {
+        if(-not $Path) {
+            Write-Error "Path was null or empty. Provide a path for the key to be exported or specify SkipKeyExport";
+            return;
+        }
+    }
+
     if($PSCmdlet.ParameterSetName -eq "ECDsa") {
         $accountKey = [ACMESharpCore.Crypto.IAccountKey]([ACMESharpCore.Crypto.ECDsaAdapter]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa account key with hash size $ECDsaHashSize";

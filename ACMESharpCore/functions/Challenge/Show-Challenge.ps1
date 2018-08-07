@@ -6,50 +6,33 @@ function Show-Challenge {
         [AcmeAuthorization] $Authorization,
 
         [Parameter(ParameterSetName="ByAuthorization")]
-        [string] $type,
+        [string] $Type,
 
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0, ParameterSetName="ByChallenge")]
         [ValidateNotNull()]
         [AcmeChallenge] $Challenge,
 
-        [Parameter(Mandatory = $true, Position = 1)]
+        [Parameter(Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey
+        [ACMESharpCore.Crypto.IAccountKey] $AccountKey = $Script:AccountKey
     )
 
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
-            if($type) {
-                return ($Authorization.challenges | Where-Object { $_.type -eq $type } | Show-Challenge $AccountKey);
+            if($Type) {
+                return ($Authorization.challenges | Where-Object { $_.Type -eq $Type } | Show-Challenge -AccountKey $AccountKey);
             } else {
-                return ($Authorization.challenges | Show-Challenge $AccountKey);
+                return ($Authorization.challenges | Show-Challenge -AccountKey $AccountKey);
             }
         }
 
-        $challengeData = @{
-            
-        }
-
-        $content = $($Challenge.token)+"."+$(ConvertTo-UrlBase64 -InputBytes $AccountKey.JwsThumbprint)
-
-        switch($Challenge.type) {
-            "http-01" {
-                Show-Http01Challenge $Challenge $AccountKey;
-            }
-
-            "dns-01" {
-                Show-Dns01Challenge $Challenge $AccountKey;
-                
-            }
-
-            "tls-alpn-1" {
-                @{
-
-                }
-            }
+        switch($Challenge.Type) {
+            "http-01" { Show-Http01Challenge $Challenge $AccountKey; }
+            "dns-01" { Show-Dns01Challenge $Challenge $AccountKey; }
+            "tls-alpn-01" { Show-TLSALPN01Challenge $Challenge $AccountKey; }
 
             Default {
-                Write-Error "Cannot show how to resolve challange of type $($Challenge.type)"
+                Write-Error "Cannot show how to resolve challange of type $($Challenge.Type)"
             }
         }
     }
@@ -74,15 +57,15 @@ function Show-Http01Challenge {
 
         $fileName = $Challenge.Token;
         $relativePath = "/.well-known/acme-challenges/$fileName"
-        $fqdn = "$($Challenge.Identifier.value)$relativePath"
+        $fqdn = "$($Challenge.Identifier.Value)$relativePath"
         $content = [ACMESharpCore.Crypto.IAccountKeyExtensions]::ComputeKeyAuthorization($AccountKey, $Challenge.Token);
 
         return @{
-            "Type" = $Challenge.type;
-            "Token" = $Challenge.token;
+            "Type" = $Challenge.Type;
+            "Token" = $Challenge.Token;
             "Filename" = $fileName;
-            "RelativePath" = $relativePath;
-            "FullQualifiedDomainName" = $fqdn;
+            "RelativeUrl" = $relativePath;
+            "AbsoluteUrl" = $fqdn;
             "Content" = $content;
         }
     }
@@ -105,12 +88,12 @@ function Show-Dns01Challenge {
             return;
         }
 
-        $txtRecordName = "_acme-challenge.$($Challenge.Identifier.value)";
+        $txtRecordName = "_acme-challenge.$($Challenge.Identifier.Value)";
         $content = [ACMESharpCore.Crypto.IAccountKeyExtensions]::ComputeKeyAuthorizationDigest($AccountKey, $Challenge.Token);
 
         return @{
             "Type" = "dns-01";
-            "Token" = $Challenge.token;
+            "Token" = $Challenge.Token;
             "TxtRecordName" = $txtRecordName;
             "Content" = $content;
         }
@@ -134,14 +117,14 @@ function Show-TLSALPN01Challenge {
             return;
         }
 
-        $relativePath = "/.well-known/acme-challenges/$($Challenge.token)"
-        $fqdn = "$($Challenge.Identifier.value)$relativePath"
+        $relativePath = "/.well-known/acme-challenges/$($Challenge.Token)"
+        $fqdn = "$($Challenge.Identifier.Value)$relativePath"
         $content = [ACMESharpCore.Crypto.IAccountKeyExtensions]::ComputeKeyAuthorization($AccountKey, $Challenge.Token);
 
         return @{
-            "Type" = $Challenge.type;
-            "Token" = $Challenge.token;
-            "SubjectAlternativeName" = $Challenge.Identifier.value;
+            "Type" = $Challenge.Type;
+            "Token" = $Challenge.Token;
+            "SubjectAlternativeName" = $Challenge.Identifier.Value;
             "AcmeValidation-v1" = $content;
         }
     }

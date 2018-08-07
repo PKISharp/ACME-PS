@@ -1,7 +1,7 @@
 function Get-Account {
     <#
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "FindAccount")]
     param(
         [Parameter(Position = 0, ParameterSetName="FindAccount")]
         [ValidateNotNull()]
@@ -48,7 +48,7 @@ function Get-Account {
 
     $requestBody = New-SignedMessage -Url $AccountUrl -Payload @{} -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce
 
-    $response = Invoke-AcmeWebRequest $Url -Method POST -JsonBody $requestBody
+    $response = Invoke-AcmeWebRequest $AccountUrl -Method POST -JsonBody $requestBody
     $result = [AcmeAccount]::new($response, $KeyId);
 
     if($AutomaticAccountHandling) {

@@ -1,4 +1,40 @@
 function New-Order {
+    <#
+        .SYNOPSIS
+            Creates a new order object.
+
+        .DESCRIPTION
+            Creates a new order object to be used for signing a new certificate including all submitted identifiers.
+
+        
+        .PARAMETER Directory
+            The service directory of the ACME service. Can be handled by the module, if enabled.
+
+        .PARAMETER AccountKey
+            Your account key for JWS Signing. Can be handled by the module, if enabled.
+        
+        .PARAMETER KeyId
+            Your "kid" as defined in the acme standard (usually the url to your account)
+
+        .PARAMETER Nonce
+            Replay nonce from ACME service. Can be handled by the module, if enabled.
+        
+        .PARAMETER Identifiers
+            The list of identifiers, which will be covered by the certificates subject alternative names.
+
+        .PARAMETER NotBefore
+            Earliest date the certificate should be considered valid.
+
+        .PARAMETER NotAfter
+            Latest date the certificate should be considered valid.
+
+        
+        .EXAMPLE 
+            PS> New-Order -Directory $myDirectory -AccountKey $myAccountKey -KeyId $myKid -Nonce $myNonce -Identifiers $myIdentifiers
+
+        .EXAMPLE
+            PS> New-Order -Identifiers (New-Identifier "dns" "www.test.com")
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
@@ -10,7 +46,7 @@ function New-Order {
         [ValidateNotNull()]
         [ACMESharpCore.Crypto.IAccountKey] $AccountKey = $Script:AccountKey,
 
-        [Parameter(Position = 2, ParameterSetName="GetAccount")]
+        [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]
         [string] $KeyId = $Script:KeyId,
 
@@ -37,8 +73,10 @@ function New-Order {
         $payload.Add("notAfter", $NotAfter.ToString("o"));
     }
 
-    $requestBody = New-SignedMessage -Url $Url -JwsAlgorith $AccountKey -KeyId $KeyId -Nonce $Nonce -Payload $payload;
-    $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST;
+    $requestUrl = $Directory.NewOrder;
+
+    $requestBody = New-SignedMessage -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce -Payload $payload;
+    $response = Invoke-AcmeWebRequest $requestUrl $requestBody -Method POST;
 
     return [AcmeOrder]::new($response);
 }
