@@ -4,8 +4,8 @@ namespace ACMESharpCore.Crypto
 {
     public interface ICertificateKey
     {
-        
+        byte[] ExportPfx(byte[] acmeCertificate, string password);
 
-        byte[] GenerateCsr(IList<string> dnsNames);
+        byte[] GenerateCsr(string[] dnsNames);
     }
 }

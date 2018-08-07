@@ -55,15 +55,15 @@ namespace ACMESharpCore.Crypto
         #region ICertificateKey
         public byte[] ExportPfx(byte[] acmeCertificate, string password = null) {
             var certifiate = new X509Certificate2(acmeCertificate);
-            certifiate.PrivateKey = Algorithm;
+            certifiate = certifiate.CopyWithPrivateKey(Algorithm);
 
             if(string.IsNullOrEmpty(password))
-                return certifiate.Export(X509ContentType.Pkcs12);
+                return certifiate.Export(X509ContentType.Pfx);
             else
-                return certifiate.Export(X509ContentType.Pkcs12, password);
+                return certifiate.Export(X509ContentType.Pfx, password);
         }
 
-        public byte[] GenerateCsr(IList<string> dnsNames)
+        public byte[] GenerateCsr(string[] dnsNames)
         {
             if (!dnsNames?.Any() ?? false)
                 throw new ArgumentException("You need to provide at least one DNSName", nameof(dnsNames));

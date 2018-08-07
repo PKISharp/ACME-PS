@@ -40,6 +40,7 @@
 		"Get-Nonce",
 		"New-Nonce",
 
+		"Complete-Order",
 		"Get-Order",
 		"New-Identifier",
 		"New-Order",

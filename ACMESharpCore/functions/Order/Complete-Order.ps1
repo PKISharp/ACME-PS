@@ -1,9 +1,10 @@
 function Complete-Order {
     <#
         .SYNOPSIS
-        
-        .DESCRIPTION
+            Finalizes an acme order
 
+        .DESCRIPTION
+            Finalizes the acme order by submitting a CSR to the acme service.
 
         .PARAMETER Directory
             The service directory of the ACME service. Can be handled by the module, if enabled.
@@ -17,11 +18,15 @@ function Complete-Order {
         .PARAMETER Nonce
             Replay nonce from ACME service. Can be handled by the module, if enabled.
 
-        .PARAMETER 
+        .PARAMETER Order
+            The order to be finalized.
+        
+        .PARAMETER CertificateKey
+            The certificate key to be used to create a CSR.
 
 
         .EXAMPLE
-            PS> 
+            PS> Complete-Order -Order $myOrder -CertificateKey $myCertKey
     #>
     param(
         [Parameter(Position = 0)]
@@ -53,14 +58,18 @@ function Complete-Order {
     )
 
     process {
+        $ErrorActionPreference = 'Stop';
+
         $dnsNames = $Order.Identifiers | ForEach-Object { $_.Value }
 
-        $csr = ConvertTo-UrlBase64 $CertificateKey.GenerateCsr($dnsNames);
-        $payload = @{ "csr"= $csr }
+        $csr = $CertificateKey.GenerateCsr($dnsNames);
+        $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) }
 
         $requestUrl = $Order.FinalizeUrl;
 
         $requestBody = New-SignedMessage -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce -Payload $payload;
         $response = Invoke-AcmeWebRequest $requestUrl $requestBody -Method POST;
+
+        $Order.UpdateOrder($response);
     }
 }
