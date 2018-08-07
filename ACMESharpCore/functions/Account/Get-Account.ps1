@@ -32,8 +32,8 @@ function Get-Account {
     if($PSCmdlet.ParameterSetName -eq "FindAccount") {
         $payload = @{"onlyReturnExisting" = $true};
 
-        $requestBody = New-SignedMessage -Url $Url -Payload $payload -AccountKey $AccountKey -Nonce $Nonce
-        $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST
+        $requestBody = New-SignedMessage -Url $Directory.NewAccount -Payload $payload -AccountKey $AccountKey -Nonce $Nonce
+        $response = Invoke-AcmeWebRequest $Directory.NewAccount $requestBody -Method POST
     
         if($response.StatusCode -eq 200) {
             $Nonce = $response.NextNonce;
