@@ -53,6 +53,12 @@ $script:PSModuleRoot = $PSScriptRoot
 
 $classPath = "$script:PSModuleRoot\internal\classes";
 $classes = @(
+    "crypto/KeyExport",
+    "crypto/KeyBase",
+    "crypto/Certificate",
+    "crypto/RSAKey",
+    "crypto/ECDsaKey",
+    "crypto/KeyAuthorization",
     "crypto/AlgorithmFactory",
     "AcmeHttpResponse",
     "AcmeDirectory",
