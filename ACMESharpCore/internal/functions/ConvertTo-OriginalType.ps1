@@ -1,4 +1,4 @@
-function ConvertFrom-Import {
+function ConvertTo-OriginalType {
     param(
         [Parameter(Mandatory=$true, Position=0, ValueFromPipeline=$true)]
         $inputObject,
