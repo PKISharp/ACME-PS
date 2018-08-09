@@ -31,7 +31,9 @@ function Initialize-AutomaticHandlers {
         $AccountKeyPath
     )
 
-    Get-ServiceDirectory -Path $DirectoryPath -AutomaticDirectoryHandling -AutomaticNonceHandling -ErrorAction 'Stop' | Out-Null
-    Import-AccountKey -Path $AccountKeyPath -AutomaticAccountKeyHandling -ErrorAction 'Stop' | Out-Null
+    $ErrorActionPreference = 'Stop';
+
+    Get-ServiceDirectory -Path $DirectoryPath -AutomaticDirectoryHandling -AutomaticNonceHandling | Out-Null
+    Import-AccountKey -Path $AccountKeyPath -AutomaticAccountKeyHandling | Out-Null
     Get-Account -AutomaticAccountHandling | Out-Null
 }
