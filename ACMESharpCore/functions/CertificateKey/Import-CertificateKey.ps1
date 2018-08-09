@@ -20,11 +20,11 @@ function Import-CertificateKey {
     $ErrorActionPreference = 'Stop'
 
     if($Path -like "*.json") {
-        $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertFrom-Import;
+        $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertTo-OriginalType;
     } else {
-        $imported = Import-Clixml $Path | ConvertFrom-Import
+        $imported = Import-Clixml $Path | ConvertTo-OriginalType
     }
 
-    $certificateKey = [AcmeSharpCore.Crypto.ICertificateKey][AcmeSharpCore.Crypto.AlgorithmFactory]::CreateCertificateKey($imported);
+    $certificateKey = [AcmeSharpCore.Crypto.ICertificateKey][AlgorithmFactory]::CreateCertificateKey($imported);
     return $certificateKey;
 }

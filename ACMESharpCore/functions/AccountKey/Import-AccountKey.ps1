@@ -27,12 +27,12 @@ function Import-AccountKey {
     $ErrorActionPreference = 'Stop'
 
     if($Path -like "*.json") {
-        $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertFrom-Import;
+        $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertTo-OriginalType;
     } else {
-        $imported = Import-Clixml $Path | ConvertFrom-Import
+        $imported = Import-Clixml $Path | ConvertTo-OriginalType;
     }
 
-    $accountKey = [AcmeSharpCore.Crypto.IAccountKey][AcmeSharpCore.Crypto.AlgorithmFactory]::CreateAccountKey($imported);
+    $accountKey = [AlgorithmFactory]::CreateAccountKey($imported);
     
     if($AutomaticAccountKeyHandling) {
         Enable-AccountKeyHandling $accountKey;

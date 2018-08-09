@@ -53,6 +53,7 @@ $script:PSModuleRoot = $PSScriptRoot
 
 $classPath = "$script:PSModuleRoot\internal\classes";
 $classes = @(
+    "crypto/AlgorithmFactory",
     "AcmeHttpResponse",
     "AcmeDirectory",
     "AcmeAccount",
