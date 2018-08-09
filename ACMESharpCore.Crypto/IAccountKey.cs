@@ -1,5 +1,3 @@
-namespace ACMESharpCore.Crypto
-{
     public interface IAccountKey
     {
         string JwsAlgorithmName { get; }
@@ -8,4 +6,3 @@ namespace ACMESharpCore.Crypto
         byte[] Sign(byte[] inputBytes);
         byte[] Sign(string inputString);
     }
-}

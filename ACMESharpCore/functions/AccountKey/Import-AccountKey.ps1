@@ -32,7 +32,7 @@ function Import-AccountKey {
         $imported = Import-Clixml $Path | ConvertTo-OriginalType;
     }
 
-    $accountKey = [AlgorithmFactory]::CreateAccountKey($imported);
+    $accountKey = [KeyFactory]::CreateAccountKey($imported);
     
     if($AutomaticAccountKeyHandling) {
         Enable-AccountKeyHandling $accountKey;

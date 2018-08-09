@@ -26,7 +26,7 @@ function Export-CertificateKey {
 
         [Parameter(ValueFromPipeline=$true)]
         [ValidateNotNull()]
-        [AcmeSharpCore.Crypto.ICertificateKey]
+        [ICertificateKey]
         $CertificateKey
     )
 

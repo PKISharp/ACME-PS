@@ -19,7 +19,7 @@ function Enable-AccountKeyHandling {
     param(
         [Parameter(Mandatory=$true, Position=0, ValueFromPipeline=$true)]
         [ValidateNotNull()]
-        [AcmeSharpCore.Crypto.IAccountKey]
+        [IAccountKey]
         $AccountKey
     )
 

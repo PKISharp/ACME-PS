@@ -95,10 +95,10 @@ function New-AccountKey {
     }
 
     if($PSCmdlet.ParameterSetName -eq "ECDsa") {
-        $accountKey = [ACMESharpCore.Crypto.IAccountKey]([ACMESharpCore.Crypto.ECDsaAdapter]::new($ECDsaHashSize));
+        $accountKey = [ACMESharpCore.Crypto.IAccountKey]([ECDsaAccountKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa account key with hash size $ECDsaHashSize";
     } else {
-        $accountKey = [ACMESharpCore.Crypto.IAccountKey]([ACMESharpCore.Crypto.RSAAdapter]::new($RSAHashSize, $RSAKeySize));
+        $accountKey = [ACMESharpCore.Crypto.IAccountKey]([RSAAccountKey]::new($RSAHashSize, $RSAKeySize));
         Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
     }
 

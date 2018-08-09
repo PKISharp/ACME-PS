@@ -25,6 +25,6 @@ function Import-CertificateKey {
         $imported = Import-Clixml $Path | ConvertTo-OriginalType
     }
 
-    $certificateKey = [AcmeSharpCore.Crypto.ICertificateKey][AlgorithmFactory]::CreateCertificateKey($imported);
+    $certificateKey = [ICertificateKey][AlgorithmFactory]::CreateCertificateKey($imported);
     return $certificateKey;
 }

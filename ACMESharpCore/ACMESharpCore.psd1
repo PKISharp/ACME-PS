@@ -10,8 +10,9 @@
 	Description = "PowerShell client module for the ACME protocol"
 
 	RequiredAssemblies = @(
-		'./bin/ACMESharpCore.Crypto/ACMESharpCore.Crypto.dll',
-		'System.Net.Http')
+		'./bin/AcmeSharpCore.Crypto/AcmeSharpCore.Crypto.dll'
+		'System.Net.Http'
+	)
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(

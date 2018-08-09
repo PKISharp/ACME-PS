@@ -42,7 +42,7 @@ class RSAKeyBase : KeyBase
     }
 }
 
-class RSAAccountKey : RSAKeyBase {
+class RSAAccountKey : RSAKeyBase, IAccountKey {
     RSAAccountKey([int] $hashSize, [int] $keySize) : base($hashSize, $keySize) { } 
     RSAAccountKey([int] $hashSize, [System.Security.Cryptography.RSAParameters] $keyParameters) : base($hashSize, $keyParameters) { }
 
@@ -75,7 +75,7 @@ class RSAAccountKey : RSAKeyBase {
     }
 }
 
-class RSACertificateKey : RSAKeyBase {
+class RSACertificateKey : RSAKeyBase, ICertificateKey {
     RSACertificateKey([int] $hashSize, [int] $keySize) : base($hashSize, $keySize) { } 
     RSACertificateKey([int] $hashSize, [System.Security.Cryptography.RSAParameters] $keyParameters) : base($hashSize, $keyParameters) { }
 

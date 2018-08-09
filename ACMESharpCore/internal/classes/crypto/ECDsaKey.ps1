@@ -48,7 +48,7 @@ class ECDsaKeyBase : KeyBase
     }
 }
 
-class ECDsaAccountKey : ECDsaKeyBase {
+class ECDsaAccountKey : ECDsaKeyBase, IAccountKey {
     ECDsaAccountKey([int] $hashSize) : base($hashSize) { }
     ECDsaAccountKey([int] $hashSize, [System.Security.Cryptography.ECParameters] $keyParameters) : base($hashSize, $keyParameters) { }
 
@@ -82,7 +82,7 @@ class ECDsaAccountKey : ECDsaKeyBase {
     }
 }
 
-class ECDsaCertificateKey : ECDsaKeyBase {
+class ECDsaCertificateKey : ECDsaKeyBase, ICertificateKey {
     ECDsaCertificateKey([int] $hashSize) : base($hashSize) { }
     ECDsaCertificateKey([int] $hashSize, [System.Security.Cryptography.ECParameters] $keyParameters) : base($hashSize, $keyParameters) { }
 

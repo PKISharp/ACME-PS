@@ -78,7 +78,6 @@ Merge-ModuleFiles -Path "$script:PSModuleRoot\internal\functions\*" -OutFile $in
 Merge-ModuleFiles -Path "$script:PSModuleRoot\functions\*" -OutFile $exportedFunctions
 
 $classes | ForEach-Object { Get-Content "$classPath\$_.ps1" } | Set-Content $classMergeFile
-
 . Import-ModuleFile $classMergeFile;
 . Import-ModuleFile $internalFunctions;
 . Import-ModuleFile $exportedFunctions;

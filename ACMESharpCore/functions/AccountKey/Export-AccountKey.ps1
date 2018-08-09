@@ -26,7 +26,7 @@ function Export-AccountKey {
 
         [Parameter(ValueFromPipeline=$true)]
         [ValidateNotNull()]
-        [AcmeSharpCore.Crypto.IAccountKey]
+        [IAccountKey]
         $AccountKey = $Script:AccountKey
     )
 
