@@ -36,7 +36,7 @@ function Complete-Order {
 
         [Parameter(Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey = $Script:AccountKey,
+        [IAccountKey] $AccountKey = $Script:AccountKey,
 
         [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -53,7 +53,7 @@ function Complete-Order {
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.ICertificateKey] 
+        [ICertificateKey] 
         $CertificateKey
     )
 

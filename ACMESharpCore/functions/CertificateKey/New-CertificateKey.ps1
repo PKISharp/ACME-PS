@@ -85,10 +85,10 @@ function New-CertificateKey {
     }
 
     if($PSCmdlet.ParameterSetName -eq "ECDsa") {
-        $certificateKey = [ACMESharpCore.Crypto.ICertificateKey]([ECDsaCertifiaceKey]::new($ECDsaHashSize));
+        $certificateKey = [ICertificateKey]([ECDsaCertifiaceKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa certificate key with hash size $ECDsaHashSize";
     } else {
-        $certificateKey = [ACMESharpCore.Crypto.ICertificateKey]([RSACertificateKey]::new($RSAHashSize, $RSAKeySize));
+        $certificateKey = [ICertificateKey]([RSACertificateKey]::new($RSAHashSize, $RSAKeySize));
         Write-Verbose "Created new RSA certificate key with hash size $RSAHashSize and key size $RSAKeySize";
     }
 

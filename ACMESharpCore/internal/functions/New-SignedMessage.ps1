@@ -6,7 +6,7 @@ function New-SignedMessage {
         [string] $Url,
 
         [Parameter(Mandatory = $true, Position = 1)]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey,
+        [IAccountKey] $AccountKey,
 
         [Parameter(Position = 2)]
         [string] $KeyId,

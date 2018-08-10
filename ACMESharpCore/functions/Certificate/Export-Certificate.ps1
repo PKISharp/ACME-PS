@@ -27,7 +27,7 @@ function Export-PfxCertificate {
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.ICertificateKey] 
+        [ICertificateKey] 
         $CertificateKey,
 
         [Parameter(Mandatory = $true)]

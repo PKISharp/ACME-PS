@@ -14,7 +14,7 @@
         $directory.Directory | Out-File "$acmeStateDirectory/.ACMESharpStore" -Encoding ASCII;
         Export-Clixml "$acmeStateDirectory/ServiceDirectory.xml" -InputObject $directory;
 
-        $jwsTool = [ACMESharpCore.Crypto.JOSE.JwsTool]::new($AccountKey);
+        $jwsTool = [JOSE.JwsTool]::new($AccountKey);
         Export-Clixml "$acmeStateDirectory/AccountKey.xml" -InputObject ($jwsTool.Export());
 
         return [LocalStore]::new($acmeStateDirectory);
@@ -40,5 +40,5 @@
     hidden [string] $Path;
 
     [ACMESharp.Protocol.Resources.ServiceDirectory] $Directory;
-    [ACMESharpCore.Crypto.JOSE.JwsExport] $AccountKey;
+    [JOSE.JwsExport] $AccountKey;
 } #>

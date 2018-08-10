@@ -46,7 +46,7 @@ function New-Account {
 
         [Parameter(Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey = $Script:AccountKey,
+        [IAccountKey] $AccountKey = $Script:AccountKey,
 
         [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]

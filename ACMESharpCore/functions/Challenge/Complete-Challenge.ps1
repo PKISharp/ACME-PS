@@ -10,7 +10,7 @@ function Complete-Challenge {
 
         [Parameter(Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] 
+        [IAccountKey] 
         $AccountKey = $Script:AccountKey,
 
         [Parameter(Position = 2)]

@@ -14,7 +14,7 @@ function Show-Challenge {
 
         [Parameter(Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey = $Script:AccountKey
+        [IAccountKey] $AccountKey = $Script:AccountKey
     )
 
     process {
@@ -46,7 +46,7 @@ function Show-Http01Challenge {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey
+        [IAccountKey] $AccountKey
     )
 
     process {
@@ -58,7 +58,7 @@ function Show-Http01Challenge {
         $fileName = $Challenge.Token;
         $relativePath = "/.well-known/acme-challenges/$fileName"
         $fqdn = "$($Challenge.Identifier.Value)$relativePath"
-        $content = [ACMESharpCore.Crypto.IAccountKeyExtensions]::ComputeKeyAuthorization($AccountKey, $Challenge.Token);
+        $content = [IAccountKeyExtensions]::ComputeKeyAuthorization($AccountKey, $Challenge.Token);
 
         return @{
             "Type" = $Challenge.Type;
@@ -79,7 +79,7 @@ function Show-Dns01Challenge {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey
+        [IAccountKey] $AccountKey
     )
 
     process {
@@ -89,7 +89,7 @@ function Show-Dns01Challenge {
         }
 
         $txtRecordName = "_acme-challenge.$($Challenge.Identifier.Value)";
-        $content = [ACMESharpCore.Crypto.IAccountKeyExtensions]::ComputeKeyAuthorizationDigest($AccountKey, $Challenge.Token);
+        $content = [IAccountKeyExtensions]::ComputeKeyAuthorizationDigest($AccountKey, $Challenge.Token);
 
         return @{
             "Type" = "dns-01";
@@ -108,7 +108,7 @@ function Show-TLSALPN01Challenge {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ACMESharpCore.Crypto.IAccountKey] $AccountKey
+        [IAccountKey] $AccountKey
     )
 
     process {
@@ -119,7 +119,7 @@ function Show-TLSALPN01Challenge {
 
         $relativePath = "/.well-known/acme-challenges/$($Challenge.Token)"
         $fqdn = "$($Challenge.Identifier.Value)$relativePath"
-        $content = [ACMESharpCore.Crypto.IAccountKeyExtensions]::ComputeKeyAuthorization($AccountKey, $Challenge.Token);
+        $content = [IAccountKeyExtensions]::ComputeKeyAuthorization($AccountKey, $Challenge.Token);
 
         return @{
             "Type" = $Challenge.Type;

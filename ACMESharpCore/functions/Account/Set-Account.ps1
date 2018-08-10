@@ -14,7 +14,7 @@ function Set-AccountKey {
         [string] $Nonce = $Script:Nonce,
 
         [Parameter(Mandatory = $true, ParameterSetName="NewAccountKey")]
-        [ACMESharpCore.Crypto.IAccountKey] $NewAccountKey
+        [IAccountKey] $NewAccountKey
     )
 
     $innerPayload = @{
