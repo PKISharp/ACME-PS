@@ -15,10 +15,10 @@ $ErrorActionPreference = 'Stop';
 $InformationPreference = 'Continue';
 
 $ModuleSourcePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore"));
-# $BinSourcePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore.Crypto"));
+$BinSourcePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore.Crypto"));
 
 $ModuleOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $ModuleOutPath));
-# $BinOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore/bin/ACMESharpCore.Crypto"));
+$BinOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore/bin/ACMESharpCore.Crypto"));
 
 if($PublishModule) {
     $binOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "$ModuleOutPath/bin/ACMESharpCore.Crypto"));
@@ -45,14 +45,14 @@ if(Test-Path $binOutPath) {
 }
 
 Write-Information "Calling dotnet publish $BinSourcePath -o $binOutPath";
-# $args = @("publish", "`"$BinSourcePath`"", "-o", "`"$binOutPath`"")
-# & "dotnet.exe" $args
+$args = @("publish", "`"$BinSourcePath`"", "-o", "`"$binOutPath`"", "-c", "RELEASE")
+& "dotnet.exe" $args
 
 
 <# Publish the module #>
 
 if($PublishModule) {
-    Import-Module "$PSScriptRoot/ACMESharpCore" -Force -ErrorAction 'Stop'
+    Import-Module "$PSScriptRoot/ACMESharpCore" -Force -ErrorAction 'Stop' # This will create the All* files.
 
     Copy-Item -LiteralPath "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/ACMESharpCore.psd1" -Force;
     
