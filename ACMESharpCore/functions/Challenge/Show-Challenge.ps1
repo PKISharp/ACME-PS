@@ -5,7 +5,7 @@ function Show-Challenge {
         [ValidateNotNull()]
         [AcmeAuthorization] $Authorization,
 
-        [Parameter(Mandatory = $true, ParameterSetName="ByAuthorization")]
+        [Parameter(Mandatory = $true, Position=1, ParameterSetName="ByAuthorization")]
         [ValidateSet("http-01", "dns-01", "tls-alpn-01")]
         [string] $Type,
 

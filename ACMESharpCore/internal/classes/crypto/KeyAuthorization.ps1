@@ -3,7 +3,7 @@ class KeyAuthorization {
     {
         $jwkJson = $accountKey.ExportPublicJwk() | ConvertTo-Json -Compress;
         $jwkBytes = [System.Text.Encoding]::UTF8.GetBytes($jwkJson);
-        $jwkHash = $hashAlgorithm.ComputeHash($jwkBytes);;
+        $jwkHash = $hashAlgorithm.ComputeHash($jwkBytes);
 
         return $jwkHash;
     }
@@ -14,7 +14,8 @@ class KeyAuthorization {
         $sha256 = [System.Security.Cryptography.SHA256]::Create();
 
         try {
-            $thumbprint = ConvertTo-UrlBase64 -InputBytes [KeyAuthorization]::ComputeThumbprint($accountKey)
+            $thumbprintBytes = [KeyAuthorization]::ComputeThumbprint($accountKey, $sha256);
+            $thumbprint = ConvertTo-UrlBase64 -InputBytes $thumbprintBytes;
             return "$token.$thumbprint";
         } finally {
             $sha256.Dispose();
@@ -26,7 +27,8 @@ class KeyAuthorization {
         $sha256 = [System.Security.Cryptography.SHA256]::Create();
 
         try {
-            $thumbprint = ConvertTo-UrlBase64 -InputBytes [KeyAuthorization]::ComputeThumbprint($accountKey)
+            $thumbprintBytes = [KeyAuthorization]::ComputeThumbprint($accountKey, $sha256);
+            $thumbprint = ConvertTo-UrlBase64 -InputBytes $thumbprintBytes;
             $keyAuthZBytes = [System.Text.Encoding]::UTF8.GetBytes("$token.$thumbprint");
 
             $digest = $sha256.ComputeHash($keyAuthZBytes);
