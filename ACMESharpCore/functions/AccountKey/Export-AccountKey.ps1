@@ -32,7 +32,7 @@ function Export-AccountKey {
 
     process {
         if(Test-Path $Path) {
-            Write-Error "$Path already exists. This method will not override existing files"
+            Write-Error "$Path already exists. This method does not support overriding existing files."
         }
 
         if($Path -like "*.json") {
