@@ -9,8 +9,11 @@
 	
 	Description = "PowerShell client module for the ACME protocol"
 
+	ScriptsToProcess = @(
+		"./TypeDefinitions.ps1"
+	)
+
 	RequiredAssemblies = @(
-		'./bin/InterfaceDefinitions/InterfaceDefinitions.dll'
 		'System.Net.Http'
 	)
 
