@@ -10,7 +10,7 @@
 	Description = "PowerShell client module for the ACME protocol"
 
 	RequiredAssemblies = @(
-		'./bin/ACMESharpCore.Crypto/ACMESharpCore.Crypto.dll'
+		'./bin/InterfaceDefinitions/InterfaceDefinitions.dll'
 		'System.Net.Http'
 	)
 

@@ -41,7 +41,7 @@ function New-CertificateKey {
             PS> New-CertificateKey -ECDsa -HashSize 384 -SkipExport
     #>
     [CmdletBinding(DefaultParameterSetName="RSA")]
-    [OutputType("ACMESharpCore.Crypto.ICertificateKey")]
+    [OutputType("ICertificateKey")]
     param(
         [Parameter(ParameterSetName="RSA")]
         [switch]

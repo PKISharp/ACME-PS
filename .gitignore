@@ -2,13 +2,13 @@
 .vs/
 
 # build.ps1 -BuildDependencies will create this
-/ACMESharpCore/bin/ACMESharpCore.Crypto/
+/ACMESharpCore/bin/InterfaceDefinitions/
 
 /ACMESharpCore/internal/AllClasses.ps1
 /ACMESharpCore/internal/AllFunctions.ps1
 /ACMESharpCore/AllFunctions.ps1
 
-/ACMESharpCore.Crypto/bin/
-/ACMESharpCore.Crypto/obj/
+/InterfaceDefinitions/bin/
+/InterfaceDefinitions/obj/
 
 /publish

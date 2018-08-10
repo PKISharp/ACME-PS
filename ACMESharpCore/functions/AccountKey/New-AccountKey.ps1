@@ -47,7 +47,7 @@ function New-AccountKey {
             PS> New-AccountKey -ECDsa -HashSize 384 -SkipExport
     #>
     [CmdletBinding(DefaultParameterSetName="RSA")]
-    [OutputType("ACMESharpCore.Crypto.IAccountKey")]
+    [OutputType("IAccountKey")]
     param(
         [Parameter(ParameterSetName="RSA")]
         [switch]
