@@ -1,7 +1,7 @@
 <# abstract #> 
 class KeyBase
 {
-    [ValidateSet(245,384,512)]
+    [ValidateSet(256,384,512)]
     [int] 
     hidden $HashSize;
 
