@@ -26,23 +26,23 @@ if($PublishModule) {
 
 <# Clean Publish folder #>
 
+if(Test-Path $binOutPath) {
+    Remove-Module "ACMESharpCore" -Force -ErrorAction 'Ignore'
+
+    Write-Information "Deleting $binOutPath/*";
+    Get-ChildItem "$binOutPath/*" -Recurse | Remove-Item -Force -Recurse | Out-Null
+}
+
 if($PublishModule) {
     if(Test-Path $ModuleOutPath) {
         Write-Information "Deleting $ModuleOutPath/*";
-        Get-ChildItem "$ModuleOutPath/*" | Remove-Item -Force -Recurse | Out-Null
+        Get-ChildItem "$ModuleOutPath/*" -Recurse | Remove-Item -Force -Recurse | Out-Null
     } else {
         New-Item $ModuleOutPath -ItemType Directory
     }
 }
 
 <# Building the dependencies #>
-    
-if(Test-Path $binOutPath) {
-    Remove-Module "ACMESharpCore" -Force -ErrorAction 'Ignore'
-
-    Write-Information "Deleting $binOutPath/*";
-    Get-ChildItem "$binOutPath/*" | Remove-Item -Force -Recurse | Out-Null
-}
 
 Write-Information "Calling dotnet publish $BinSourcePath -o $binOutPath";
 $args = @("publish", "`"$BinSourcePath`"", "-o", "`"$binOutPath`"", "-c", "RELEASE")
