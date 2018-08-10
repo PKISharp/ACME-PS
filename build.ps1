@@ -8,7 +8,10 @@ param(
     [Switch] $PublishModule,
 
     [Parameter()]
-    [Switch] $SignModule
+    [Switch] $SignModule,
+
+    [Parameter()]
+    [Switch] $SkipDependencies
 )
 
 $ErrorActionPreference = 'Stop';
@@ -20,13 +23,9 @@ $BinSourcePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScri
 $ModuleOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $ModuleOutPath));
 $BinOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore/bin/InterfaceDefinitions"));
 
-if($PublishModule) {
-    $binOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "$ModuleOutPath/bin/InterfaceDefinitions"));
-}
-
 <# Clean Publish folder #>
 
-if(Test-Path $binOutPath) {
+if(-not $SkipDependencies -and (Test-Path $binOutPath)) {
     Remove-Module "ACMESharpCore" -Force -ErrorAction 'Ignore'
 
     Write-Information "Deleting $binOutPath/*";
@@ -44,9 +43,11 @@ if($PublishModule) {
 
 <# Building the dependencies #>
 
-Write-Information "Calling dotnet publish $BinSourcePath -o $binOutPath";
-$args = @("publish", "`"$BinSourcePath`"", "-o", "`"$binOutPath`"", "-c", "RELEASE")
-& "dotnet.exe" $args
+if(-not $SkipDependencies) {
+    Write-Information "Calling dotnet publish $BinSourcePath -o $binOutPath";
+    $args = @("publish", "`"$BinSourcePath`"", "-o", "`"$binOutPath`"", "-c", "RELEASE")
+    & "dotnet.exe" $args
+}
 
 
 <# Publish the module #>
@@ -55,6 +56,7 @@ if($PublishModule) {
     Import-Module "$PSScriptRoot/ACMESharpCore" -Force -ErrorAction 'Stop' # This will create the All* files.
 
     Copy-Item -LiteralPath "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/ACMESharpCore.psd1" -Force;
+    Copy-Item -LiteralPath "$ModuleSourcePath/bin" -Recurse -Destination "$ModuleOutPath/bin" -Force
     
     $ModuleFiles = @(
         "internal/AllClasses.ps1",

@@ -70,6 +70,8 @@ function Get-ServiceDirectory {
     }
 
     process {
+        $ErrorActionPreference = 'Stop';
+
         if($PSCmdlet.ParameterSetName -in @("FromName", "FormUrl")) {
             if($PSCmdlet.ParameterSetName -eq "FromName") {
                 $acmeBaseUrl = $KnownEndpoints[$ServiceName];

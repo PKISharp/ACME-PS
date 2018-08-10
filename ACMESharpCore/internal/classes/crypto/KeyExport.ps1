@@ -12,9 +12,7 @@ class KeyExport {
 }
 
 class RSAKeyExport : KeyExport {
-    [string] TypeName() {
-        return "RSAKeyExport";
-    }
+    hidden [string] $TypeName = "RSAKeyExport";
 
     [int] $HashSize;
 
@@ -29,9 +27,7 @@ class RSAKeyExport : KeyExport {
 }
 
 class ECDsaKeyExport : KeyExport {
-    [string] TypeName() {
-        return "ECDsaKeyExport";
-    }
+    hidden [string] $TypeName = "ECDsaKeyExport";
     
     [int] $HashSize;
 

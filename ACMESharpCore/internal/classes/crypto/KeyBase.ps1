@@ -16,11 +16,11 @@ class KeyBase
 
         $this.HashSize = $hashSize;
 
-        switch (hashSize)
+        switch ($hashSize)
         {
-            256 { $this.HashName = SHA256;  }
-            384 { $this.HashName = SHA384;  }
-            512 { $this.HashName = SHA512;  }
+            256 { $this.HashName = "SHA256";  }
+            384 { $this.HashName = "SHA384";  }
+            512 { $this.HashName = "SHA512";  }
 
             default {
                 throw [System.ArgumentOutOfRangeException]::new("Cannot set hash size");

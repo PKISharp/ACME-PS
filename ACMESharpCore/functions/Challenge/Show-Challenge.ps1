@@ -5,7 +5,8 @@ function Show-Challenge {
         [ValidateNotNull()]
         [AcmeAuthorization] $Authorization,
 
-        [Parameter(ParameterSetName="ByAuthorization")]
+        [Parameter(Mandatory = $true, ParameterSetName="ByAuthorization")]
+        [ValidateSet("http-01", "dns-01", "tls-alpn-01")]
         [string] $Type,
 
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0, ParameterSetName="ByChallenge")]
@@ -19,11 +20,7 @@ function Show-Challenge {
 
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
-            if($Type) {
-                return ($Authorization.challenges | Where-Object { $_.Type -eq $Type } | Show-Challenge -AccountKey $AccountKey);
-            } else {
-                return ($Authorization.challenges | Show-Challenge -AccountKey $AccountKey);
-            }
+            return ($Authorization.challenges | Where-Object { $_.Type -eq $Type } | select -First 1 | Show-Challenge -AccountKey $AccountKey);
         }
 
         switch($Challenge.Type) {
@@ -58,7 +55,7 @@ function Show-Http01Challenge {
         $fileName = $Challenge.Token;
         $relativePath = "/.well-known/acme-challenges/$fileName"
         $fqdn = "$($Challenge.Identifier.Value)$relativePath"
-        $content = [IAccountKeyExtensions]::ComputeKeyAuthorization($AccountKey, $Challenge.Token);
+        $content = [KeyAuthorization]::Compute($AccountKey, $Challenge.Token);
 
         return @{
             "Type" = $Challenge.Type;
@@ -89,7 +86,7 @@ function Show-Dns01Challenge {
         }
 
         $txtRecordName = "_acme-challenge.$($Challenge.Identifier.Value)";
-        $content = [IAccountKeyExtensions]::ComputeKeyAuthorizationDigest($AccountKey, $Challenge.Token);
+        $content = [KeyAuthorization]::ComputeDigest($AccountKey, $Challenge.Token);
 
         return @{
             "Type" = "dns-01";
@@ -119,7 +116,7 @@ function Show-TLSALPN01Challenge {
 
         $relativePath = "/.well-known/acme-challenges/$($Challenge.Token)"
         $fqdn = "$($Challenge.Identifier.Value)$relativePath"
-        $content = [IAccountKeyExtensions]::ComputeKeyAuthorization($AccountKey, $Challenge.Token);
+        $content = [IAccountKeyExtensions]::Compute($AccountKey, $Challenge.Token);
 
         return @{
             "Type" = $Challenge.Type;

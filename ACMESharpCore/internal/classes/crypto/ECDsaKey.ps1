@@ -11,14 +11,7 @@ class ECDsaKeyBase : KeyBase
         }
 
         $this.CurveName = "P-$hashSize";
-
-        [System.Security.Cryptography.ECCurve] $curve = $null;
-        switch ($hashSize) {
-            256 { $curve = [System.Security.Cryptography.ECCurve+NamedCurves]::nistP256; }
-            384 { $curve = [System.Security.Cryptography.ECCurve+NamedCurves]::nistP384; }
-            512 { $curve = [System.Security.Cryptography.ECCurve+NamedCurves]::nistP521; }
-            Default { throw [System.ArgumentOutOfRangeException]::new("Cannot use hash size to create curve."); }
-        }
+        $curve = [ECDsaKeyBase]::GetCurve($hashSize);
 
         $this.ECDsa = [System.Security.Cryptography.ECDsa]::Create($curve);
     }
@@ -32,6 +25,17 @@ class ECDsaKeyBase : KeyBase
         
         $this.CurveName = "P-$hashSize";
         $this.ECDsa = [System.Security.Cryptography.ECDsa]::Create($keyParameters);
+    }
+
+    static [System.Security.Cryptography.ECCurve] GetCurve($hashSize) {
+        switch ($hashSize) {
+            256 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP256; }
+            384 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP384; }
+            512 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP521; }
+            Default { throw [System.ArgumentOutOfRangeException]::new("Cannot use hash size to create curve."); }
+        }
+
+        return $null;
     }
 
     [ECDsaKeyExport] ExportKey() {
@@ -80,6 +84,17 @@ class ECDsaAccountKey : ECDsaKeyBase, IAccountKey {
     {
         return $this.Sign([System.Text.Encoding]::UTF8.GetBytes($inputString));
     }
+
+    static [IAccountKey] Create([ECDsaKeyExport] $keyExport) {
+        $keyParameters = [System.Security.Cryptography.ECParameters]::new();
+ 
+        $keyParameters.Curve = [ECDsaKeyBase]::GetCurve($keyExport.HashSize);
+        $keyParameters.D = $keyExport.D;
+        $keyParameters.Q.X = $keyExport.QX;
+        $keyParameters.Q.Y = $keyExport.QY;
+ 
+        return [ECDsaAccountKey]::new($keyExport.HashSize, $keyParameters);
+     }
 }
 
 class ECDsaCertificateKey : ECDsaKeyBase, ICertificateKey {
@@ -93,4 +108,15 @@ class ECDsaCertificateKey : ECDsaKeyBase, ICertificateKey {
     [byte[]] GenerateCsr([string[]] $dnsNames) {
         return [Certificate]::GenerateCsr($dnsNames, $this.ECDsa, $this.HashName);
     }
+
+    static [ICertificateKey] Create([ECDsaKeyExport] $keyExport) {
+        $keyParameters = [System.Security.Cryptography.ECParameters]::new();
+ 
+        $keyParameters.Curve = [ECDsaKeyBase]::GetCurve($keyExport.HashSize);
+        $keyParameters.D = $keyExport.D;
+        $keyParameters.Q.X = $keyExport.QX;
+        $keyParameters.Q.Y = $keyExport.QY;
+ 
+        return [ECDsaCertificateKey]::new($keyExport.HashSize, $keyParameters);
+     }
 }

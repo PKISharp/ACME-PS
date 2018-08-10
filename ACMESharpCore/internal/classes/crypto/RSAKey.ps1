@@ -66,12 +66,27 @@ class RSAAccountKey : RSAKeyBase, IAccountKey {
 
     [byte[]] Sign([byte[]] $inputBytes)
     {
-        return $this.RSA.SignData($inputBytes, $this.HashName);
+        return $this.RSA.SignData($inputBytes, $this.HashName, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1);
     }
 
     [byte[]] Sign([string] $inputString)
     {
         return $this.Sign([System.Text.Encoding]::UTF8.GetBytes($inputString));
+    }
+
+    static [IAccountKey] Create([RSAKeyExport] $keyExport) {
+       $keyParameters = [System.Security.Cryptography.RSAParameters]::new();
+
+       $keyParameters.D = $keyExport.D;
+       $keyParameters.DP = $keyExport.DP;
+       $keyParameters.DQ = $keyExport.DQ;
+       $keyParameters.Exponent = $keyExport.Exponent;
+       $keyParameters.InverseQ = $keyExport.InverseQ;
+       $keyParameters.Modulus = $keyExport.Modulus;
+       $keyParameters.P = $keyExport.P;
+       $keyParameters.Q = $keyExport.Q;
+
+       return [RSAAccountKey]::new($keyExport.HashSize, $keyParameters);
     }
 }
 
@@ -86,4 +101,19 @@ class RSACertificateKey : RSAKeyBase, ICertificateKey {
     [byte[]] GenerateCsr([string[]] $dnsNames) {
         return [Certificate]::GenerateCsr($dnsNames, $this.RSA, $this.HashName);
     }
+
+    static [ICertificateKey] Create([RSAKeyExport] $keyExport) {
+        $keyParameters = [System.Security.Cryptography.RSAParameters]::new();
+ 
+        $keyParameters.D = $keyExport.D;
+        $keyParameters.DP = $keyExport.DP;
+        $keyParameters.DQ = $keyExport.DQ;
+        $keyParameters.Exponent = $keyExport.Exponent;
+        $keyParameters.InverseQ = $keyExport.InverseQ;
+        $keyParameters.Modulus = $keyExport.Modulus;
+        $keyParameters.P = $keyExport.P;
+        $keyParameters.Q = $keyExport.Q;
+ 
+        return [RSACertificateKey]::new($keyExport.HashSize, $keyParameters);
+     }
 }
