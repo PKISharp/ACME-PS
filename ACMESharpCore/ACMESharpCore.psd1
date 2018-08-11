@@ -1,36 +1,67 @@
-﻿
-## For a reference of this file's elements, see:
-##    https://technet.microsoft.com/library/hh849709.aspx
-##    https://technet.microsoft.com/en-us/library/dd878297(v=vs.85).aspx
-
-## 64-bit:
-##    %SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe
-## 32-bit:
-##    %SystemRoot%\syswow64\WindowsPowerShell\v1.0\powershell.exe
-
 @{
 	RootModule = 'ACMESharpCore.psm1'
 	ModuleVersion = '2.0.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 	
 	Author = 'https://github.com/PKISharp/ACMESharpCore-PowerShell/graphs/contributors'
-
 	CompanyName = 'https://github.com/PKISharp'
-
-	Copyright = '(c) 2018 Eugene Bekker. All rights reserved.'	
-
+	Copyright = '(c) 2018 Thomas Glatzer, Eugene Bekker. All rights reserved.'	
+	
 	Description = "PowerShell client module for the ACME protocol"
 
-	## As a nested module, this will inherit the prefix of the outer root module
-	# Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
-	# DefaultCommandPrefix = 'ACME'
+	ScriptsToProcess = @(
+		"./TypeDefinitions.ps1"
+	)
 
-	## Minimum version of the Windows PowerShell engine required by this module
-	## This does not appear to be enforce for versions > 2.0 as per
-	##    https://technet.microsoft.com/en-us/library/dd878297(v=vs.85).aspx
-	PowerShellVersion = '3.0'
+	RequiredAssemblies = @(
+		'System.Net.Http'
+	)
 
-	DotNetFrameworkVersion = '4.5'
+	DefaultCommandPrefix = 'ACME'
+	FunctionsToExport = @(
+		"Enable-AccountHandling",
+		"Find-Account",
+		"Get-Account",
+		"New-Account",
+		"Set-Account",
+
+		"Enable-AccountKeyHandling",
+		"Export-AccountKey",
+		"Import-AccountKey",
+		"New-AccountKey",
+
+		"Get-Authorization",
+
+		"Export-Certificate",
+
+		"Export-CertificateKey",
+		"Import-CertificateKey",
+		"New-CertificateKey",
+		
+		"Complete-Challenge",
+		"Get-Challenge",
+		"Show-Challenge",
+
+		"Enable-NonceHandling",
+		"Get-Nonce",
+		"New-Nonce",
+
+		"Complete-Order",
+		"Get-Order",
+		"New-Identifier",
+		"New-Order",
+		"Update-Order"
+
+		"Enable-ServiceDirectoryHandling",
+		"Get-ServiceDirectory",
+		"Get-TermsOfService",
+
+		"Initialize-AutomaticHandlers"
+	)
+
+	AliasesToExport = @(
+		"Import-AccountKey"
+	)
 
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 	PrivateData = @{
@@ -67,9 +98,6 @@
 	# Modules that must be imported into the global environment prior to importing this module
 	# RequiredModules = @()
 
-	# Assemblies that must be loaded prior to importing this module
-	# RequiredAssemblies = @()
-
 	# Script files (.ps1) that are run in the caller's environment prior to importing this module.
 	# ScriptsToProcess = @()
 
@@ -85,11 +113,11 @@
 	# Functions to export from this module
 	# FunctionsToExport = '*'
 
-	# Cmdlets to export from this module
-	# CmdletsToExport = '*'
-
 	# Variables to export from this module
 	# VariablesToExport = '*'
+
+	# Cmdlets to export from this module
+	# CmdletsToExport = '*'
 
 	# Aliases to export from this module
 	# AliasesToExport = '*'
