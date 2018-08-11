@@ -31,6 +31,8 @@ function Export-AccountKey {
     )
 
     process {
+        $ErrorActionPreference = 'Stop';
+
         if(Test-Path $Path) {
             Write-Error "$Path already exists. This method does not support overriding existing files."
         }

@@ -24,19 +24,21 @@ function Import-AccountKey {
         $AutomaticAccountKeyHandling
     )
 
-    $ErrorActionPreference = 'Stop'
+    process {
+        $ErrorActionPreference = 'Stop'
 
-    if($Path -like "*.json") {
-        $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertTo-OriginalType;
-    } else {
-        $imported = Import-Clixml $Path | ConvertTo-OriginalType;
+        if($Path -like "*.json") {
+            $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertTo-OriginalType;
+        } else {
+            $imported = Import-Clixml $Path | ConvertTo-OriginalType;
+        }
+
+        $accountKey = [KeyFactory]::CreateAccountKey($imported);
+        
+        if($AutomaticAccountKeyHandling) {
+            Enable-AccountKeyHandling $accountKey;
+        }
+
+        return $accountKey;
     }
-
-    $accountKey = [KeyFactory]::CreateAccountKey($imported);
-    
-    if($AutomaticAccountKeyHandling) {
-        Enable-AccountKeyHandling $accountKey;
-    }
-
-    return $accountKey;
 }
