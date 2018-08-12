@@ -27,8 +27,7 @@ function Complete-Challenge {
     process {
         $payload = @{};
 
-        $requestBody = New-SignedMessage -Url $Challenge.Url -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
-        $response = Invoke-AcmeWebRequest $Challenge.Url $requestBody -Method POST;
+        $response = Invoke-SignedWebRequest -Url $Challenge.Url -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
 
         return [AcmeChallenge]::new($response, $Challenge.Identifier);
     }

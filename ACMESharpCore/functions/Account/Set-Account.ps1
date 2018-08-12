@@ -23,9 +23,7 @@ function Set-AccountKey {
     };
 
     $payload = New-SignedMessage -Url $Url -AccountKey $NewAccountKey -Payload $innerPayload;
-    $requestBody = New-SignedMessage -Url $Url -AccountKey $AccountKey -KeyId $Account.KeyId -Nonce $Nonce.Next -Payload $payload;
-
-    $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST;
+    $response = Invoke-SignedWebRequest -Url $Url -AccountKey $AccountKey -KeyId $Account.KeyId -Nonce $Nonce.Next -Payload $payload;
 
     return Get-Account -Url $TargetAccount.ResourceUrl -AccountKey $NewAccountKey -KeyId $Account.KeyId `
                        -Nonce $response.NextNonce -AutomaticAccountHandling:$($Script:AutoAccount)

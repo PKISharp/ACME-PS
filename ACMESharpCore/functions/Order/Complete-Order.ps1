@@ -67,8 +67,7 @@ function Complete-Order {
 
         $requestUrl = $Order.FinalizeUrl;
 
-        $requestBody = New-SignedMessage -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
-        $response = Invoke-AcmeWebRequest $requestUrl $requestBody -Method POST;
+        $response = Invoke-SignedWebRequest -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
 
         $Order.UpdateOrder($response);
     }
