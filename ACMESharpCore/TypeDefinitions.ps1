@@ -10,7 +10,7 @@ public interface IAccountKey
 
 public interface ICertificateKey
 {
-    byte[] ExportPfx(byte[] acmeCertificate, string password);
+    byte[] ExportPfx(byte[] acmeCertificate, System.Security.SecureString password);
     byte[] GenerateCsr(string[] dnsNames);
 }
 "@

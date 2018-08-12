@@ -22,7 +22,8 @@ function Show-Challenge {
 
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
-            return ($Authorization.challenges | Where-Object { $_.Type -eq $Type } | select -First 1 | Show-Challenge -AccountKey $AccountKey);
+            return ($Authorization.challenges | Where-Object { $_.Type -eq $Type } | 
+                Select-Object -First 1 | Show-Challenge -AccountKey $AccountKey);
         }
 
         $accountKey = $State.AccountKey;
@@ -118,8 +119,6 @@ function Show-TLSALPN01Challenge {
             return;
         }
 
-        $relativePath = "/.well-known/acme-challenges/$($Challenge.Token)"
-        $fqdn = "$($Challenge.Identifier.Value)$relativePath"
         $content = [IAccountKeyExtensions]::Compute($AccountKey, $Challenge.Token);
 
         return @{

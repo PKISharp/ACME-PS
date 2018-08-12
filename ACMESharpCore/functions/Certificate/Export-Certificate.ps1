@@ -36,7 +36,7 @@ function Export-PfxCertificate {
         $Path,
 
         [Parameter()]
-        [string]
+        [SecureString]
         $Passsword,
 
         [Parameter()]

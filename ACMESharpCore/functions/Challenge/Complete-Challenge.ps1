@@ -19,10 +19,6 @@ function Complete-Challenge {
     )
 
     process {
-        $accountKey = $State.AccountKey;
-        $keyId = $State.Account.KeyId;
-        $nonce = $State.Nonce;    
-
         $payload = @{};
 
         $response = Invoke-SignedWebRequest $Challenge.Url $State $payload;

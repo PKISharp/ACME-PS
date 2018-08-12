@@ -22,8 +22,6 @@ function Get-Account {
         [string] $KeyId
     )
 
-    $accountKey = $State.AccountKey;
-
     if($PSCmdlet.ParameterSetName -eq "FindAccount") {
         $requestUrl = $State.ServiceDirectory.NewAccount;
         $payload = @{"onlyReturnExisting" = $true};

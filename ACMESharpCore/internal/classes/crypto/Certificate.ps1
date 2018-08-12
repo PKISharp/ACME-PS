@@ -1,5 +1,5 @@
 class Certificate {
-    static [byte[]] ExportPfx([byte[]] $acmeCertificate, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [string] $password = $null) {
+    static [byte[]] ExportPfx([byte[]] $acmeCertificate, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
         $certifiate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificate);
 
         switch($algorithm.GetType())

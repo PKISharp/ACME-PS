@@ -94,7 +94,7 @@ class RSACertificateKey : RSAKeyBase, ICertificateKey {
     RSACertificateKey([int] $hashSize, [int] $keySize) : base($hashSize, $keySize) { } 
     RSACertificateKey([int] $hashSize, [System.Security.Cryptography.RSAParameters] $keyParameters) : base($hashSize, $keyParameters) { }
 
-    [byte[]] ExportPfx([byte[]] $acmeCertificate, [string] $password) {
+    [byte[]] ExportPfx([byte[]] $acmeCertificate, [SecureString] $password) {
         return [Certificate]::ExportPfx($acmeCertificate, $this.RSA, $password);
     }
 
