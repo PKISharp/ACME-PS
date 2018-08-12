@@ -30,15 +30,19 @@ function New-AccountKey {
         .PARAMETER Path
             The path where the keys will be stored.
 
-        .PARAMETER ExportType
-            Choose if you want to export CLIXML (default) or JSON.
+        .PARAMETER SkipExport
+            Allows you to skip exporting the account key. Use with care.
 
-        .PARAMETER AutomaticAccountKeyHandling
-            If set, the module will be initialized to automatically provide the account key, where neccessary.
+            
+        .PARAMETER State
+            The account key will be written into the provided state instance.
+        
+        .PARAMETER PassThrough
+            If set, the account key will be returned to the pipeline.
 
         
         .EXAMPLE
-            PS> New-AccountKey -Path C:\myKeyExport.xml -AutomaticAccountKeyHandling
+            PS> New-AccountKey -Path C:\myKeyExport.xml
 
         .EXAMPLE
             PS> New-AccountKey -Path C:\myKeyExport.json -RSA -HashSize 512
@@ -73,18 +77,22 @@ function New-AccountKey {
         [int]
         $ECDsaHashSize = 256,
 
-
         [Parameter()]
         [string]
         $Path,
 
         [Parameter()]
         [switch]
-        $AutomaticAccountKeyHandling,
+        $SkipKeyExport,
+
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNull()]
+        [AcmeState]
+        $State,
 
         [Parameter()]
         [switch]
-        $SkipKeyExport
+        $PassThrough
     )
 
     if(-not $SkipKeyExport) {
@@ -105,13 +113,13 @@ function New-AccountKey {
     if($SkipKeyExport) {
         Write-Warning "The account key will not be exported. Make sure you save the account key or you might loose access to your ACME account.";
         
-        if($AutomaticAccountKeyHandling) {
-            Enable-AccountKeyHandling $accountKey;            
-        }
+        $State.AccountKey = $accountKey;
 
-        return $accountKey;
+        if($PassThrough) {
+            return $accountKey;
+        }
     }
 
-    Export-AccountKey -AccountKey $accountKey -Path $Path -ErrorAction 'Stop' | Out-Null
-    return Import-AccountKey -Path $Path -AutomaticAccountKeyHandling:$AutomaticAccountKeyHandling -ErrorAction 'Stop'
+    Export-AccountKey -AccountKey $accountKey -Path $Path | Out-Null
+    Import-AccountKey -State $State -Path $Path -PassThrough:$PassThrough
 }

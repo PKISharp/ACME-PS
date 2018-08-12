@@ -9,19 +9,27 @@ function Import-AccountKey {
         .PARAMETER Path
             The path where the key has been exported to.
 
-        .PARAMETER AutomaticAccountKeyHandling
-            If set, automatic handling of the account key will be enabled.
+        .PARAMETER State
+            The account key will be written into the provided state instance.
+        
+        .PARAMETER PassThrough
+            If set, the account key will be returned to the pipeline.
     #>
     param(
         # Specifies a path to one or more locations.
-        [Parameter(Mandatory=$true, Position=0)]
+        [Parameter(Mandatory=$true, Position=1)]
         [ValidateNotNullOrEmpty()]
         [string]
         $Path,
 
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNull()]
+        [AcmeState]
+        $State,
+
         [Parameter()]
         [switch]
-        $AutomaticAccountKeyHandling
+        $PassThrough
     )
 
     process {
@@ -34,11 +42,10 @@ function Import-AccountKey {
         }
 
         $accountKey = [KeyFactory]::CreateAccountKey($imported);
-        
-        if($AutomaticAccountKeyHandling) {
-            Enable-AccountKeyHandling $accountKey;
-        }
+        $state.AccountKey = $accountKey;
 
-        return $accountKey;
+        if($PassThrough) {
+            return $accountKey;
+        }
     }
 }

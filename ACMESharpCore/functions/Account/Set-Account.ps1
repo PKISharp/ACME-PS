@@ -1,32 +1,28 @@
 function Set-AccountKey {
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0, ValueFromPipeline = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [AcmeAccount] $Account = $Script:Account,
+        [ValidateScript({$_.Validate()})]
+        [AcmeState]
+        $State,
 
-        [Parameter(Position = 1)]
-        [ValidateNotNull()]
-        [AcmeAccount] $AccountKey = $Script:AccountKey,
-
-        [Parameter(Position = 2)]
-        [ValidateNotNullOrEmpty()]
-        [string] $Nonce = $Script:Nonce,
+        [Parameter()]
+        [switch]
+        $PassThrough,
 
         [Parameter(Mandatory = $true, ParameterSetName="NewAccountKey")]
         [IAccountKey] $NewAccountKey
     )
 
     $innerPayload = @{
-        "account" = $Account.KeyId;
-        "oldKey" = $AccountKey.ExportPuplicKey()
+        "account" = $State.Account.KeyId;
+        "oldKey" = $State.AccountKey.ExportPuplicKey()
     };
 
     $payload = New-SignedMessage -Url $Url -AccountKey $NewAccountKey -Payload $innerPayload;
-    $requestBody = New-SignedMessage -Url $Url -AccountKey $AccountKey -KeyId $Account.KeyId -Nonce $Nonce -Payload $payload;
+    Invoke-SignedWebRequest $Url -$State $payload -ErrorAction 'Stop';
 
-    $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST;
-
-    return Get-Account -Url $TargetAccount.ResourceUrl -AccountKey $NewAccountKey -KeyId $Account.KeyId `
-                       -Nonce $response.NextNonce -AutomaticAccountHandling:$($Script:AutoAccount)
+    $State.AccountKey = $NewAccountKey
+    return Get-Account -Url $TargetAccount.ResourceUrl -State $State -KeyId $Account.KeyId
 }

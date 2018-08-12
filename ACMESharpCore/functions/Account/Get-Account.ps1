@@ -3,40 +3,31 @@ function Get-Account {
     #>
     [CmdletBinding(DefaultParameterSetName = "FindAccount")]
     param(
-        [Parameter(Position = 0, ParameterSetName="FindAccount")]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [AcmeDirectory]
-        $Directory = $Script:ServiceDirectory,
+        [ValidateScript({$_.Validate("AccountKey")})]
+        [AcmeState]
+        $State,
+
+        [Parameter()]
+        [switch]
+        $PassThrough,
 
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName="GetAccount")]
         [ValidateNotNull()]
         [uri] $AccountUrl, 
 
-        [Parameter(Position = 1)]
-        [ValidateNotNull()]
-        [IAccountKey] $AccountKey = $Script:AccountKey,
-
-        [Parameter(Position = 2, ParameterSetName="GetAccount")]
+        [Parameter(Mandatory = $true, Position = 2, ParameterSetName="GetAccount")]
         [ValidateNotNullOrEmpty()]
-        [string] $KeyId = $Script:KeyId,
-
-        [Parameter(Position = 3)]
-        [ValidateNotNullOrEmpty()]
-        [string] $Nonce = $Script:Nonce,
-
-        [Parameter()]
-        [switch]
-        $AutomaticAccountHandling
+        [string] $KeyId
     )
 
     if($PSCmdlet.ParameterSetName -eq "FindAccount") {
+        $requestUrl = $State.ServiceDirectory.NewAccount;
         $payload = @{"onlyReturnExisting" = $true};
-
-        $requestBody = New-SignedMessage -Url $Directory.NewAccount -Payload $payload -AccountKey $AccountKey -Nonce $Nonce
-        $response = Invoke-AcmeWebRequest $Directory.NewAccount $requestBody -Method POST
+        $response = Invoke-SignedWebRequest $requestUrl $State $payload
     
         if($response.StatusCode -eq 200) {
-            $Nonce = $response.NextNonce;
             $KeyId = $response.Headers["Location"][0];
             
             $AccountUrl = $KeyId;
@@ -46,9 +37,7 @@ function Get-Account {
         }
     } 
 
-    $requestBody = New-SignedMessage -Url $AccountUrl -Payload @{} -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce
-
-    $response = Invoke-AcmeWebRequest $AccountUrl -Method POST -JsonBody $requestBody
+    $response = Invoke-SignedWebRequest $AccountUrl $State @{}
     $result = [AcmeAccount]::new($response, $KeyId);
 
     if($AutomaticAccountHandling) {

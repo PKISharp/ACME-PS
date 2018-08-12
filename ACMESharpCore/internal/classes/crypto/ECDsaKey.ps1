@@ -101,7 +101,7 @@ class ECDsaCertificateKey : ECDsaKeyBase, ICertificateKey {
     ECDsaCertificateKey([int] $hashSize) : base($hashSize) { }
     ECDsaCertificateKey([int] $hashSize, [System.Security.Cryptography.ECParameters] $keyParameters) : base($hashSize, $keyParameters) { }
 
-    [byte[]] ExportPfx([byte[]] $acmeCertificate, [string] $password) {
+    [byte[]] ExportPfx([byte[]] $acmeCertificate, [SecureString] $password) {
         return [Certificate]::ExportPfx($acmeCertificate, $this.ECDsa, $password);
     }
 

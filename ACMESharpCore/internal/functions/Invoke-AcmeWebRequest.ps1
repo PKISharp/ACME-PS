@@ -3,19 +3,16 @@ function Invoke-ACMEWebRequest {
     #>
     [CmdletBinding()]
     param(
-        # Parameter help description
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [Alias("Url")]
         [uri] $Uri,
 
-        # Parameter help description
         [Parameter(Position = 1)]
         [ValidateNotNull()]
         [string]
         $JsonBody,
 
-        # Parameter help description
         [Parameter(Mandatory = $true)]
         [ValidateSet("GET", "POST", "HEAD")]
         [string]

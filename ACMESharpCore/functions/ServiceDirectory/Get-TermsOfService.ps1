@@ -12,12 +12,12 @@ function Get-TermsOfService {
     #>
     [CmdletBinding()]
     param(
-        [Parameter()]
-        [AcmeDirectory]
-        $Directory = $Script:ServiceDirectory
+        [Parameter(Mandatory=$true)]
+        [AcmeState]
+        $State
     )
 
     process {
-        Start-Process $Directory.Meta.TermsOfService;
+        Start-Process $State.ServiceDirectory.Meta.TermsOfService;
     }
 }

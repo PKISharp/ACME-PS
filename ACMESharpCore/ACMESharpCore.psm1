@@ -62,11 +62,13 @@ $classes = @(
     "crypto/AlgorithmFactory",
     "AcmeHttpResponse",
     "AcmeDirectory",
+    "AcmeNonce",
     "AcmeAccount",
     "AcmeIdentifier",
     "AcmeChallenge",
     "AcmeOrder",
-    "AcmeAuthorization"
+    "AcmeAuthorization",
+    "AcmeState"
 )
 
 $classMergeFile = "$classPath\..\AllClasses.ps1";

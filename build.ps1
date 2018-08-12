@@ -31,9 +31,8 @@ if(Test-Path $ModuleOutPath) {
 <# Publish the module #>
 Import-Module "$PSScriptRoot/ACMESharpCore" -Force -ErrorAction 'Stop' # This will create the All* files.
 
-Copy-Item -LiteralPath "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/ACMESharpCore.psd1" -Force;
-Copy-Item -LiteralPath "$ModuleSourcePath/*.ps1" -Destination "$ModuleOutPath/" -Force;
-Copy-Item -LiteralPath "$ModuleSourcePath/bin" -Recurse -Destination "$ModuleOutPath/bin" -Force
+Copy-Item -Path "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/ACMESharpCore.psd1" -Force;
+Copy-Item -Path "$ModuleSourcePath/TypeDefinitions.ps1" -Destination "$ModuleOutPath/" -Force;
 
 $ModuleFiles = @(
     "internal/AllClasses.ps1",
