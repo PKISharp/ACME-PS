@@ -50,7 +50,7 @@ function New-Account {
 
         [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]
-        [string] $Nonce = $Script:Nonce,
+        [AcmeNonce] $Nonce = $Script:Nonce,
 
         [Switch]
         $AcceptTOS,
@@ -75,7 +75,7 @@ function New-Account {
     }
     
     $url = $Directory.NewAccount;
-    $requestBody = New-SignedMessage -Url $url -Payload $payload -AccountKey $AccountKey -Nonce $Nonce
+    $requestBody = New-SignedMessage -Url $url -Payload $payload -AccountKey $AccountKey -Nonce $Nonce.Next
 
     if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
         $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST
@@ -84,10 +84,10 @@ function New-Account {
             if(-not $ExistingAccountIsError) {
                 Write-Warning "JWK had already been registered for an account - trying to fetch account."
 
-                $Nonce = $response.NextNonce;
+                $Nonce.Push($response.NextNonce);
                 $keyId = $response.Headers["Location"][0];
 
-                return Get-Account -Url $keyId -AccountKey $AccountKey -KeyId $keyId -Nonce $Nonce -AutomaticAccountHandling:$AutomaticAccountHandling
+                return Get-Account -Url $keyId -AccountKey $AccountKey -KeyId $keyId -Nonce $Nonce.Next -AutomaticAccountHandling:$AutomaticAccountHandling
             } else {
                 Write-Error "JWK had already been registiered for an account."
             }

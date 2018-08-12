@@ -52,7 +52,7 @@ function New-Order {
 
         [Parameter(Position = 3)]
         [ValidateNotNullOrEmpty()]
-        [string] $Nonce = $Script:Nonce,
+        [AcmeNonce] $Nonce = $Script:Nonce,
 
         [Parameter(Mandatory = $true)]
         [AcmeIdentifier[]] $Identifiers,
@@ -75,7 +75,7 @@ function New-Order {
 
     $requestUrl = $Directory.NewOrder;
 
-    $requestBody = New-SignedMessage -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce -Payload $payload;
+    $requestBody = New-SignedMessage -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
     $response = Invoke-AcmeWebRequest $requestUrl $requestBody -Method POST;
 
     return [AcmeOrder]::new($response);

@@ -20,14 +20,14 @@ function Complete-Challenge {
 
         [Parameter(Position = 3)]
         [ValidateNotNullOrEmpty()]
-        [string] 
+        [AcmeNonce] 
         $Nonce = $Script:Nonce
     )
 
     process {
         $payload = @{};
 
-        $requestBody = New-SignedMessage -Url $Challenge.Url -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce -Payload $payload;
+        $requestBody = New-SignedMessage -Url $Challenge.Url -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
         $response = Invoke-AcmeWebRequest $Challenge.Url $requestBody -Method POST;
 
         return [AcmeChallenge]::new($response, $Challenge.Identifier);

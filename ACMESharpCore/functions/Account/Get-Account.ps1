@@ -22,7 +22,7 @@ function Get-Account {
 
         [Parameter(Position = 3)]
         [ValidateNotNullOrEmpty()]
-        [string] $Nonce = $Script:Nonce,
+        [AcmeNonce] $Nonce = $Script:Nonce,
 
         [Parameter()]
         [switch]
@@ -32,11 +32,11 @@ function Get-Account {
     if($PSCmdlet.ParameterSetName -eq "FindAccount") {
         $payload = @{"onlyReturnExisting" = $true};
 
-        $requestBody = New-SignedMessage -Url $Directory.NewAccount -Payload $payload -AccountKey $AccountKey -Nonce $Nonce
+        $requestBody = New-SignedMessage -Url $Directory.NewAccount -Payload $payload -AccountKey $AccountKey -Nonce $Nonce.Next
         $response = Invoke-AcmeWebRequest $Directory.NewAccount $requestBody -Method POST
     
         if($response.StatusCode -eq 200) {
-            $Nonce = $response.NextNonce;
+            $Nonce.Push($response.NextNonce);
             $KeyId = $response.Headers["Location"][0];
             
             $AccountUrl = $KeyId;
@@ -46,7 +46,7 @@ function Get-Account {
         }
     } 
 
-    $requestBody = New-SignedMessage -Url $AccountUrl -Payload @{} -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce
+    $requestBody = New-SignedMessage -Url $AccountUrl -Payload @{} -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next
 
     $response = Invoke-AcmeWebRequest $AccountUrl -Method POST -JsonBody $requestBody
     $result = [AcmeAccount]::new($response, $KeyId);

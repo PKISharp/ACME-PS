@@ -11,7 +11,7 @@ function Set-AccountKey {
 
         [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]
-        [string] $Nonce = $Script:Nonce,
+        [AcmeNonce] $Nonce = $Script:Nonce,
 
         [Parameter(Mandatory = $true, ParameterSetName="NewAccountKey")]
         [IAccountKey] $NewAccountKey
@@ -23,7 +23,7 @@ function Set-AccountKey {
     };
 
     $payload = New-SignedMessage -Url $Url -AccountKey $NewAccountKey -Payload $innerPayload;
-    $requestBody = New-SignedMessage -Url $Url -AccountKey $AccountKey -KeyId $Account.KeyId -Nonce $Nonce -Payload $payload;
+    $requestBody = New-SignedMessage -Url $Url -AccountKey $AccountKey -KeyId $Account.KeyId -Nonce $Nonce.Next -Payload $payload;
 
     $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST;
 

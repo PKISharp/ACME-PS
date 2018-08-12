@@ -21,7 +21,7 @@ function New-Nonce {
             PS> New-Nonce -Uri "https://acme-staging-v02.api.letsencrypt.org/acme/new-nonce"
     #>
     [CmdletBinding(DefaultParameterSetName="UseDirectory")]
-    [OutputType("String")]
+    [OutputType("AcmeNonce")]
     param(
         [Parameter(Position = 0, ParameterSetName="UseUrl")]
         [ValidateNotNullOrEmpty()]
@@ -44,5 +44,5 @@ function New-Nonce {
     }
 
     $response = Invoke-AcmeWebRequest $Url -Method Head 
-    return $response.NextNonce
+    return [AcmeNonce]::new($response.NextNonce);
 }

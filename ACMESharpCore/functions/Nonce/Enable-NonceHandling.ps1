@@ -20,7 +20,7 @@ function Enable-NonceHandling {
     param(
         [Parameter(Mandatory=$true, Position=0, ValueFromPipeline=$true)]
         [ValidateNotNull()]
-        [string]
+        [AcmeNonce]
         $Nonce,
 
         [Parameter(Mandatory=$true)]
@@ -34,6 +34,6 @@ function Enable-NonceHandling {
 
         $Script:AutoNonce = $true;
         $Script:NewNonceUrl = $NewNonceUrl;
-        $Script:Nonce = $Nonce;
+        $Script:Nonce = $Nonce.Next;
     }
 }
