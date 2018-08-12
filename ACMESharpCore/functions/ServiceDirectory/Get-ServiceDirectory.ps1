@@ -17,25 +17,21 @@ function Get-ServiceDirectory {
         .PARAMETER Path
             Path to load the Directory from. The given file needs to be .json or .xml (CLI-Xml)
         
-        .PARAMETER AutomaticDirectoryHandling
-            If set, the loaded service collection will be set as Module-Scoped variable. 
-            Other functions needing Urls from the service collection will be able to determine them automatically.
+        .PARAMETER State
+            If present, the service directory will be written into the provided state instance.
         
-        .PARAMETER AutomaticNonceHandling
-            If set, the nonce will be initialized and handled by the module. You can access the current Nonce by calling Get-Nonce.
+        .PARAMETER PassThrough
+            If set, the service directory will be returned to the pipeline.
 
 
         .EXAMPLE
-            PS> Get-ServiceDirectory
+            PS> Get-ServiceDirectory $myState
 
         .EXAMPLE
-            PS> Get-ServiceDirectory "LetsEncrypt"
+            PS> Get-ServiceDirectory "LetsEncrypt" $myState -PassThrough
 
         .EXAMPLE
-            PS> Get-ServiceDirectory "LetsEncrypt" -AutomaticDirectoryHandling -AutomaticNonceHandling
-
-        .EXAMPLE
-            PS> Get-ServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org"
+            PS> Get-ServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org" $myState
     #>
     [CmdletBinding(DefaultParameterSetName="FromName")]
     [OutputType("ACMEDirectory")]
@@ -53,13 +49,14 @@ function Get-ServiceDirectory {
         [string]
         $Path,
 
-        [Parameter()]
-        [Switch]
-        $AutomaticDirectoryHandling,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [ValidateNotNull()]
+        [AcmeState]
+        $State,
 
         [Parameter()]
-        [Switch]
-        $AutomaticNonceHandling
+        [switch]
+        $PassThrough
     )
 
     begin {
@@ -75,7 +72,7 @@ function Get-ServiceDirectory {
         if($PSCmdlet.ParameterSetName -in @("FromName", "FormUrl")) {
             if($PSCmdlet.ParameterSetName -eq "FromName") {
                 $acmeBaseUrl = $KnownEndpoints[$ServiceName];
-                if($acmeBaseUrl -eq $null) {
+                if($null -eq $acmeBaseUrl) {
                     $knownNames = $KnownEndpoints.Keys -join ", "
                     throw "The ACME-Service-Name $ServiceName is not known. Known names are $knownNames."
                 }
@@ -99,15 +96,10 @@ function Get-ServiceDirectory {
             }
         }
 
-        if($AutomaticDirectoryHandling) {
-            Enable-ServiceDirectoryHandling -ServiceDirectory $result;
-        }
+        $state.ServiceDirectory = $result;
 
-        if($AutomaticNonceHandling) {
-            $nonce = New-Nonce -Directory $result;
-            Enable-NonceHandling -Nonce $nonce -NewNonceUrl $result.NewNonce;
+        if($PassThrough) {
+            return $result;
         }
-
-        return $result;
     }
 }

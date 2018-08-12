@@ -1,27 +1,21 @@
 function Complete-Challenge {
     <#
+        .PARAMETER State
+            State instance containing service directory, account key, account and nonce.
+        
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [Parameter(Mandatory = $true, Position = 1, ValueFromPipeline = $true)]
         [ValidateNotNull()]
         [AcmeChallenge] 
         $Challenge,
 
-        [Parameter(Position = 1)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [IAccountKey] 
-        $AccountKey = $Script:AccountKey,
-
-        [Parameter(Position = 2)]
-        [ValidateNotNullOrEmpty()]
-        [string] 
-        $KeyId = $Script:KeyId,
-
-        [Parameter(Position = 3)]
-        [ValidateNotNullOrEmpty()]
-        [AcmeNonce] 
-        $Nonce = $Script:Nonce
+        [ValidateScript({$_.Validate()})]
+        [AcmeState]
+        $State
     )
 
     process {

@@ -13,15 +13,19 @@ function Show-Challenge {
         [ValidateNotNull()]
         [AcmeChallenge] $Challenge,
 
-        [Parameter(Position = 1)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [IAccountKey] $AccountKey = $Script:AccountKey
+        [ValidateScript({$_.Validate()})]
+        [AcmeState]
+        $State
     )
 
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
             return ($Authorization.challenges | Where-Object { $_.Type -eq $Type } | select -First 1 | Show-Challenge -AccountKey $AccountKey);
         }
+
+        $accountKey = $State.AccountKey;
 
         switch($Challenge.Type) {
             "http-01" { Show-Http01Challenge $Challenge $AccountKey; }

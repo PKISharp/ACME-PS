@@ -1,48 +1,44 @@
 function New-Nonce {
     <#
         .SYNOPSIS
-            Gets a new nonce from the uri
+            Gets a new nonce.
 
         .DESCRIPTION
-            Issues a web request to receive a new nonce from the given uri
+            Issues a web request to receive a new nonce from the service directory
 
 
-        .PARAMETER Url
-            Requests a new nonce from the given Url
-
-        .PARAMETER Directory
-            Request a new nonce by using the ACME-Directory
-
-        .PARAMETER ForceAutoNonceUsage
-            If automatic nonce handling is enabled and service directory handling is disabled, 
-            you might need to enforce AutoNonceUrl usage instead of DirectoryUrl usage
-
+        .PARAMETER State
+            The nonce will be written into the provided state instance.
+        
+        .PARAMETER PassThrough
+            If set, the nonce will be returned to the pipeline.
+    
+        
         .EXAMPLE
             PS> New-Nonce -Uri "https://acme-staging-v02.api.letsencrypt.org/acme/new-nonce"
     #>
-    [CmdletBinding(DefaultParameterSetName="UseDirectory")]
+    [CmdletBinding()]
     [OutputType("AcmeNonce")]
     param(
-        [Parameter(Position = 0, ParameterSetName="UseUrl")]
-        [ValidateNotNullOrEmpty()]
-        [uri]
-        $Url = $Script:NewNonceUrl,
-
-        [Parameter(ParameterSetName="UseUrl")]
-        [Switch]
-        $ForceAutoNonceUsage,
-
-        [Parameter(Position = 0, ParameterSetName="UseDirectory")]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [AcmeDirectory]
-        $Directory = $Script:ServiceDirectory
+        [ValidateScript({$_.Validate("ServiceDirectory")})]
+        [AcmeState]
+        $State,
+
+        [Parameter()]
+        [switch]
+        $PassThrough
     )
 
-    if($Directory) {
-        Write-Verbose "Using new nonce Url from service directory. "
-        $Url = $Directory.NewNonce;
-    }
+    $Url = $State.ServiceDirectory.NewNonce;
 
     $response = Invoke-AcmeWebRequest $Url -Method Head 
-    return [AcmeNonce]::new($response.NextNonce);
+    $nonce = [AcmeNonce]::new($response.NextNonce);
+
+    $State.Nonce = $nonce;
+    
+    if($PassThrough) {
+        return $nonce;
+    }
 }

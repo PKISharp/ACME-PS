@@ -15,7 +15,7 @@ function New-Identifier {
 
         
         .EXAMPLE
-            PS> New-Identifier DNS www.example.com
+            PS> New-Identifier www.example.com
     #>
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]

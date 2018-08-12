@@ -7,17 +7,8 @@ function New-Order {
             Creates a new order object to be used for signing a new certificate including all submitted identifiers.
 
         
-        .PARAMETER Directory
-            The service directory of the ACME service. Can be handled by the module, if enabled.
-
-        .PARAMETER AccountKey
-            Your account key for JWS Signing. Can be handled by the module, if enabled.
-        
-        .PARAMETER KeyId
-            Your "kid" as defined in the acme standard (usually the url to your account)
-
-        .PARAMETER Nonce
-            Replay nonce from ACME service. Can be handled by the module, if enabled.
+        .PARAMETER State
+            State instance containing service directory, account key, account and nonce.
         
         .PARAMETER Identifiers
             The list of identifiers, which will be covered by the certificates subject alternative names.
@@ -37,22 +28,11 @@ function New-Order {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [AcmeDirectory]
-        $Directory = $Script:ServiceDirectory,
-
-        [Parameter(Position = 1)]
-        [ValidateNotNull()]
-        [IAccountKey] $AccountKey = $Script:AccountKey,
-
-        [Parameter(Position = 2)]
-        [ValidateNotNullOrEmpty()]
-        [string] $KeyId = $Script:KeyId,
-
-        [Parameter(Position = 3)]
-        [ValidateNotNullOrEmpty()]
-        [AcmeNonce] $Nonce = $Script:Nonce,
+        [ValidateScript({$_.Validate()})]
+        [AcmeState]
+        $State,
 
         [Parameter(Mandatory = $true)]
         [AcmeIdentifier[]] $Identifiers,
@@ -73,9 +53,11 @@ function New-Order {
         $payload.Add("notAfter", $NotAfter.ToString("o"));
     }
 
-    $requestUrl = $Directory.NewOrder;
+    $requestUrl = $Status.ServiceDirectory.NewOrder;
+    $accountKey = $Status.AccountKey;
+    $keyId = $Status.Account.KeyId;
 
-    $response = Invoke-SignedWebRequest -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
+    $response = Invoke-SignedWebRequest -Url $requestUrl -AccountKey $accountKey -KeyId $keyId -Nonce $Nonce -Payload $payload;
 
     return [AcmeOrder]::new($response);
 }

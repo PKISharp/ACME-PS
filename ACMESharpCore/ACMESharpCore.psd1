@@ -19,13 +19,11 @@
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
-		"Enable-AccountHandling",
 		"Find-Account",
 		"Get-Account",
 		"New-Account",
 		"Set-Account",
 
-		"Enable-AccountKeyHandling",
 		"Export-AccountKey",
 		"Import-AccountKey",
 		"New-AccountKey",
@@ -42,7 +40,6 @@
 		"Get-Challenge",
 		"Show-Challenge",
 
-		"Enable-NonceHandling",
 		"Get-Nonce",
 		"New-Nonce",
 
@@ -52,11 +49,10 @@
 		"New-Order",
 		"Update-Order"
 
-		"Enable-ServiceDirectoryHandling",
 		"Get-ServiceDirectory",
 		"Get-TermsOfService",
 
-		"Initialize-AutomaticHandlers"
+		"Initialize-State"
 	)
 
 	AliasesToExport = @(

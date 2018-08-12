@@ -8,14 +8,11 @@ function New-Account {
             communicate with the ACME service.
 
         
-        .PARAMETER Directory
-            The service directory of the ACME service. Can be handled by the module, if enabled.
-
-        .PARAMETER AccountKey
-            Your account key for JWS Signing. Can be handled by the module, if enabled.
+        .PARAMETER State
+            The account will be written into the provided state instance.
         
-        .PARAMETER Nonce
-            Replay nonce from ACME service. Can be handled by the module, if enabled.
+        .PARAMETER PassThrough
+            If set, the account will be returned to the pipeline.
 
         .PARAMETER AcceptTOS
             If you set this, you accepted the Terms-of-service.
@@ -27,9 +24,6 @@ function New-Account {
         .PARAMETER EmailAddresses
             Contact adresses for certificate expiration mails and similar.
 
-        .PARAMETER AutomaticAccountHandling
-             If set, the module will be initialized to automatically provide the account, where neccessary.
-
             
         .EXAMPLE
             PS> New-Account -AcceptTOS -EmailAddresses "mail@example.com" -AutomaticAccountHandling
@@ -39,18 +33,15 @@ function New-Account {
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
-        [Parameter(Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [AcmeDirectory]
-        $Directory = $Script:ServiceDirectory,
+        [ValidateScript({$_.Validate("AccountKey")})]
+        [AcmeState]
+        $State,
 
-        [Parameter(Position = 1)]
-        [ValidateNotNull()]
-        [IAccountKey] $AccountKey = $Script:AccountKey,
-
-        [Parameter(Position = 2)]
-        [ValidateNotNullOrEmpty()]
-        [AcmeNonce] $Nonce = $Script:Nonce,
+        [Parameter()]
+        [switch]
+        $PassThrough,
 
         [Switch]
         $AcceptTOS,
@@ -59,12 +50,9 @@ function New-Account {
         $ExistingAccountIsError,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string[]]
-        $EmailAddresses,
-
-        [Parameter()]
-        [switch]
-        $AutomaticAccountHandling
+        $EmailAddresses
     )
 
     $Contacts = @($EmailAddresses | ForEach-Object { if($_.StartsWith("mailto:")) { $_ } else { "mailto:$_" } });
@@ -74,10 +62,10 @@ function New-Account {
         "Contact"=$Contacts;
     }
     
-    $url = $Directory.NewAccount;
+    $url = $State.ServiceDirectory.NewAccount;
 
     if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
-        $response = Invoke-SignedWebRequest -Url $url -Payload $payload -AccountKey $AccountKey -Nonce $Nonce.Next
+        $response = Invoke-SignedWebRequest -Url $url -Payload $payload -AccountKey $AccountKey -Nonce $State.Nonce
 
         if($response.StatusCode -eq 200) {
             if(-not $ExistingAccountIsError) {
@@ -86,18 +74,17 @@ function New-Account {
                 $Nonce.Push($response.NextNonce);
                 $keyId = $response.Headers["Location"][0];
 
-                return Get-Account -Url $keyId -AccountKey $AccountKey -KeyId $keyId -Nonce $Nonce.Next -AutomaticAccountHandling:$AutomaticAccountHandling
+                return Get-Account -Url $keyId -KeyId $keyId -State $State -PassThrough:$PassThrough
             } else {
                 Write-Error "JWK had already been registiered for an account."
             }
         } 
 
-        $result = [AcmeAccount]::new($response, $response.Headers["Location"][0]);
+        $account = [AcmeAccount]::new($response, $response.Headers["Location"][0]);
+        $State.Account = $account;
 
-        if($AutomaticAccountHandling) {
-            Enable-AccountHandling -Account $result;
+        if($PassThrough) {
+            return $result;
         }
-
-        return $result;
     }
 }

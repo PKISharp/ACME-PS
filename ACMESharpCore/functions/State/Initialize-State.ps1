@@ -1,11 +1,11 @@
-function Initialize-AutomaticHandlers {
+function Initialize-State {
     <#
         .SYNOPSIS
-            Initializes automatic handlers.
+            Initializes state from saved date.
         
         .DESCRIPTION
-            Initializes automatic service directory handling, nonce handling, accountkey handling and account handling.
-            Use this if you already have an exported account key to initialize all automatic handling.
+            Initializes state from saved data.
+            Use this if you already have an exported account key and an account.
 
         
         .PARAMETER DirectoryPath
@@ -33,7 +33,12 @@ function Initialize-AutomaticHandlers {
 
     $ErrorActionPreference = 'Stop';
 
-    Get-ServiceDirectory -Path $DirectoryPath -AutomaticDirectoryHandling -AutomaticNonceHandling | Out-Null
-    Import-AccountKey -Path $AccountKeyPath -AutomaticAccountKeyHandling | Out-Null
-    Get-Account -AutomaticAccountHandling | Out-Null
+    $state = New-State
+
+    Get-ServiceDirectory -State $state -Path $DirectoryPath
+    New-Nonce -State $state
+    Import-AccountKey -State $state -Path $AccountKeyPath 
+    Get-Account -State $state
+
+    return $state;
 }
