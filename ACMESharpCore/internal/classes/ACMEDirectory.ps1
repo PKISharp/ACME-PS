@@ -1,5 +1,7 @@
 class AcmeDirectory {
     AcmeDirectory([PSCustomObject] $obj) {
+        $this.ResourceUrl = $obj.ResourceUrl
+
         $this.NewAccount = $obj.NewAccount;
         $this.NewAuthz = $obj.NewAuthz;
         $this.NewNonce = $obj.NewNonce;
@@ -9,6 +11,8 @@ class AcmeDirectory {
 
         $this.Meta = [AcmeDirectoryMeta]::new($obj.Meta);
     }
+
+    [string] $ResourceUrl;
 
     [string] $NewAccount;
     [string] $NewAuthz;
