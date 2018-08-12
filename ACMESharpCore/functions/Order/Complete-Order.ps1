@@ -48,8 +48,9 @@ function Complete-Order {
         $requestUrl = $Order.FinalizeUrl;
         $accountKey = $State.AccountKey;
         $keyId = $State.Account.KeyId;
+        $nonce = $State.Nonce;
 
-        $response = Invoke-SignedWebRequest -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
+        $response = Invoke-SignedWebRequest -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce -Payload $payload;
 
         $Order.UpdateOrder($response);
     }

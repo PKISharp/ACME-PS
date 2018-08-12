@@ -12,7 +12,7 @@ function Invoke-SignedWebRequest {
         [Parameter(Position = 2)]
         [string] $KeyId,
 
-        [Parameter(Position = 3)]
+        [Parameter(Mandatory=$true, Position = 3)]
         [AcmeNonce] $Nonce,
 
         [Parameter(Mandatory = $true, Position = 4)]

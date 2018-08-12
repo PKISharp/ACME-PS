@@ -56,6 +56,7 @@ function New-Order {
     $requestUrl = $State.ServiceDirectory.NewOrder;
     $accountKey = $State.AccountKey;
     $keyId = $State.Account.KeyId;
+    $nonce = $State.Nonce;
 
     $response = Invoke-SignedWebRequest -Url $requestUrl -AccountKey $accountKey -KeyId $keyId -Nonce $Nonce -Payload $payload;
 

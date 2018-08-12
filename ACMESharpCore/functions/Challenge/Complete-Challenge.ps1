@@ -19,9 +19,13 @@ function Complete-Challenge {
     )
 
     process {
+        $accountKey = $State.AccountKey;
+        $keyId = $State.Account.KeyId;
+        $nonce = $State.Nonce;    
+
         $payload = @{};
 
-        $response = Invoke-SignedWebRequest -Url $Challenge.Url -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
+        $response = Invoke-SignedWebRequest -Url $Challenge.Url -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce -Payload $payload;
 
         return [AcmeChallenge]::new($response, $Challenge.Identifier);
     }
