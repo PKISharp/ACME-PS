@@ -7,25 +7,23 @@ function Invoke-SignedWebRequest {
         [string] $Url,
 
         [Parameter(Mandatory = $true, Position = 1)]
-        [IAccountKey] $AccountKey,
+        [AcmeState] $State,
 
-        [Parameter(Position = 2)]
-        [string] $KeyId,
-
-        [Parameter(Mandatory=$true, Position = 3)]
-        [AcmeNonce] $Nonce,
-
-        [Parameter(Mandatory = $true, Position = 4)]
+        [Parameter(Mandatory = $true, Position = 2)]
         [ValidateNotNull()]
         [object] $Payload
     )
 
     process {
-        $requestBody = New-SignedMessage -Url $Url -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $Payload
+        $accountKey = $State.AccountKey;
+        $keyId = (if($State.Account) { $State.Account.KeyId });
+        $nonce = $State.Nonce;
+
+        $requestBody = New-SignedMessage -Url $Url -AccountKey $accountKey -KeyId $keyId -Nonce $nonce.Next -Payload $Payload
         $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST
 
         if($null -ne $response -and $response.NextNonce) {
-            $Nonce.Push($response.NextNonce);
+            $nonce.Push($response.NextNonce);
         }
 
         return $response;

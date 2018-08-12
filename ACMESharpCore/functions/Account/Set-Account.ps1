@@ -21,7 +21,7 @@ function Set-AccountKey {
     };
 
     $payload = New-SignedMessage -Url $Url -AccountKey $NewAccountKey -Payload $innerPayload;
-    Invoke-SignedWebRequest -Url $Url -AccountKey $State.AccountKey -KeyId $State.Account.KeyId -Nonce $Nonce -Payload $payload -ErrorAction 'Stop';
+    Invoke-SignedWebRequest $Url -$State $payload -ErrorAction 'Stop';
 
     $State.AccountKey = $NewAccountKey
     return Get-Account -Url $TargetAccount.ResourceUrl -State $State -KeyId $Account.KeyId
