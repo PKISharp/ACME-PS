@@ -52,7 +52,8 @@
 		"Get-ServiceDirectory",
 		"Get-TermsOfService",
 
-		"Initialize-State"
+		"Initialize-State",
+		"New-State"
 	)
 
 	AliasesToExport = @(

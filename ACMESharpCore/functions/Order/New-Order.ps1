@@ -53,9 +53,9 @@ function New-Order {
         $payload.Add("notAfter", $NotAfter.ToString("o"));
     }
 
-    $requestUrl = $Status.ServiceDirectory.NewOrder;
-    $accountKey = $Status.AccountKey;
-    $keyId = $Status.Account.KeyId;
+    $requestUrl = $State.ServiceDirectory.NewOrder;
+    $accountKey = $State.AccountKey;
+    $keyId = $State.Account.KeyId;
 
     $response = Invoke-SignedWebRequest -Url $requestUrl -AccountKey $accountKey -KeyId $keyId -Nonce $Nonce -Payload $payload;
 

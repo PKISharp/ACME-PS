@@ -46,8 +46,8 @@ function Complete-Order {
         $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) }
 
         $requestUrl = $Order.FinalizeUrl;
-        $accountKey = $Status.AccountKey;
-        $keyId = $Status.Account.KeyId;
+        $accountKey = $State.AccountKey;
+        $keyId = $State.Account.KeyId;
 
         $response = Invoke-SignedWebRequest -Url $requestUrl -AccountKey $AccountKey -KeyId $KeyId -Nonce $Nonce.Next -Payload $payload;
 
