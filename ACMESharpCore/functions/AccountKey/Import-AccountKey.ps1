@@ -17,12 +17,12 @@ function Import-AccountKey {
     #>
     param(
         # Specifies a path to one or more locations.
-        [Parameter(Mandatory=$true, Position=0)]
+        [Parameter(Mandatory=$true, Position=1)]
         [ValidateNotNullOrEmpty()]
         [string]
         $Path,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [AcmeState]
         $State,

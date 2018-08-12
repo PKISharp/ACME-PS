@@ -36,7 +36,7 @@ function Get-ServiceDirectory {
     [CmdletBinding(DefaultParameterSetName="FromName")]
     [OutputType("ACMEDirectory")]
     param(
-        [Parameter(Position=0, ParameterSetName="FromName")]
+        [Parameter(Position=1, ParameterSetName="FromName")]
         [string]
         $ServiceName = "LetsEncrypt-Staging",
 
@@ -49,7 +49,7 @@ function Get-ServiceDirectory {
         [string]
         $Path,
 
-        [Parameter(Mandatory = $true, Position = 1)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [AcmeState]
         $State,

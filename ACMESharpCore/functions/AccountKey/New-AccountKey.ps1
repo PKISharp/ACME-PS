@@ -85,7 +85,7 @@ function New-AccountKey {
         [switch]
         $SkipKeyExport,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [AcmeState]
         $State,
