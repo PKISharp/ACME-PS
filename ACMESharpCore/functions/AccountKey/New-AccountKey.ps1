@@ -113,7 +113,7 @@ function New-AccountKey {
     if($SkipKeyExport) {
         Write-Warning "The account key will not be exported. Make sure you save the account key or you might loose access to your ACME account.";
 
-        $State.AccountKey = $accountKey;
+        $State.Set($accountKey);
 
         if($PassThrough) {
             return $accountKey;

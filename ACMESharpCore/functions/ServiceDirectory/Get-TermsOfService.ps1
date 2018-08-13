@@ -18,6 +18,6 @@ function Get-TermsOfService {
     )
 
     process {
-        Start-Process $State.ServiceDirectory.Meta.TermsOfService;
+        Start-Process $State.GetServiceDirectory().Meta.TermsOfService;
     }
 }

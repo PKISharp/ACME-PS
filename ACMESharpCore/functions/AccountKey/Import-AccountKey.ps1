@@ -42,7 +42,7 @@ function Import-AccountKey {
         }
 
         $accountKey = [KeyFactory]::CreateAccountKey($imported);
-        $state.AccountKey = $accountKey;
+        $State.Set($accountKey);
 
         if($PassThrough) {
             return $accountKey;

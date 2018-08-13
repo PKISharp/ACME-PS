@@ -23,7 +23,7 @@ function Get-Account {
     )
 
     if($PSCmdlet.ParameterSetName -eq "FindAccount") {
-        $requestUrl = $State.ServiceDirectory.NewAccount;
+        $requestUrl = $State.GetServiceDirectory().NewAccount;
         $payload = @{"onlyReturnExisting" = $true};
         $response = Invoke-SignedWebRequest $requestUrl $State $payload
 

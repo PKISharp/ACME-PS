@@ -15,9 +15,10 @@ function Invoke-SignedWebRequest {
     )
 
     process {
-        $accountKey = $State.AccountKey;
-        $keyId = (if($State.Account) { $State.Account.KeyId });
-        $nonce = $State.Nonce;
+        $accountKey = $State.GetAccountKey();
+        $account = $State.GetAccount();
+        $keyId = (if($account) { $account.KeyId });
+        $nonce = $State.GetNonce();
 
         $requestBody = New-SignedMessage -Url $Url -AccountKey $accountKey -KeyId $keyId -Nonce $nonce.Next -Payload $Payload
         $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST

@@ -62,7 +62,7 @@ function New-Account {
         "Contact"=$Contacts;
     }
 
-    $url = $State.ServiceDirectory.NewAccount;
+    $url = $State.GetServiceDirectory().NewAccount;
 
     if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
         $response = Invoke-SignedWebRequest $url $State $payload
@@ -81,7 +81,7 @@ function New-Account {
         }
 
         $account = [AcmeAccount]::new($response, $response.Headers["Location"][0]);
-        $State.Account = $account;
+        $State.Set($account);
 
         if($PassThrough) {
             return $result;

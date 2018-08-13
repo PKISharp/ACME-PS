@@ -96,7 +96,7 @@ function Get-ServiceDirectory {
             }
         }
 
-        $state.ServiceDirectory = $result;
+        $State.Set($result);
 
         if($PassThrough) {
             return $result;

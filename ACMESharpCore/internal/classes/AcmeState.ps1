@@ -1,16 +1,68 @@
 class AcmeState {
-    [ValidateNotNull()]
-    [AcmeDirectory] $ServiceDirectory;
+    [ValidateNotNull()] hidden [AcmeDirectory] $ServiceDirectory;
+    [ValidateNotNull()] hidden [AcmeNonce] $Nonce;
+    [ValidateNotNull()] hidden [IAccountKey] $AccountKey;
+    [ValidateNotNull()] hidden [AcmeAccount] $Account;
 
-    [ValidateNotNull()]
-    [AcmeNonce] $Nonce;
+    hidden [string] $SavePath;
+    hidden [bool] $AutoSave;
 
-    [ValidateNotNull()]
-    [IAccountKey] $AccountKey;
+    static hidden [hashtable] $FilenameFormats = @{
+        "ServiceDirectory"="ServiceDirectory.xml";
+        "AcmeNonce"="NextNonce.txt";
+        "AccountKey"="AccountKey.xml";
+        "Account"="Account.xml";
 
-    [ValidateNotNull()]
-    [AcmeAccount] $Account;
+        "Order"="Orders/Order-[i].xml";
+    };
 
+    AcmeState() { }
+
+    AcmeState([string] $savePath) {
+        $this.SavePath = Resolve-Path $savePath;
+        $this.AutoSave = $true;
+
+        if(-not (Test-Path $this.SavePath)) {
+            New-Item $this.SavePath -ItemType Directory;
+        }
+
+        # Initialize pre saved entries
+    }
+
+
+    [AcmeDirectory] GetServiceDirectory() { return $this.ServiceDirectory; }
+    [AcmeNonce] GetNonce() { return $this.Nonce; }
+    [IAccountKey] GetAccountKey() { return $this.AccountKey; }
+    [AcmeAccount] GetAccount() { return $this.Account; }
+
+
+    [void] Set([AcmeDirectory] $serviceDirectory) {
+        $this.ServiceDirectory = $serviceDirectory;
+        if($this.AutoSave) { [AcmeState]::Save($this.SavePath, $this.ServiceDirectory); }
+    }
+    [void] Set([AcmeNonce] $nonce) {
+        $this.Nonce = $nonce;
+        if($this.AutoSave) { [AcmeState]::Save($this.SavePath, $this.Nonce); }
+    }
+    [void] Set([IAccountKey] $accountKey) {
+        $this.AccountKey = $accountKey;
+        if($this.AutoSave) { [AcmeState]::Save($this.SavePath, $this.AccountKey); }
+    }
+    [void] Set([AcmeAccount] $account) {
+        $this.Account = $account;
+        if($this.AutoSave) { [AcmeState]::Save($this.SavePath, $this.Account); }
+    }
+
+    [void] AddOrder([AcmeOrder] $order) {
+        
+    }
+    [void] RemoveOrder([AcmeOrder] $order) {
+
+    }
+
+    [string] FindOrderUrl([string[]] $dnsNames) {
+
+    }
 
     [bool] Validate() {
         return $null -ne $this.ServiceDirectory -and
