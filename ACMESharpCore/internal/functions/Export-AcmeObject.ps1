@@ -1,6 +1,6 @@
 function Export-AcmeObject {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string]
         $FilePath,
@@ -15,6 +15,12 @@ function Export-AcmeObject {
     )
 
     process {
+        $ErrorActionPreference = 'Stop'
+        
+        if(Test-Path $Path -and -not $Force) {
+            Write-Error "$Path already exists."
+        }
+
         if($FileName -like "*.json") {
             $InputObject | ConvertTo-Json | Out-File -FilePath $FilePath -Encoding utf8 -Force:$Force;
         } else {
