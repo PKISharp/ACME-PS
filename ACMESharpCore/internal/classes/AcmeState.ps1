@@ -18,15 +18,15 @@ class AcmeState {
 
     AcmeState() { }
 
-    AcmeState([string] $savePath) {
+    AcmeState([string] $savePath, [bool]$autoSave) {
         $this.SavePath = Resolve-Path $savePath;
-        $this.AutoSave = $true;
+        $this.AutoSave = $autoSave;
 
         if(-not (Test-Path $this.SavePath)) {
             New-Item $this.SavePath -ItemType Directory;
         }
 
-        # Initialize pre saved entries
+        # TODO: Initialize pre saved entries
     }
 
 
