@@ -5,8 +5,6 @@ class AcmeOrder {
     }
 
     [void] UpdateOrder([AcmeHttpResponse] $httpResponse) {
-        $this.HttpResponse = $httpResponse;
-
         $this.Status = $httpResponse.Content.Status;
         $this.Expires  = $httpResponse.Content.Expires;
 
@@ -27,7 +25,6 @@ class AcmeOrder {
         }
     }
 
-    [AcmeHttpResponse] $HttpResponse;
     [string] $ResourceUrl;
 
     [string] $Status;
