@@ -1,4 +1,4 @@
-function Export-Object {
+function Export-AcmeObject {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
