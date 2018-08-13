@@ -5,14 +5,20 @@ function Export-AcmeObject {
         [string]
         $FilePath,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, ValueFromPipeline = $true)]
         [ValidateNotNull()]
-        $InputObject
+        $InputObject,
+
+        [Parameter()]
+        [switch]
+        $Force
     )
 
-    if($FileName -like "*.json") {
-        $InputObject | ConvertTo-Json | Out-File -FilePath $FilePath -Encoding utf8;
-    } else {
-        Export-Clixml $Path -InputObject $InputObject;
+    process {
+        if($FileName -like "*.json") {
+            $InputObject | ConvertTo-Json | Out-File -FilePath $FilePath -Encoding utf8 -Force:$Force;
+        } else {
+            Export-Clixml $Path -InputObject $InputObject -Force:$Force;
+        }
     }
 }
