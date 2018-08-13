@@ -1,4 +1,4 @@
-<# abstract #> 
+<# abstract #>
 class KeyExport {
     KeyExport () {
         if ($this.GetType() -eq [KeyExport]) {
@@ -28,7 +28,7 @@ class RSAKeyExport : KeyExport {
 
 class ECDsaKeyExport : KeyExport {
     hidden [string] $TypeName = "ECDsaKeyExport";
-    
+
     [int] $HashSize;
 
     [byte[]] $D;

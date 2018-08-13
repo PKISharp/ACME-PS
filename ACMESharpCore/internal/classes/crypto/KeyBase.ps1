@@ -1,8 +1,8 @@
-<# abstract #> 
+<# abstract #>
 class KeyBase
 {
     [ValidateSet(256,384,512)]
-    [int] 
+    [int]
     hidden $HashSize;
 
     [System.Security.Cryptography.HashAlgorithmName]
@@ -26,7 +26,7 @@ class KeyBase
                 throw [System.ArgumentOutOfRangeException]::new("Cannot set hash size");
             }
         }
-    } 
+    }
 
     <# abstract #> [KeyExport] ExportKey() {
         throw [System.NotImplementedException]::new();

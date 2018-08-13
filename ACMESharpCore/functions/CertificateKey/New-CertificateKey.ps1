@@ -1,9 +1,9 @@
 function New-CertificateKey {
     <#
         .SYNOPSIS
-            Creates a new certificate key, that can will used to sign ACME operations. 
+            Creates a new certificate key, that can will used to sign ACME operations.
             Provide a path where to save the key, since being able to restore it is crucial.
-        
+
         .DESCRIPTION
             Creates and stores a new certificate key, that can be used for ACME operations.
             The key will first be created, than exported and imported again to make sure, it has been saved.
@@ -12,21 +12,21 @@ function New-CertificateKey {
 
         .PARAMETER RSA
             Used to select RSA key type. (default)
-        
+
         .PARAMETER RSAHashSize
             The hash size used for the RSA algorithm.
-            
+
         .PARAMETER RSAKeySize
             The key size of the RSA algorithm.
 
 
         .PARAMETER ECDsa
             Used to select ECDsa key type.
-        
+
         .PARAMETER ECDsaHashSize
             The hash size used for the ECDsa algorithm.
 
-        
+
         .PARAMETER Path
             The path where the keys will be stored.
 

@@ -6,10 +6,10 @@ function Export-PfxCertificate {
         .DESCRIPTION
             Exports an issued certificate by downloading it from the acme service and combining it with the private key.
 
-        
+
         .PARAMETER Order
             The order which contains the issued certificate.
-        
+
         .PARAMETER CertificateKey
             The key which was used to create the orders CSR.
 
@@ -27,7 +27,7 @@ function Export-PfxCertificate {
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [ICertificateKey] 
+        [ICertificateKey]
         $CertificateKey,
 
         [Parameter(Mandatory = $true)]

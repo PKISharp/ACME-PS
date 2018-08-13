@@ -2,7 +2,7 @@ function Import-CertificateKey {
     <#
         .SYNOPSIS
             Imports an exported certificate key.
-        
+
         .DESCRIPTION
             Imports an certificate key that has been exported with Export-CertificateKey. If requested, the key is registered for automatic key handling.
 

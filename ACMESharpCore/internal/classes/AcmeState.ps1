@@ -1,16 +1,16 @@
 class AcmeState {
     [ValidateNotNull()]
     [AcmeDirectory] $ServiceDirectory;
-    
-    [ValidateNotNull()]    
+
+    [ValidateNotNull()]
     [AcmeNonce] $Nonce;
 
-    [ValidateNotNull()]    
+    [ValidateNotNull()]
     [IAccountKey] $AccountKey;
-    
-    [ValidateNotNull()]    
+
+    [ValidateNotNull()]
     [AcmeAccount] $Account;
-    
+
 
     [bool] Validate() {
         return $null -ne $this.ServiceDirectory -and
@@ -40,5 +40,5 @@ class AcmeState {
         }
 
         return false;
-    } 
+    }
 }

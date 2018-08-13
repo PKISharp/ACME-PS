@@ -1,9 +1,9 @@
 function New-AccountKey {
     <#
         .SYNOPSIS
-            Creates a new account key, that can will used to sign ACME operations. 
+            Creates a new account key, that can will used to sign ACME operations.
             Provide a path where to save the key, since being able to restore it is crucial.
-        
+
         .DESCRIPTION
             Creates and stores a new account key, that can be used for ACME operations.
             The key will first be created, than exported and imported again to make sure, it has been saved.
@@ -12,35 +12,35 @@ function New-AccountKey {
 
         .PARAMETER RSA
             Used to select RSA key type. (default)
-        
+
         .PARAMETER RSAHashSize
             The hash size used for the RSA algorithm.
-            
+
         .PARAMETER RSAKeySize
             The key size of the RSA algorithm.
 
 
         .PARAMETER ECDsa
             Used to select ECDsa key type.
-        
+
         .PARAMETER ECDsaHashSize
             The hash size used for the ECDsa algorithm.
 
-        
+
         .PARAMETER Path
             The path where the keys will be stored.
 
         .PARAMETER SkipExport
             Allows you to skip exporting the account key. Use with care.
 
-            
+
         .PARAMETER State
             The account key will be written into the provided state instance.
-        
+
         .PARAMETER PassThrough
             If set, the account key will be returned to the pipeline.
 
-        
+
         .EXAMPLE
             PS> New-AccountKey -Path C:\myKeyExport.xml
 
@@ -112,7 +112,7 @@ function New-AccountKey {
 
     if($SkipKeyExport) {
         Write-Warning "The account key will not be exported. Make sure you save the account key or you might loose access to your ACME account.";
-        
+
         $State.AccountKey = $accountKey;
 
         if($PassThrough) {

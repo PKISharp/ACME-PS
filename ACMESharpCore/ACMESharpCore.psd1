@@ -2,11 +2,11 @@
 	RootModule = 'ACMESharpCore.psm1'
 	ModuleVersion = '2.0.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
-	
+
 	Author = 'https://github.com/PKISharp/ACMESharpCore-PowerShell/graphs/contributors'
 	CompanyName = 'https://github.com/PKISharp'
-	Copyright = '(c) 2018 Thomas Glatzer, Eugene Bekker. All rights reserved.'	
-	
+	Copyright = '(c) 2018 Thomas Glatzer, Eugene Bekker. All rights reserved.'
+
 	Description = "PowerShell client module for the ACME protocol"
 
 	ScriptsToProcess = @(
@@ -35,7 +35,7 @@
 		"Export-CertificateKey",
 		"Import-CertificateKey",
 		"New-CertificateKey",
-		
+
 		"Complete-Challenge",
 		"Get-Challenge",
 		"Show-Challenge",

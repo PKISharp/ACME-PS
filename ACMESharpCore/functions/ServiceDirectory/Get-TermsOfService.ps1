@@ -6,7 +6,7 @@ function Get-TermsOfService {
         .DESCRIPTION
             Show the ACME service TOS
 
-        
+
         .PARAMETER Directory
             The directory to read the TOS from.
     #>

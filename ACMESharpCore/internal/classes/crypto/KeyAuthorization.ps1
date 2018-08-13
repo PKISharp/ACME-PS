@@ -8,7 +8,7 @@ class KeyAuthorization {
         return $jwkHash;
     }
 
-    
+
     static [string] Compute([IAccountKey] $accountKey, [string] $token)
     {
         $sha256 = [System.Security.Cryptography.SHA256]::Create();

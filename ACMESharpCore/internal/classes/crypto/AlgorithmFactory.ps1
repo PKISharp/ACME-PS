@@ -26,7 +26,7 @@ class KeyFactory
     {
         $keyType = $keyParameters.GetType();
         $factory = [KeyFactory]::Factories | Where-Object { $_.TargetType -eq $targetType -and $_.KeyType -eq $keyType } | Select-Object -First 1
-        
+
         if ($null -eq $factory) {
             throw [InvalidOperationException]::new("Unknown KeyParameters-Type.");
         }
@@ -39,5 +39,5 @@ class KeyFactory
     }
     static [ICertificateKey] CreateCertificateKey([KeyExport] $keyParameters) {
         return [KeyFactory]::Create("ICertificateKey", $keyParameters);
-    }   
+    }
 }

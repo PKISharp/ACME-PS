@@ -2,13 +2,13 @@ function Complete-Challenge {
     <#
         .PARAMETER State
             State instance containing service directory, account key, account and nonce.
-        
+
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 1, ValueFromPipeline = $true)]
         [ValidateNotNull()]
-        [AcmeChallenge] 
+        [AcmeChallenge]
         $Challenge,
 
         [Parameter(Mandatory = $true, Position = 0)]

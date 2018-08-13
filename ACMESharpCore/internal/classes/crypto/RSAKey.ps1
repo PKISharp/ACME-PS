@@ -1,9 +1,9 @@
-<# abstract #> 
+<# abstract #>
 class RSAKeyBase : KeyBase
 {
     hidden [System.Security.Cryptography.RSA] $RSA;
 
-    RSAKeyBase([int] $hashSize, [int] $keySize) : base($hashSize) 
+    RSAKeyBase([int] $hashSize, [int] $keySize) : base($hashSize)
     {
         if ($this.GetType() -eq [KeyBase]) {
             throw [System.InvalidOperationException]::new("Class must be inherited");
@@ -12,7 +12,7 @@ class RSAKeyBase : KeyBase
         $this.RSA = [System.Security.Cryptography.RSA]::Create($keySize);
     }
 
-    RSAKeyBase([int] $hashSize, [System.Security.Cryptography.RSAParameters] $keyParameters) 
+    RSAKeyBase([int] $hashSize, [System.Security.Cryptography.RSAParameters] $keyParameters)
         :base($hashSize)
     {
         if ($this.GetType() -eq [KeyBase]) {
@@ -43,17 +43,17 @@ class RSAKeyBase : KeyBase
 }
 
 class RSAAccountKey : RSAKeyBase, IAccountKey {
-    RSAAccountKey([int] $hashSize, [int] $keySize) : base($hashSize, $keySize) { } 
+    RSAAccountKey([int] $hashSize, [int] $keySize) : base($hashSize, $keySize) { }
     RSAAccountKey([int] $hashSize, [System.Security.Cryptography.RSAParameters] $keyParameters) : base($hashSize, $keyParameters) { }
 
     [string] JwsAlgorithmName() { return "RS$($this.HashSize)" }
 
     [hashtable] ExportPublicJwk() {
         $keyParams = $this.RSA.ExportParameters($false);
-        
-        <# 
+
+        <#
             As per RFC 7638 Section 3, these are the *required* elements of the
-            JWK and are sorted in lexicographic order to produce a canonical form 
+            JWK and are sorted in lexicographic order to produce a canonical form
         #>
         $publicJwk = @{
             "e" = ConvertTo-UrlBase64 -InputBytes $keyParams.Exponent;
@@ -91,7 +91,7 @@ class RSAAccountKey : RSAKeyBase, IAccountKey {
 }
 
 class RSACertificateKey : RSAKeyBase, ICertificateKey {
-    RSACertificateKey([int] $hashSize, [int] $keySize) : base($hashSize, $keySize) { } 
+    RSACertificateKey([int] $hashSize, [int] $keySize) : base($hashSize, $keySize) { }
     RSACertificateKey([int] $hashSize, [System.Security.Cryptography.RSAParameters] $keyParameters) : base($hashSize, $keyParameters) { }
 
     [byte[]] ExportPfx([byte[]] $acmeCertificate, [SecureString] $password) {
@@ -104,7 +104,7 @@ class RSACertificateKey : RSAKeyBase, ICertificateKey {
 
     static [ICertificateKey] Create([RSAKeyExport] $keyExport) {
         $keyParameters = [System.Security.Cryptography.RSAParameters]::new();
- 
+
         $keyParameters.D = $keyExport.D;
         $keyParameters.DP = $keyExport.DP;
         $keyParameters.DQ = $keyExport.DQ;
@@ -113,7 +113,7 @@ class RSACertificateKey : RSAKeyBase, ICertificateKey {
         $keyParameters.Modulus = $keyExport.Modulus;
         $keyParameters.P = $keyExport.P;
         $keyParameters.Q = $keyExport.Q;
- 
+
         return [RSACertificateKey]::new($keyExport.HashSize, $keyParameters);
      }
 }

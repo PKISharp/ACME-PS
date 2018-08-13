@@ -1,4 +1,4 @@
-<# abstract #> 
+<# abstract #>
 class ECDsaKeyBase : KeyBase
 {
     hidden [System.Security.Cryptography.ECDsa] $ECDsa;
@@ -16,13 +16,13 @@ class ECDsaKeyBase : KeyBase
         $this.ECDsa = [System.Security.Cryptography.ECDsa]::Create($curve);
     }
 
-    ECDsaKeyBase([int] $hashSize,[System.Security.Cryptography.ECParameters] $keyParameters) 
+    ECDsaKeyBase([int] $hashSize,[System.Security.Cryptography.ECParameters] $keyParameters)
         :base($hashSize)
     {
         if ($this.GetType() -eq [KeyBase]) {
             throw [System.InvalidOperationException]::new("Class must be inherited");
         }
-        
+
         $this.CurveName = "P-$hashSize";
         $this.ECDsa = [System.Security.Cryptography.ECDsa]::Create($keyParameters);
     }
@@ -60,10 +60,10 @@ class ECDsaAccountKey : ECDsaKeyBase, IAccountKey {
 
     [hashtable] ExportPublicJwk() {
         $keyParams = $this.ECDsa.ExportParameters($false);
-        
-        <# 
+
+        <#
             As per RFC 7638 Section 3, these are the *required* elements of the
-            JWK and are sorted in lexicographic order to produce a canonical form 
+            JWK and are sorted in lexicographic order to produce a canonical form
         #>
         $publicJwk = @{
             "crv" = $this.CurveName;
@@ -87,12 +87,12 @@ class ECDsaAccountKey : ECDsaKeyBase, IAccountKey {
 
     static [IAccountKey] Create([ECDsaKeyExport] $keyExport) {
         $keyParameters = [System.Security.Cryptography.ECParameters]::new();
- 
+
         $keyParameters.Curve = [ECDsaKeyBase]::GetCurve($keyExport.HashSize);
         $keyParameters.D = $keyExport.D;
         $keyParameters.Q.X = $keyExport.QX;
         $keyParameters.Q.Y = $keyExport.QY;
- 
+
         return [ECDsaAccountKey]::new($keyExport.HashSize, $keyParameters);
      }
 }
@@ -111,12 +111,12 @@ class ECDsaCertificateKey : ECDsaKeyBase, ICertificateKey {
 
     static [ICertificateKey] Create([ECDsaKeyExport] $keyExport) {
         $keyParameters = [System.Security.Cryptography.ECParameters]::new();
- 
+
         $keyParameters.Curve = [ECDsaKeyBase]::GetCurve($keyExport.HashSize);
         $keyParameters.D = $keyExport.D;
         $keyParameters.Q.X = $keyExport.QX;
         $keyParameters.Q.Y = $keyExport.QY;
- 
+
         return [ECDsaCertificateKey]::new($keyExport.HashSize, $keyParameters);
      }
 }

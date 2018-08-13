@@ -7,19 +7,19 @@ function Get-ServiceDirectory {
             This will issue a web request to either the url or to a well-known ACME server to fetch the service directory.
             Alternatively the directory can be loaded from a path, when it has been stored with Export-CliXML or as Json.
 
-        
+
         .PARAMETER EndpointName
             The Name of an Well-Known ACME-Endpoint.
-        
+
         .PARAMETER DirectoryUrl
             Url of an ACME Directory.
-        
+
         .PARAMETER Path
             Path to load the Directory from. The given file needs to be .json or .xml (CLI-Xml)
-        
+
         .PARAMETER State
             If present, the service directory will be written into the provided state instance.
-        
+
         .PARAMETER PassThrough
             If set, the service directory will be returned to the pipeline.
 
@@ -60,9 +60,9 @@ function Get-ServiceDirectory {
     )
 
     begin {
-        $KnownEndpoints = @{ 
+        $KnownEndpoints = @{
             "LetsEncrypt-Staging"="https://acme-staging-v02.api.letsencrypt.org";
-            "LetsEncrypt"="https://acme-v02.api.letsencrypt.org" 
+            "LetsEncrypt"="https://acme-v02.api.letsencrypt.org"
         }
     }
 
@@ -81,7 +81,7 @@ function Get-ServiceDirectory {
             } elseif ($PSCmdlet.ParameterSetName -eq "FromUrl") {
                 $serviceDirectoryUrl = $DirectoryUrl
             }
-            
+
             $response = Invoke-WebRequest $serviceDirectoryUrl;
 
             $result = [AcmeDirectory]::new(($response.Content | ConvertFrom-Json));

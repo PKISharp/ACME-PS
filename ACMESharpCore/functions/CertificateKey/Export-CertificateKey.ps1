@@ -2,18 +2,18 @@ function Export-CertificateKey {
     <#
         .SYNOPSIS
             Stores an certificate key to the given path.
-        
+
         .DESCRIPTION
             Stores an certificate key to the given path. If the path already exists an error will be thrown and the key will not be saved.
 
-        
+
         .PARAMETER Path
             The path where the key should be exported to. Uses json if path ends with .json. Will use clixml in other cases.
 
         .PARAMETER CertificateKey
             The certificate key that will be exported to the Path. If AutomaticCertificateKeyHandling is enabled it will export the registered certificate key.
 
-        
+
         .EXAMPLE
             PS> Export-CertificateKey -Path "C:\myExportPath.xml" -CertificateKey $myCertificateKey
     #>

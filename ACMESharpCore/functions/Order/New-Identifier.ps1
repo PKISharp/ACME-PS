@@ -6,14 +6,14 @@ function New-Identifier {
         .DESCRIPTION
             Creates a new identifier needed for orders and authorizations
 
-        
+
         .PARAMETER Type
             The identifier type
 
         .PARAMETER Value
             The value of the identifer, e.g. the FQDN.
 
-        
+
         .EXAMPLE
             PS> New-Identifier www.example.com
     #>

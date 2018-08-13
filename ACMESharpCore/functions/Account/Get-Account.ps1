@@ -15,7 +15,7 @@ function Get-Account {
 
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName="GetAccount")]
         [ValidateNotNull()]
-        [uri] $AccountUrl, 
+        [uri] $AccountUrl,
 
         [Parameter(Mandatory = $true, Position = 2, ParameterSetName="GetAccount")]
         [ValidateNotNullOrEmpty()]
@@ -26,16 +26,16 @@ function Get-Account {
         $requestUrl = $State.ServiceDirectory.NewAccount;
         $payload = @{"onlyReturnExisting" = $true};
         $response = Invoke-SignedWebRequest $requestUrl $State $payload
-    
+
         if($response.StatusCode -eq 200) {
             $KeyId = $response.Headers["Location"][0];
-            
+
             $AccountUrl = $KeyId;
         } else {
             Write-Error "JWK seems not to be registered for an account."
             return $null;
         }
-    } 
+    }
 
     $response = Invoke-SignedWebRequest $AccountUrl $State @{}
     $result = [AcmeAccount]::new($response, $KeyId);

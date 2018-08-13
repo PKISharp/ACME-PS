@@ -25,7 +25,7 @@ function New-SignedMessage {
 
     if($Nonce) {
         Write-Debug "Nonce $Nonce will be used";
-        $headers.Add("nonce", $Nonce); 
+        $headers.Add("nonce", $Nonce);
     }
 
     if($KeyId) {
@@ -46,7 +46,7 @@ function New-SignedMessage {
         $messagePayload = $Payload | ConvertTo-Json -Compress;
     }
 
-    $jsonHeaders = $headers | ConvertTo-Json -Compress 
+    $jsonHeaders = $headers | ConvertTo-Json -Compress
 
     Write-Debug "Payload is now: $messagePayload";
     Write-Debug "Headers are: $jsonHeaders"
@@ -60,6 +60,6 @@ function New-SignedMessage {
 
     $result = $signedPayload | ConvertTo-Json;
     Write-Debug "Created signed message`n: $result";
-    
+
     return $result;
 }

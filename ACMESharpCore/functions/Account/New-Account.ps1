@@ -7,10 +7,10 @@ function New-Account {
             Registers the given account key with an ACME service to retreive an account that enables you to
             communicate with the ACME service.
 
-        
+
         .PARAMETER State
             The account will be written into the provided state instance.
-        
+
         .PARAMETER PassThrough
             If set, the account will be returned to the pipeline.
 
@@ -24,7 +24,7 @@ function New-Account {
         .PARAMETER EmailAddresses
             Contact adresses for certificate expiration mails and similar.
 
-            
+
         .EXAMPLE
             PS> New-Account -AcceptTOS -EmailAddresses "mail@example.com" -AutomaticAccountHandling
 
@@ -61,7 +61,7 @@ function New-Account {
         "TermsOfServiceAgreed"=$AcceptTOS.IsPresent;
         "Contact"=$Contacts;
     }
-    
+
     $url = $State.ServiceDirectory.NewAccount;
 
     if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
@@ -78,7 +78,7 @@ function New-Account {
             } else {
                 Write-Error "JWK had already been registiered for an account."
             }
-        } 
+        }
 
         $account = [AcmeAccount]::new($response, $response.Headers["Location"][0]);
         $State.Account = $account;

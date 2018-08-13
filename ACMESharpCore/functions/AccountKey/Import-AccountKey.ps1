@@ -2,7 +2,7 @@ function Import-AccountKey {
     <#
         .SYNOPSIS
             Imports an exported account key.
-        
+
         .DESCRIPTION
             Imports an account key that has been exported with Export-AccountKey. If requested, the key is registered for automatic key handling.
 
@@ -11,7 +11,7 @@ function Import-AccountKey {
 
         .PARAMETER State
             The account key will be written into the provided state instance.
-        
+
         .PARAMETER PassThrough
             If set, the account key will be returned to the pipeline.
     #>

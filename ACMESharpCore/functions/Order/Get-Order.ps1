@@ -2,11 +2,11 @@ function Get-Order {
     <#
         .SYNOPSIS
             Fetches an order from acme service
-        
+
         .DESCRIPTION
             Uses the given url to fetch an existing order object from the acme service.
 
-        
+
         .PARAMETER Url
             The resource url of the order to be fetched.
     #>

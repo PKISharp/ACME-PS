@@ -20,7 +20,7 @@ PS> & .\AcmeSharpCore\tests\A-Manual-Test-Run.ps1
 
 ## How to use the module
 
-This sequence will create a new account and account keys, to further usage.  
+This sequence will create a new account and account keys, to further usage.
 
 ```
 PS> Import-Module AcmeSharpCore
@@ -78,9 +78,9 @@ PS> $certKey = New-AcmeCertificateKey -Path C:\AcmeTemp\CertKey_www.example.com.
 PS> Complete-Order -Order $order -CertificateKey $certKey
 
 # Check for Certificate Url
-PS> while (-not $order.CertificateUrl) { 
-    Start-Sleep 60; 
-    Update-AcmeOrder $order 
+PS> while (-not $order.CertificateUrl) {
+    Start-Sleep 60;
+    Update-AcmeOrder $order
 } ;
 
 # Get Certificate

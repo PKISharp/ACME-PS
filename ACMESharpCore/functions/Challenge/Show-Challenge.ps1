@@ -22,7 +22,7 @@ function Show-Challenge {
 
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
-            return ($Authorization.challenges | Where-Object { $_.Type -eq $Type } | 
+            return ($Authorization.challenges | Where-Object { $_.Type -eq $Type } |
                 Select-Object -First 1 | Show-Challenge -AccountKey $AccountKey);
         }
 

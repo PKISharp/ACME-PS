@@ -2,11 +2,11 @@ function Update-Order {
     <#
         .SYNOPSIS
             Updates an order from acme service
-        
+
         .DESCRIPTION
             Uses the order to fetch an update from the acme service.
 
-        
+
         .PARAMETER Order
             The order to be updated.
     #>

@@ -9,11 +9,11 @@ function New-Nonce {
 
         .PARAMETER State
             The nonce will be written into the provided state instance.
-        
+
         .PARAMETER PassThrough
             If set, the nonce will be returned to the pipeline.
-    
-        
+
+
         .EXAMPLE
             PS> New-Nonce -Uri "https://acme-staging-v02.api.letsencrypt.org/acme/new-nonce"
     #>
@@ -33,11 +33,11 @@ function New-Nonce {
 
     $Url = $State.ServiceDirectory.NewNonce;
 
-    $response = Invoke-AcmeWebRequest $Url -Method Head 
+    $response = Invoke-AcmeWebRequest $Url -Method Head
     $nonce = [AcmeNonce]::new($response.NextNonce);
 
     $State.Nonce = $nonce;
-    
+
     if($PassThrough) {
         return $nonce;
     }

@@ -8,10 +8,10 @@ function Complete-Order {
 
         .PARAMETER State
             State instance containing service directory, account key, account and nonce.
-        
+
         .PARAMETER Order
             The order to be finalized.
-        
+
         .PARAMETER CertificateKey
             The certificate key to be used to create a CSR.
 
@@ -33,7 +33,7 @@ function Complete-Order {
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [ICertificateKey] 
+        [ICertificateKey]
         $CertificateKey
     )
 

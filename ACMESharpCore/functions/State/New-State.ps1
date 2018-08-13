@@ -4,7 +4,7 @@ function New-State {
             Initializes a new state object.
 
         .DESCRIPTION
-            Initializes a new state object, that will be used by other functions 
+            Initializes a new state object, that will be used by other functions
             to access the service directory, nonce, account and account key.
 
         .EXAMPLE

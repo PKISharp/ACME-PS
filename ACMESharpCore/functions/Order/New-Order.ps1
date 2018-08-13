@@ -6,10 +6,10 @@ function New-Order {
         .DESCRIPTION
             Creates a new order object to be used for signing a new certificate including all submitted identifiers.
 
-        
+
         .PARAMETER State
             State instance containing service directory, account key, account and nonce.
-        
+
         .PARAMETER Identifiers
             The list of identifiers, which will be covered by the certificates subject alternative names.
 
@@ -19,8 +19,8 @@ function New-Order {
         .PARAMETER NotAfter
             Latest date the certificate should be considered valid.
 
-        
-        .EXAMPLE 
+
+        .EXAMPLE
             PS> New-Order -Directory $myDirectory -AccountKey $myAccountKey -KeyId $myKid -Nonce $myNonce -Identifiers $myIdentifiers
 
         .EXAMPLE
