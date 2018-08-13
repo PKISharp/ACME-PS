@@ -77,14 +77,6 @@ function New-AccountKey {
         [int]
         $ECDsaHashSize = 256,
 
-        [Parameter()]
-        [string]
-        $Path,
-
-        [Parameter()]
-        [switch]
-        $SkipKeyExport,
-
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [AcmeState]
@@ -110,16 +102,9 @@ function New-AccountKey {
         Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
     }
 
-    if($SkipKeyExport) {
-        Write-Warning "The account key will not be exported. Make sure you save the account key or you might loose access to your ACME account.";
+    $State.Set($accountKey);
 
-        $State.Set($accountKey);
-
-        if($PassThrough) {
-            return $accountKey;
-        }
+    if($PassThrough) {
+        return $accountKey;
     }
-
-    Export-AccountKey -AccountKey $accountKey -Path $Path | Out-Null
-    Import-AccountKey -State $State -Path $Path -PassThrough:$PassThrough
 }
