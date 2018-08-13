@@ -27,7 +27,7 @@ function Export-AccountKey {
         [Parameter(ValueFromPipeline=$true)]
         [ValidateNotNull()]
         [IAccountKey]
-        $AccountKey = $Script:AccountKey
+        $AccountKey
     )
 
     process {

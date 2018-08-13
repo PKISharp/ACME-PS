@@ -83,5 +83,3 @@ $classes | ForEach-Object { Get-Content "$classPath\$_.ps1" } | Set-Content $cla
 . Import-ModuleFile $classMergeFile;
 . Import-ModuleFile $internalFunctions;
 . Import-ModuleFile $exportedFunctions;
-
-$Script:AutoNonce = $true
