@@ -24,7 +24,7 @@ function Export-AcmeObject {
         if($FileName -like "*.json") {
             $InputObject | ConvertTo-Json | Out-File -FilePath $FilePath -Encoding utf8 -Force:$Force;
         } else {
-            Export-Clixml $Path -InputObject $InputObject -Force:$Force;
+            Export-Clixml $FilePath -InputObject $InputObject -Force:$Force;
         }
     }
 }
