@@ -7,7 +7,7 @@ class AcmeState {
     hidden [string] $SavePath;
     hidden [bool] $AutoSave;
 
-    static hidden [hashtable] $Filenames = @{
+    hidden [hashtable] $Filenames = @{
         "ServiceDirectory"="ServiceDirectory.xml";
         "AcmeNonce"="NextNonce.txt";
         "AccountKey"="AccountKey.xml";
@@ -20,7 +20,7 @@ class AcmeState {
     AcmeState() { }
 
     AcmeState([string] $savePath, [bool]$autoSave) {
-        if(-not (Test-Path $this.SavePath)) {
+        if(-not (Test-Path $savePath)) {
             New-Item $savePath -ItemType Directory -Force;
         }
 
@@ -38,14 +38,14 @@ class AcmeState {
     [void] Set([AcmeDirectory] $serviceDirectory) {
         $this.ServiceDirectory = $serviceDirectory;
         if($this.AutoSave) { 
-            $directoryPath = "$($this.SavePath)/$([AcmeState]::Filenames["ServiceDirectory"])";
+            $directoryPath = "$($this.SavePath)/$($this.Filenames["ServiceDirectory"])";
             $this.ServiceDirectory | Export-AcmeObject $directoryPath;
         }
     }
     [void] Set([AcmeNonce] $nonce) {
         $this.Nonce = $nonce;
         if($this.AutoSave) {
-            $noncePath = "$($this.SavePath)/$([AcmeState]::Filenames["Nonce"])";
+            $noncePath = "$($this.SavePath)/$($this.Filenames["Nonce"])";
             Set-Content $noncePath -Value $this.Nonce -NoNewLine;
         }
     }
@@ -53,7 +53,7 @@ class AcmeState {
         $this.AccountKey = $accountKey;
         
         if($this.AutoSave) { 
-            $accountKeyPath = "$($this.SavePath)/$([AcmeState]::Filenames["AccountKey"])";         
+            $accountKeyPath = "$($this.SavePath)/$($this.Filenames["AccountKey"])";         
             $this.AccountKey | Export-AccountKey $accountKeyPath -Force;
         } else {
             # this warning should not show up during reinitialization ..
@@ -64,7 +64,7 @@ class AcmeState {
     [void] Set([AcmeAccount] $account) {
         $this.Account = $account;
         if($this.AutoSave) {
-            $accountPath = "$($this.SavePath)/$([AcmeState]::Filenames["Account"])"; 
+            $accountPath = "$($this.SavePath)/$($this.Filenames["Account"])"; 
             $this.Account | Export-AcmeObject $this.SavePath;
         }
     }
@@ -84,7 +84,7 @@ class AcmeState {
         }
     }
     hidden [string] GetOrderFileName([string] $orderHash) {
-        $fileName = ([AcmeState]::Filenames["Order"]).Replace("[hash]", $orderHash);
+        $fileName = ($this.Filenames["Order"]).Replace("[hash]", $orderHash);
         return "$($this.SavePath)/$filename";
     }
 
@@ -108,7 +108,7 @@ class AcmeState {
             $orderFileName = $this.GetOrderFileName($orderHash);
 
             if(-not (Test-Path $order)) {
-                $orderListFile = "$($this.SavePath)/$([AcmeState]::Filenames["OrderList"])";
+                $orderListFile = "$($this.SavePath)/$($this.Filenames["OrderList"])";
                 
                 foreach ($id in $order.Identifiers) {
                     if(-not (Test-Path $orderFileName)) {
@@ -134,7 +134,7 @@ class AcmeState {
                 Remove-Item $orderFileName;
             }
 
-            $orderListFile = "$($this.SavePath)/$([AcmeState]::Filenames["OrderList"])";
+            $orderListFile = "$($this.SavePath)/$($this.Filenames["OrderList"])";
             Set-Content -Path $orderListFile -Value (Get-Content -Path $orderListFile | Select-String -Pattern "=$orderHash" -NotMatch -SimpleMatch)
         } else {
             Write-Warning "If AutoSaving is off, this method does nothing."
@@ -142,7 +142,7 @@ class AcmeState {
     }
 
     [AcmeOrder] FindOrder([string[]] $dnsNames) {
-        $orderListFile = "$($this.SavePath)/$([AcmeState]::Filenames["OrderList"])";
+        $orderListFile = "$($this.SavePath)/$($this.Filenames["OrderList"])";
 
         $first = $true;
         $lastMatch = $null;
@@ -191,10 +191,10 @@ class AcmeState {
     static [AcmeState] FromPath([string] $Path) {
         $state = [AcmeState]::new($Path, $false);
 
-        $directoryPath = "$Path/$([AcmeState]::Filenames["ServiceDirectory"])";
-        $noncePath = "$Path/$([AcmeState]::Filenames["Nonce"])";
-        $accountKeyPath = "$Path/$([AcmeState]::Filenames["AccountKey"])"; 
-        $accountPath = "$Path/$([AcmeState]::Filenames["Account"])"; 
+        $directoryPath = "$Path/$($state.Filenames["ServiceDirectory"])";
+        $noncePath = "$Path/$($state.Filenames["Nonce"])";
+        $accountKeyPath = "$Path/$($state.Filenames["AccountKey"])"; 
+        $accountPath = "$Path/$($state.Filenames["Account"])"; 
         
         if(Test-Path $directoryPath) {
             Get-ServiceDirectory $state -Path $directoryPath
