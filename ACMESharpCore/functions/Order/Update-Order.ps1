@@ -25,6 +25,7 @@ function Update-Order {
 
     $response = Invoke-AcmeWebRequest $Order.ResourceUrl -Method GET;
     $Order.UpdateOrder($response);
+    $State.SetOrder($Order);
 
     if($PassThrough) {
         return $Order;

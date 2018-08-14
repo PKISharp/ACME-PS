@@ -56,5 +56,8 @@ function New-Order {
     $requestUrl = $State.GetServiceDirectory().NewOrder;
     $response = Invoke-SignedWebRequest $requestUrl $State $payload;
 
-    return [AcmeOrder]::new($response);
+    $order = [AcmeOrder]::new($response);
+    $state.AddOrder($order);
+    
+    return $order;
 }
