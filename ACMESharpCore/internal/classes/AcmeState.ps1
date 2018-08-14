@@ -13,20 +13,19 @@ class AcmeState {
         "AccountKey"="AccountKey.xml";
         "Account"="Account.xml";
 
-        "Order"="Orders/Order-[i].xml";
+        "OrderList"="Orders/OrderList.txt"
+        "Order"="Orders/Order-[hash].xml";
     };
 
     AcmeState() { }
 
     AcmeState([string] $savePath, [bool]$autoSave) {
-        $this.SavePath = Resolve-Path $savePath;
-        $this.AutoSave = $autoSave;
-
         if(-not (Test-Path $this.SavePath)) {
-            New-Item $this.SavePath -ItemType Directory;
+            New-Item $savePath -ItemType Directory -Force;
         }
 
-        # TODO: Initialize pre saved entries
+        $this.AutoSave = $autoSave;
+        $this.SavePath = Resolve-Path $savePath;
     }
 
 
@@ -40,25 +39,24 @@ class AcmeState {
         $this.ServiceDirectory = $serviceDirectory;
         if($this.AutoSave) { 
             $directoryPath = "$($this.SavePath)/$([AcmeState]::Filenames["ServiceDirectory"])";
-        
-            [AcmeState]::Save($this.SavePath, $this.ServiceDirectory); 
+            $this.ServiceDirectory | Export-AcmeObject $directoryPath;
         }
     }
     [void] Set([AcmeNonce] $nonce) {
         $this.Nonce = $nonce;
         if($this.AutoSave) {
             $noncePath = "$($this.SavePath)/$([AcmeState]::Filenames["Nonce"])";
-            
-            [AcmeState]::Save($this.SavePath, $this.Nonce); 
+            Set-Content $noncePath -Value $this.Nonce -NoNewLine;
         }
     }
     [void] Set([IAccountKey] $accountKey) {
         $this.AccountKey = $accountKey;
-        if($this.AutoSave) { 
-            $accountKeyPath = "$($this.SavePath)/$([AcmeState]::Filenames["AccountKey"])"; 
         
-            [AcmeState]::Save($this.SavePath, $this.AccountKey);
+        if($this.AutoSave) { 
+            $accountKeyPath = "$($this.SavePath)/$([AcmeState]::Filenames["AccountKey"])";         
+            $this.AccountKey | Export-AccountKey $accountKeyPath -Force;
         } else {
+            # this warning should not show up during reinitialization ..
             Write-Warning "The account key will not be exported."+
                 "Make sure you save the account key or you might loose access to your ACME account.";
         }
@@ -67,20 +65,97 @@ class AcmeState {
         $this.Account = $account;
         if($this.AutoSave) {
             $accountPath = "$($this.SavePath)/$([AcmeState]::Filenames["Account"])"; 
-        
-            [AcmeState]::Save($this.SavePath, $this.Account);
+            $this.Account | Export-AcmeObject $this.SavePath;
         }
     }
 
+    hidden [string] GetOrderHash([AcmeOrder] $order) {
+        $orderIdentifiers = $order.Identifiers | Foreach-Object { $_.ToString() } | Sort-Object;
+        $identifier = [string].Join('|', $order.Identifiers);
+
+        $sha256 = [System.Security.Cryptography.SHA256]::Create();
+        try {
+            $identifierBytes = $sha256.CalculateHash($identifier);
+            $result = ConvertTo-UrlBase64 -InputBytes $identifierBytes;
+
+            return $result;
+        } finally {
+            $sha256.Dispose();
+        }
+    }
+    hidden [string] GetOrderFileName([string] $orderHash) {
+        $fileName = ([AcmeState]::Filenames["Order"]).Replace("[hash]", $orderHash);
+        return "$($this.SavePath)/$filename";
+    }
+
+    hidden [AcmeOrder] LoadOrder([string] $orderHash) {
+        $orderFile = $this.GetOrderFileName($orderHash);
+        if(Test-Path $orderFile) {
+            $order = Import-AcmeObject -Path $orderFile -TypeName "AcmeOrder";
+            return $order;
+        }
+
+        return $null;
+    }
+    
     [void] AddOrder([AcmeOrder] $order) {
-        
+        $this.SetOrder($order);
     }
+
+    [void] SetOrder([AcmeOrder] $order) {
+        if($this.AutoSave) {
+            $orderHash = $this.GetOrderHash($order);
+            $orderFileName = $this.GetOrderFileName($orderHash);
+
+            if(-not (Test-Path $order)) {
+                $orderListFile = "$($this.SavePath)/$([AcmeState]::Filenames["OrderList"])";
+                
+                foreach ($id in $order.Identifiers) {
+                    if(-not (Test-Path $orderFileName)) {
+                        New-Item $orderFileName -Force;
+                    }
+
+                    "$($id.ToString())=$orderHash" | Set-Content $orderFileName -Append;
+                }
+            }
+
+            $order | Export-AcmeObject $orderFileName -Force;
+        } else {
+            Write-Warning "If AutoSaving is off, this method does nothing."
+        }
+    }
+
     [void] RemoveOrder([AcmeOrder] $order) {
+        if($this.AutoSave) {
+            $orderHash = $this.GetOrderHash($order);
+            $orderFileName = $this.GetOrderFileName($orderHash);
 
+            if(Test-Path $orderFileName) {
+                Remove-Item $orderFileName;
+            }
+
+            $orderListFile = "$($this.SavePath)/$([AcmeState]::Filenames["OrderList"])";
+            Set-Content -Path $orderListFile -Value (Get-Content -Path $orderListFile | Select-String -Pattern "=$orderHash" -NotMatch -SimpleMatch)
+        } else {
+            Write-Warning "If AutoSaving is off, this method does nothing."
+        }
     }
 
-    [string] FindOrderUrl([string[]] $dnsNames) {
-        return "";
+    [AcmeOrder] FindOrder([string[]] $dnsNames) {
+        $orderListFile = "$($this.SavePath)/$([AcmeState]::Filenames["OrderList"])";
+
+        $first = $true;
+        $lastMatch = $null;
+        foreach($dnsName in $dnsNames) {
+            $match = Select-String -Path $orderListFile -Pattern "$dnsName=" -SimpleMatch | Select-Object -Last 1
+            if($first) { $lastMatch = $match; }
+            if($match -ne $lastMatch) { return $null; }
+
+            $lastMatch = $match;
+        }
+
+        $orderHash = ($lastMatch -split "=", 2)[1];
+        return LoadOrder($orderHash);
     }
 
     [bool] Validate() {
