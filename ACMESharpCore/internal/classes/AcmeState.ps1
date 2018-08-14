@@ -200,15 +200,19 @@ class AcmeState {
             Get-ServiceDirectory $state -Path $directoryPath
         }
         if(Test-Path $noncePath) {
-            $nonce = Get-Content $Path -Raw
-            $state.Set([AcmeNonce]::new($nonce));
+            $importedNonce = Get-Content $Path -Raw
+            if($importedNonce) {
+                $state.Set([AcmeNonce]::new($importedNonce));
+            } else {
+                New-Nonce $state;
+            }
         }
         if(Test-Path $accountKeyPath) {
             Import-AccountKey $state -Path $accountKeyPath
         }
         if(Test-Path $accountPath) {
-            $account = Import-AcmeObject -Path $accountPath -TypeName "AcmeAccount"
-            $state.Set($account);
+            $importedAccount = Import-AcmeObject -Path $accountPath -TypeName "AcmeAccount"
+            $state.Set($importedAccount);
         }
         
         $state.AutoSave = $true;
