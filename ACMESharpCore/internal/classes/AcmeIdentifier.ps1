@@ -11,4 +11,8 @@ class AcmeIdentifier {
 
     [string] $type;
     [string] $value;
+
+    [string] ToString() {
+        return "$($this.Type.ToLower()):$($this.Value.ToLower())";
+    }
 }
