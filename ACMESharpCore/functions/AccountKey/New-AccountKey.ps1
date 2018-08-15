@@ -77,7 +77,7 @@ function New-AccountKey {
         [int]
         $ECDsaHashSize = 256,
 
-        [Parameter(Mandatory = $true, Position = 0)]
+        [Parameter(Position = 0)]
         [ValidateNotNull()]
         [AcmeState]
         $State,
@@ -87,13 +87,6 @@ function New-AccountKey {
         $PassThrough
     )
 
-    if(-not $SkipKeyExport) {
-        if(-not $Path) {
-            Write-Error "Path was null or empty. Provide a path for the key to be exported or specify SkipKeyExport";
-            return;
-        }
-    }
-
     if($PSCmdlet.ParameterSetName -eq "ECDsa") {
         $accountKey = [IAccountKey]([ECDsaAccountKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa account key with hash size $ECDsaHashSize";
@@ -102,9 +95,11 @@ function New-AccountKey {
         Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
     }
 
-    $State.Set($accountKey);
+    if($State) {
+        $State.Set($accountKey);
+    }
 
-    if($PassThrough) {
+    if($PassThrough -or -not $State) {
         return $accountKey;
     }
 }

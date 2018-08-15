@@ -22,7 +22,7 @@ function Import-AccountKey {
         [string]
         $Path,
 
-        [Parameter(Mandatory = $true, Position = 0)]
+        [Parameter(Position = 0)]
         [ValidateNotNull()]
         [AcmeState]
         $State,
@@ -42,9 +42,11 @@ function Import-AccountKey {
         }
 
         $accountKey = [KeyFactory]::CreateAccountKey($imported);
-        $State.Set($accountKey);
+        if($State) {
+            $State.Set($accountKey);
+        }
 
-        if($PassThrough) {
+        if($PassThrough -or -not $State) {
             return $accountKey;
         }
     }
