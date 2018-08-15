@@ -45,7 +45,7 @@ class AcmeState {
         $this.Nonce = $nonce;
         if($this.AutoSave) {
             $noncePath = $this.Filenames.Nonce;
-            Set-Content $noncePath -Value $this.Nonce -NoNewLine;
+            Set-Content $noncePath -Value $this.Nonce.NextNonce -NoNewLine;
         }
     }
     [void] Set([IAccountKey] $accountKey) {
