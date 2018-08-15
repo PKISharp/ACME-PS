@@ -1,6 +1,6 @@
 class AcmeState {
     [ValidateNotNull()] hidden [AcmeDirectory] $ServiceDirectory;
-    [ValidateNotNull()] hidden [AcmeNonce] $Nonce;
+    [ValidateNotNull()] hidden [string] $Nonce;
     [ValidateNotNull()] hidden [IAccountKey] $AccountKey;
     [ValidateNotNull()] hidden [AcmeAccount] $Account;
 
@@ -27,7 +27,7 @@ class AcmeState {
 
 
     [AcmeDirectory] GetServiceDirectory() { return $this.ServiceDirectory; }
-    [AcmeNonce] GetNonce() { return $this.Nonce; }
+    [string] GetNonce() { return $this.Nonce; }
     [IAccountKey] GetAccountKey() { return $this.AccountKey; }
     [AcmeAccount] GetAccount() { return $this.Account; }
 
@@ -41,11 +41,11 @@ class AcmeState {
             $this.ServiceDirectory | Export-AcmeObject $directoryPath -Force;
         }
     }
-    [void] Set([AcmeNonce] $nonce) {
+    [void] SetNonve([string] $nonce) {
         $this.Nonce = $nonce;
         if($this.AutoSave) {
             $noncePath = $this.Filenames.Nonce;
-            Set-Content $noncePath -Value $this.Nonce.NextNonce -NoNewLine;
+            Set-Content $noncePath -Value $nonce -NoNewLine;
         }
     }
     [void] Set([IAccountKey] $accountKey) {
@@ -83,7 +83,7 @@ class AcmeState {
         if(Test-Path $noncePath) {
             $importedNonce = Get-Content $noncePath -Raw
             if($importedNonce) {
-                $this.Set([AcmeNonce]::new($importedNonce));
+                $this.SetNonce($importedNonce);
             } else {
                 New-Nonce $this;
             }

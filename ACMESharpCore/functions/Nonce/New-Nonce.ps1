@@ -34,9 +34,9 @@ function New-Nonce {
     $Url = $State.GetServiceDirectory().NewNonce;
 
     $response = Invoke-AcmeWebRequest $Url -Method Head
-    $nonce = [AcmeNonce]::new($response.NextNonce);
+    $nonce = $response.NextNonce;
 
-    $State.Set($nonce);
+    $State.SetNonce($nonce);
 
     if($PassThrough) {
         return $nonce;
