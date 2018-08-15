@@ -6,20 +6,17 @@ class AcmeState {
 
     hidden [string] $SavePath;
     hidden [bool] $AutoSave;
+    hidden [bool] $IsInitializing;
 
-    hidden [hashtable] $Filenames = @{
-        "ServiceDirectory"="ServiceDirectory.xml";
-        "AcmeNonce"="NextNonce.txt";
-        "AccountKey"="AccountKey.xml";
-        "Account"="Account.xml";
+    hidden [AcmeStatePaths] $Filenames;
 
-        "OrderList"="Orders/OrderList.txt"
-        "Order"="Orders/Order-[hash].xml";
-    };
-
-    AcmeState() { }
+    AcmeState() { 
+        $this.Filenames = [AcmeStatePaths]::new("");
+    }
 
     AcmeState([string] $savePath, [bool]$autoSave) {
+        $this.Filenames = [AcmeStatePaths]::new($savePath);
+
         if(-not (Test-Path $savePath)) {
             New-Item $savePath -ItemType Directory -Force;
         }
@@ -38,14 +35,16 @@ class AcmeState {
     [void] Set([AcmeDirectory] $serviceDirectory) {
         $this.ServiceDirectory = $serviceDirectory;
         if($this.AutoSave) { 
-            $directoryPath = "$($this.SavePath)/$($this.Filenames["ServiceDirectory"])";
-            $this.ServiceDirectory | Export-AcmeObject $directoryPath;
+            $directoryPath = $this.Filenames.ServiceDirectory;
+
+            Write-Debug "Storing the service directory to $directoryPath";
+            $this.ServiceDirectory | Export-AcmeObject $directoryPath -Force;
         }
     }
     [void] Set([AcmeNonce] $nonce) {
         $this.Nonce = $nonce;
         if($this.AutoSave) {
-            $noncePath = "$($this.SavePath)/$($this.Filenames["Nonce"])";
+            $noncePath = $this.Filenames.Nonce;
             Set-Content $noncePath -Value $this.Nonce -NoNewLine;
         }
     }
@@ -53,10 +52,9 @@ class AcmeState {
         $this.AccountKey = $accountKey;
         
         if($this.AutoSave) { 
-            $accountKeyPath = "$($this.SavePath)/$($this.Filenames["AccountKey"])";         
+            $accountKeyPath = $this.Filenames.AccountKey;
             $this.AccountKey | Export-AccountKey $accountKeyPath -Force;
-        } else {
-            # this warning should not show up during reinitialization ..
+        } elseif(-not $this.IsInitializing) {
             Write-Warning "The account key will not be exported."+
                 "Make sure you save the account key or you might loose access to your ACME account.";
         }
@@ -64,14 +62,47 @@ class AcmeState {
     [void] Set([AcmeAccount] $account) {
         $this.Account = $account;
         if($this.AutoSave) {
-            $accountPath = "$($this.SavePath)/$($this.Filenames["Account"])"; 
-            $this.Account | Export-AcmeObject $this.SavePath;
+            $accountPath = $this.Filenames.Account; 
+            $this.Account | Export-AcmeObject $accountPath;
         }
+    }
+
+    hidden [void] LoadFromPath()
+    {
+        $this.IsInitializing = $true;
+        $this.AutoSave = $false;
+
+        $directoryPath = $this.Filenames.ServiceDirectory;
+        $noncePath = $this.Filenames.Nonce;
+        $accountKeyPath = $this.Filenames.AccountKey;
+        $accountPath = $this.Filenames.Account;
+        
+        if(Test-Path $directoryPath) {
+            Get-ServiceDirectory $this -Path $directoryPath
+        }
+        if(Test-Path $noncePath) {
+            $importedNonce = Get-Content $noncePath -Raw
+            if($importedNonce) {
+                $this.Set([AcmeNonce]::new($importedNonce));
+            } else {
+                New-Nonce $this;
+            }
+        }
+        if(Test-Path $accountKeyPath) {
+            Import-AccountKey $this -Path $accountKeyPath
+        }
+        if(Test-Path $accountPath) {
+            $importedAccount = Import-AcmeObject -Path $accountPath -TypeName "AcmeAccount"
+            $this.Set($importedAccount);
+        }
+        
+        $this.AutoSave = $true;
+        $this.IsInitializing = $false
     }
 
     hidden [string] GetOrderHash([AcmeOrder] $order) {
         $orderIdentifiers = $order.Identifiers | Foreach-Object { $_.ToString() } | Sort-Object;
-        $identifier = [string].Join('|', $order.Identifiers);
+        $identifier = [string].Join('|', $orderIdentifiers);
 
         $sha256 = [System.Security.Cryptography.SHA256]::Create();
         try {
@@ -111,11 +142,11 @@ class AcmeState {
                 $orderListFile = "$($this.SavePath)/$($this.Filenames["OrderList"])";
                 
                 foreach ($id in $order.Identifiers) {
-                    if(-not (Test-Path $orderFileName)) {
-                        New-Item $orderFileName -Force;
+                    if(-not (Test-Path $orderListFile)) {
+                        New-Item $orderListFile -Force;
                     }
 
-                    "$($id.ToString())=$orderHash" | Set-Content $orderFileName -Append;
+                    "$($id.ToString())=$orderHash" | Set-Content $orderListFile -Append;
                 }
             }
 
@@ -190,33 +221,28 @@ class AcmeState {
 
     static [AcmeState] FromPath([string] $Path) {
         $state = [AcmeState]::new($Path, $false);
+        $state.LoadFromPath();
 
-        $directoryPath = "$Path/$($state.Filenames["ServiceDirectory"])";
-        $noncePath = "$Path/$($state.Filenames["Nonce"])";
-        $accountKeyPath = "$Path/$($state.Filenames["AccountKey"])"; 
-        $accountPath = "$Path/$($state.Filenames["Account"])"; 
-        
-        if(Test-Path $directoryPath) {
-            Get-ServiceDirectory $state -Path $directoryPath
-        }
-        if(Test-Path $noncePath) {
-            $importedNonce = Get-Content $Path -Raw
-            if($importedNonce) {
-                $state.Set([AcmeNonce]::new($importedNonce));
-            } else {
-                New-Nonce $state;
-            }
-        }
-        if(Test-Path $accountKeyPath) {
-            Import-AccountKey $state -Path $accountKeyPath
-        }
-        if(Test-Path $accountPath) {
-            $importedAccount = Import-AcmeObject -Path $accountPath -TypeName "AcmeAccount"
-            $state.Set($importedAccount);
-        }
-        
-        $state.AutoSave = $true;
+        return $state;
+    }
+}
 
-        return $state
+class AcmeStatePaths {
+    [string] $ServiceDirectory;
+    [string] $Nonce;
+    [string] $AccountKey;
+    [string] $Account;
+
+    [string] $OrderList;
+    [string] $Order;
+
+    AcmeStatePaths([string] $basePath) {
+        $this.ServiceDirectory = "$basePath/ServiceDirectory.xml";
+        $this.Nonce = "$basePath/NextNonce.txt";
+        $this.AccountKey = "$basePath/AccountKey.xml";
+        $this.Account = "$basePath/Account.xml";
+
+        $this.OrderList = "$basePath/Orders/OrderList.txt"
+        $this.Order = "$basePath/Orders/Order-[hash].xml";
     }
 }

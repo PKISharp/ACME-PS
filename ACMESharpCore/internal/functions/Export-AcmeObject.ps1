@@ -3,7 +3,7 @@ function Export-AcmeObject {
         [Parameter(Mandatory=$true, Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $FilePath,
+        $Path,
 
         [Parameter(Mandatory=$true, ValueFromPipeline = $true)]
         [ValidateNotNull()]
@@ -17,14 +17,15 @@ function Export-AcmeObject {
     process {
         $ErrorActionPreference = 'Stop'
         
-        if(Test-Path $Path -and -not $Force) {
+        if((Test-Path $Path) -and -not $Force) {
             Write-Error "$Path already exists."
         }
 
+        Write-Debug "Exporting $($InputObject.GetType()) to $Path"
         if($FileName -like "*.json") {
-            $InputObject | ConvertTo-Json | Out-File -FilePath $FilePath -Encoding utf8 -Force:$Force;
+            $InputObject | ConvertTo-Json | Out-File -FilePath $Path -Encoding utf8 -Force:$Force;
         } else {
-            Export-Clixml $FilePath -InputObject $InputObject -Force:$Force;
+            Export-Clixml $Path -InputObject $InputObject -Force:$Force;
         }
     }
 }
