@@ -1,4 +1,6 @@
 class AcmeHttpResponse {
+    AcmeHttpResponse() {}
+
     AcmeHttpResponse([System.Net.Http.HttpResponseMessage] $responseMessage, [string] $stringContent) {
         $this.RequestUri = $responseMessage.RequestMessage.RequestUri;
         $this.StatusCode = $responseMessage.StatusCode;

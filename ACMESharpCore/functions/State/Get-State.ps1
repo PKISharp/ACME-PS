@@ -24,6 +24,7 @@ function Get-State {
 
     $ErrorActionPreference = 'Stop';
 
+    Write-Verbose "Loading AcmeSharpCore state from $Path";
     $state = [AcmeState]::FromPath($Path);
     return $state;
 }

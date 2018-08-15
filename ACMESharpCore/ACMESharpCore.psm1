@@ -62,7 +62,6 @@ $classes = @(
     "crypto/AlgorithmFactory",
     "AcmeHttpResponse",
     "AcmeDirectory",
-    "AcmeNonce",
     "AcmeAccount",
     "AcmeIdentifier",
     "AcmeChallenge",

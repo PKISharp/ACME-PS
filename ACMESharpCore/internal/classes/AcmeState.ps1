@@ -41,7 +41,7 @@ class AcmeState {
             $this.ServiceDirectory | Export-AcmeObject $directoryPath -Force;
         }
     }
-    [void] SetNonve([string] $nonce) {
+    [void] SetNonce([string] $nonce) {
         $this.Nonce = $nonce;
         if($this.AutoSave) {
             $noncePath = $this.Filenames.Nonce;
@@ -79,7 +79,10 @@ class AcmeState {
         
         if(Test-Path $directoryPath) {
             Get-ServiceDirectory $this -Path $directoryPath
+        } else {
+            Write-Verbose "Could not find saved service directory at $directoryPath";
         }
+
         if(Test-Path $noncePath) {
             $importedNonce = Get-Content $noncePath -Raw
             if($importedNonce) {
@@ -87,13 +90,21 @@ class AcmeState {
             } else {
                 New-Nonce $this;
             }
+        } else {
+            Write-Verbose "Could not find saved nonce at $noncePath";
         }
+
         if(Test-Path $accountKeyPath) {
             Import-AccountKey $this -Path $accountKeyPath
+        } else {
+            Write-Verbose "Could not find saved account key at $accountKeyPath";
         }
+
         if(Test-Path $accountPath) {
             $importedAccount = Import-AcmeObject -Path $accountPath -TypeName "AcmeAccount"
             $this.Set($importedAccount);
+        } else {
+            Write-Verbose "Could not find saved account at $accountPath";
         }
         
         $this.AutoSave = $true;
