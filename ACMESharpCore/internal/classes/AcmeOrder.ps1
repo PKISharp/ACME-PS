@@ -43,7 +43,7 @@ class AcmeOrder {
     [string] $ResourceUrl;
 
     [string] $Status;
-    [System.DateTimeOffset] $Expires;
+    [string] $Expires;
 
     [Nullable[System.DateTimeOffset]] $NotBefore;
     [Nullable[System.DateTimeOffset]] $NotAfter;
