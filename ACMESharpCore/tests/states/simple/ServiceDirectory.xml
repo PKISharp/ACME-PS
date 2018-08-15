@@ -1,0 +1,39 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>AcmeDirectory</T>
+      <T>System.Object</T>
+    </TN>
+    <ToString>AcmeDirectory</ToString>
+    <Props>
+      <S N="ResourceUrl">https://acme-staging-v02.api.letsencrypt.org/directory</S>
+      <S N="NewAccount">https://acme-staging-v02.api.letsencrypt.org/acme/new-acct</S>
+      <S N="NewAuthz"></S>
+      <S N="NewNonce">https://acme-staging-v02.api.letsencrypt.org/acme/new-nonce</S>
+      <S N="NewOrder">https://acme-staging-v02.api.letsencrypt.org/acme/new-order</S>
+      <S N="KeyChange">https://acme-staging-v02.api.letsencrypt.org/acme/key-change</S>
+      <S N="RevokeCert">https://acme-staging-v02.api.letsencrypt.org/acme/revoke-cert</S>
+      <Obj N="Meta" RefId="1">
+        <TN RefId="1">
+          <T>AcmeDirectoryMeta</T>
+          <T>System.Object</T>
+        </TN>
+        <ToString>AcmeDirectoryMeta</ToString>
+        <Props>
+          <Obj N="CaaIdentites" RefId="2">
+            <TN RefId="2">
+              <T>System.String[]</T>
+              <T>System.Array</T>
+              <T>System.Object</T>
+            </TN>
+            <LST>
+              <S>letsencrypt.org</S>
+            </LST>
+          </Obj>
+          <S N="TermsOfService">https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf</S>
+          <S N="Website">https://letsencrypt.org/docs/staging-environment/</S>
+        </Props>
+      </Obj>
+    </Props>
+  </Obj>
+</Objs>

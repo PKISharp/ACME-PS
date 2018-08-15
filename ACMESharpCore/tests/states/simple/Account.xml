@@ -1,0 +1,28 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>AcmeAccount</T>
+      <T>System.Object</T>
+    </TN>
+    <ToString>AcmeAccount</ToString>
+    <Props>
+      <S N="ResourceUrl">https://acme-staging-v02.api.letsencrypt.org/acme/acct/6664711</S>
+      <S N="KeyId">https://acme-staging-v02.api.letsencrypt.org/acme/acct/6664711</S>
+      <S N="Status">valid</S>
+      <S N="Id">6664711</S>
+      <Obj N="Contact" RefId="1">
+        <TN RefId="1">
+          <T>System.String[]</T>
+          <T>System.Array</T>
+          <T>System.Object</T>
+        </TN>
+        <LST>
+          <S>mailto:some@example.com</S>
+        </LST>
+      </Obj>
+      <S N="InitialIp">127.0.0.1</S>
+      <S N="CreatedAt">2018-08-15T20:57:55.701346677Z</S>
+      <S N="OrderListUrl"></S>
+    </Props>
+  </Obj>
+</Objs>

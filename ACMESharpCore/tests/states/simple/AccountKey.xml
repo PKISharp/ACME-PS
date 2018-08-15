@@ -1,0 +1,22 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>RSAKeyExport</T>
+      <T>KeyExport</T>
+      <T>System.Object</T>
+    </TN>
+    <ToString>RSAKeyExport</ToString>
+    <Props>
+      <S N="TypeName">RSAKeyExport</S>
+      <I32 N="HashSize">256</I32>
+      <BA N="Modulus">x0IchMkZeRpNY7hJxS8qcJcJz0w0IyWcwowFsQ3qMi6acuEjlFy/cKn4/8QudteKtraXQIXW37wLJWJqGw/HXKQ1S1lQHQ/AZcwsaWEUXciDt+ida/UBCaZ86ODsHPeclB3O1jlCu3dga0jcjhWGDd7mV3adTPixHbtjDtYvhPOEf/dOgkLC2HoRHNkAmzZGSiTUGae4xZOIEnCcqEr+lYsUSgnXwUZVUiMz2OQ/I7eyhXagIOQjuQ4zVi9NxteHOAR/0U9Y06ffVoUe5IJR2mBQjPal1zGzH0XduI9Z9SC0qB80XW5jzDCIiI42D/r4btcrxSdgfgRqtFi79If6SQ==</BA>
+      <BA N="Exponent">AQAB</BA>
+      <BA N="P">/4A7PweWA+OYg8nfOlBo9AVIuFlactZE9lkMQ9IUX9Y0NQuGOC3mHnN3+4PnT0L2rXum+bICycLPVIfLvgFVQ2ZzkvSaaPmnmvF4KLYll0YFVbyH3bwRHG5YxinRoYoc0QOBtFFyrhphfMYAmkw/hg1WvGCW64zaO1nXMvzRmNc=</BA>
+      <BA N="Q">x6XBMQZhS8c4ge+d4Q8SVmqFgIuCCAzZWHAN+Cj09Q5+33rr8Uw3YZ+o4uWJ7ASq6f+0hDdU+BHhokJbJt8+BtF2y7C1/HkoEJ6ATOq686NcqbMgI/xwoR/fV/Xri00dpjO2n5Pcgof9+k3vbhMOPo1m/lgoKIbWtyRZUygdAd8=</BA>
+      <BA N="DP">+jziSfIpGDgB+RlvW5LDqDPArGU/M/ft5QUEASyxLcgCq+1UkJNLrYlT+u+OTc/8/556xFV3a5o0K8swXjC6DGA8U7LjxGq3oAZdtCnpmUZIFVeoDiCS9bCRm8v7d+ZoIMH5d9zJoAFQd78JehWxpZ5M1AUZ6yux1a1BGrwIoFM=</BA>
+      <BA N="DQ">T75sUSmsOTlk37mXBSsg9vVrR7HxiUeglMuFOOcbGLrmgFs33NTFli/QpHhsw6IFppulPd5gCQoTZt08TWWD//MwkSGPPz4he6njs1VawTAyNfI/V0BguGrjqd2nbKervRQQ0OKdhGHPV2hDx2LDIMcYKWWK/M0G/HX/W9C87V8=</BA>
+      <BA N="InverseQ">lORv8llUkYFnmTtx47Wlal+cZ8K1i7mz3nUr7wNg9mlSoWQb1T6if1hZAlECbyNzqmTtZKIOeZC9y1+0b052bE0Ipjc4hpQCS//K6TyvdTOR6XJa7BN5UpVIz9XKHHE2tIMvESc7AklDdFcokbjxW/LmplxI7b9b+e0x2NoX9x4=</BA>
+      <BA N="D">LBtjSrVlMRx0Yw2JLt/Y6iFU55E7vUf3Ik1yeRXWcJNGVwWlJZM+QUcuuhcIHgBqUTWr13mI7e+nG/hj+meMvuIOdgZoKHazJRWEAzOdGYFoPs58AkiymRtEbRxUx7i77UGH5n24Wtz69+SiBcWX7fwYSuYTvdUTB7zSGZep3yjPvFo+4clNzp6ryauu24DxfQxMwOv4X+eI7cX0EoYFdQLrN7Wcu127jn4KwWfZQ9+UzrDg6yDlDnLhEzJNXiNeyWX/T8jYwOg61cmPMkxeSDxTYkRlKfHTTu+XKNHlcMflc9d3er+VSL1husnE3WYJofqbvp5bw/GEG6DdAH433Q==</BA>
+    </Props>
+  </Obj>
+</Objs>
