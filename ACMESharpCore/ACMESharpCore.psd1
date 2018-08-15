@@ -55,7 +55,7 @@
 		"Get-ServiceDirectory",
 		"Get-TermsOfService",
 
-		"Initialize-State",
+		"Get-State",
 		"New-State"
 	)
 
