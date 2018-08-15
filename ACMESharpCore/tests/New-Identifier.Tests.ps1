@@ -9,14 +9,14 @@ Describe "UnitTesting $CommandName" -Tag "UnitTest" {
     }
 
     It "Creates an Identifier (Parameter by Position)" {
-        $identifier = New-AcmeIdentifier "Type" "Value";
+        $identifier = New-AcmeIdentifier "Value" "Type";
 
         $identifier.Type | Should -Be "Type";
         $identifier.Value | Should -Be "Value";
     }
 
     It "Creates an Identifier (Parameter From Pipeline)" {
-        $tmp = New-AcmeIdentifier "Type" "Value";
+        $tmp = New-AcmeIdentifier "Value" "Type";
         $identifier = $tmp | New-AcmeIdentifier;
 
         $identifier.Type | Should -Be "Type";
