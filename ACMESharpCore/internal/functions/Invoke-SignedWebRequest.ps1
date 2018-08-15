@@ -11,13 +11,16 @@ function Invoke-SignedWebRequest {
 
         [Parameter(Mandatory = $true, Position = 2)]
         [ValidateNotNull()]
-        [object] $Payload
+        [object] $Payload,
+
+        [Parameter()]
+        [switch] $SupressKeyId
     )
 
     process {
         $accountKey = $State.GetAccountKey();
         $account = $State.GetAccount();
-        $keyId = (if($account) { $account.KeyId });
+        $keyId = $(if($account -and -not $SupressKeyId) { $account.KeyId });
         $nonce = $State.GetNonce();
 
         $requestBody = New-SignedMessage -Url $Url -AccountKey $accountKey -KeyId $keyId -Nonce $nonce.Next -Payload $Payload

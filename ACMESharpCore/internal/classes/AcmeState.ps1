@@ -102,12 +102,13 @@ class AcmeState {
 
     hidden [string] GetOrderHash([AcmeOrder] $order) {
         $orderIdentifiers = $order.Identifiers | Foreach-Object { $_.ToString() } | Sort-Object;
-        $identifier = [string].Join('|', $orderIdentifiers);
+        $identifier = [string]::Join('|', $orderIdentifiers);
 
         $sha256 = [System.Security.Cryptography.SHA256]::Create();
         try {
-            $identifierBytes = $sha256.CalculateHash($identifier);
-            $result = ConvertTo-UrlBase64 -InputBytes $identifierBytes;
+            $identifierBytes = [System.Text.Encoding]::UTF8.GetBytes($identifier);
+            $identifierHash = $sha256.ComputeHash($identifierBytes);
+            $result = ConvertTo-UrlBase64 -InputBytes $identifierHash;
 
             return $result;
         } finally {
@@ -115,8 +116,8 @@ class AcmeState {
         }
     }
     hidden [string] GetOrderFileName([string] $orderHash) {
-        $fileName = ($this.Filenames["Order"]).Replace("[hash]", $orderHash);
-        return "$($this.SavePath)/$filename";
+        $fileName = $this.Filenames.Order.Replace("[hash]", $orderHash);
+        return $fileName;
     }
 
     hidden [AcmeOrder] LoadOrder([string] $orderHash) {
@@ -139,14 +140,14 @@ class AcmeState {
             $orderFileName = $this.GetOrderFileName($orderHash);
 
             if(-not (Test-Path $order)) {
-                $orderListFile = "$($this.SavePath)/$($this.Filenames["OrderList"])";
+                $orderListFile = $this.Filenames.OrderList;
                 
                 foreach ($id in $order.Identifiers) {
                     if(-not (Test-Path $orderListFile)) {
                         New-Item $orderListFile -Force;
                     }
 
-                    "$($id.ToString())=$orderHash" | Set-Content $orderListFile -Append;
+                    "$($id.ToString())=$orderHash" | Add-Content $orderListFile;
                 }
             }
 
@@ -165,7 +166,7 @@ class AcmeState {
                 Remove-Item $orderFileName;
             }
 
-            $orderListFile = "$($this.SavePath)/$($this.Filenames["OrderList"])";
+            $orderListFile = $this.Filenames.OrderList;
             Set-Content -Path $orderListFile -Value (Get-Content -Path $orderListFile | Select-String -Pattern "=$orderHash" -NotMatch -SimpleMatch)
         } else {
             Write-Warning "If AutoSaving is off, this method does nothing."
@@ -173,7 +174,7 @@ class AcmeState {
     }
 
     [AcmeOrder] FindOrder([string[]] $dnsNames) {
-        $orderListFile = "$($this.SavePath)/$($this.Filenames["OrderList"])";
+        $orderListFile = $this.Filenames.OrderList;
 
         $first = $true;
         $lastMatch = $null;
@@ -186,7 +187,7 @@ class AcmeState {
         }
 
         $orderHash = ($lastMatch -split "=", 2)[1];
-        return LoadOrder($orderHash);
+        return $this.LoadOrder($orderHash);
     }
 
     [bool] Validate() {

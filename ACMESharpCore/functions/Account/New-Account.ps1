@@ -65,16 +65,15 @@ function New-Account {
     $url = $State.GetServiceDirectory().NewAccount;
 
     if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
-        $response = Invoke-SignedWebRequest $url $State $payload
+        $response = Invoke-SignedWebRequest $url $State $payload -SupressKeyId -ErrorAction 'Stop'
 
         if($response.StatusCode -eq 200) {
             if(-not $ExistingAccountIsError) {
                 Write-Warning "JWK had already been registered for an account - trying to fetch account."
 
-                $Nonce.Push($response.NextNonce);
                 $keyId = $response.Headers["Location"][0];
 
-                return Get-Account -Url $keyId -KeyId $keyId -State $State -PassThrough:$PassThrough
+                return Get-Account -AccountUrl $keyId -KeyId $keyId -State $State -PassThrough:$PassThrough
             } else {
                 Write-Error "JWK had already been registiered for an account."
             }

@@ -13,7 +13,7 @@ function Get-Account {
         [switch]
         $PassThrough,
 
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName="GetAccount")]
+        [Parameter(Mandatory = $true, Position = 1, ParameterSetName="GetAccount")]
         [ValidateNotNull()]
         [uri] $AccountUrl,
 

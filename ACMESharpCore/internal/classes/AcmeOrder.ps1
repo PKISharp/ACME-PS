@@ -1,4 +1,19 @@
 class AcmeOrder {
+    AcmeOrder([PsCustomObject] $obj) {
+        $this.Status = $obj.Status;
+        $this.Expires  = $obj.Expires;
+        $this.NotBefore = $obj.NotBefore;
+        $this.NotAfter = $obj.NotAfter;
+
+        $this.Identifiers = $obj.Identifiers | ForEach-Object { [AcmeIdentifier]::new($_) };
+
+        $this.AuthorizationUrls = $obj.Authorizations;
+        $this.FinalizeUrl = $obj.Finalize;
+        $this.CertificateUrl = $obj.Certificate;
+
+        $this.ResourceUrl = $obj.ResourceUrl;
+    }
+
     AcmeOrder([AcmeHttpResponse] $httpResponse)
     {
         $this.UpdateOrder($httpResponse)
