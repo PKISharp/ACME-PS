@@ -6,13 +6,13 @@
     </TN>
     <ToString>AcmeDirectory</ToString>
     <Props>
-      <S N="ResourceUrl">https://acme-staging-v02.api.letsencrypt.org/directory</S>
-      <S N="NewAccount">https://acme-staging-v02.api.letsencrypt.org/acme/new-acct</S>
+      <S N="ResourceUrl">https://service.acme/directory</S>
+      <S N="NewAccount">https://service.acme/acme/new-acct</S>
       <S N="NewAuthz"></S>
-      <S N="NewNonce">https://acme-staging-v02.api.letsencrypt.org/acme/new-nonce</S>
-      <S N="NewOrder">https://acme-staging-v02.api.letsencrypt.org/acme/new-order</S>
-      <S N="KeyChange">https://acme-staging-v02.api.letsencrypt.org/acme/key-change</S>
-      <S N="RevokeCert">https://acme-staging-v02.api.letsencrypt.org/acme/revoke-cert</S>
+      <S N="NewNonce">https://service.acme/acme/new-nonce</S>
+      <S N="NewOrder">https://service.acme/acme/new-order</S>
+      <S N="KeyChange">https://service.acme/acme/key-change</S>
+      <S N="RevokeCert">https://service.acme/acme/revoke-cert</S>
       <Obj N="Meta" RefId="1">
         <TN RefId="1">
           <T>AcmeDirectoryMeta</T>
@@ -27,13 +27,14 @@
               <T>System.Object</T>
             </TN>
             <LST>
-              <S>letsencrypt.org</S>
+              <S>service.acme</S>
             </LST>
           </Obj>
-          <S N="TermsOfService">https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf</S>
-          <S N="Website">https://letsencrypt.org/docs/staging-environment/</S>
+          <S N="TermsOfService">https://service.acme/documents/TOS.pdf</S>
+          <S N="Website">https://service.acme/docs/staging-environment/</S>
         </Props>
       </Obj>
     </Props>
   </Obj>
 </Objs>
+<!-- This directory has been modified - it's unusable beyond unit tests -->

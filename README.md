@@ -26,7 +26,7 @@ This sequence will create a new account and account keys, to further usage.
 PS> Import-Module AcmeSharpCore
 
 # Create a acme state instance, which will make passing around of neccessary informations easy.
-PS> $state = New-AcmeState
+PS> $state = New-AcmeState -Path C:\Temp\AcmeState
 
 # This will load the service directoy for Let's-Encrypt-Staging and save.
 PS> Get-AcmeServiceDirectory $state -PassThrough | Export-Clixml -Path C:\AcmeTemp\ServiceDirectory.xml
@@ -43,8 +43,8 @@ From here we'll start over with the existing key and account.
 ```
 PS> Import-Moduel AcmeSharpCore
 
-# Initialize state with existing data (loads service directory, account key, a new nonce and your account)
-PS> $state = Initialize-AcmeState -DirectoryPath C:\AcmeTemp\ServiceDirectory.xml -AccountKeyPath C:\AcmeTemp\AccountKey.xml
+# Initialize state with existing data (loads service directory, account key, nonce and your account)
+PS> $state = Get-AcmeState -Path C:\Temp\AcmeState
 
 # Create Identifier(s)
 PS> $identifier = New-AcmeIdentifier "www.example.com"
