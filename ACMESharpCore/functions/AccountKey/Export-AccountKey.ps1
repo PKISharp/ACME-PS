@@ -27,22 +27,16 @@ function Export-AccountKey {
         [Parameter(ValueFromPipeline=$true)]
         [ValidateNotNull()]
         [IAccountKey]
-        $AccountKey = $Script:AccountKey
+        $AccountKey,
+
+        [Parameter()]
+        [switch]
+        $Force
     )
 
     process {
         $ErrorActionPreference = 'Stop';
 
-        if(Test-Path $Path) {
-            Write-Error "$Path already exists. This method does not support overriding existing files."
-        }
-
-        if($Path -like "*.json") {
-            $AccountKey.ExportKey() | ConvertTo-Json -Compress | Out-File $Path -Encoding utf8
-            Write-Verbose "Exported account key as JSON to $Path";
-        } else {
-            $AccountKey.ExportKey() | Export-Clixml -Path $Path
-            Write-Verbose "Exported account key as CLIXML to $Path";
-        }
+        $AccountKey.ExportKey() | Export-AcmeObject $Path -Force:$Force
     }
 }

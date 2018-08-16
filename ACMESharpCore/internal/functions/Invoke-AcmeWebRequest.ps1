@@ -41,12 +41,6 @@ function Invoke-ACMEWebRequest {
 
     if($httpRequest.StatusCode -lt 500) {
         $result = [AcmeHttpResponse]::new($httpResponse, $response);
-
-        if($null -ne $result.NextNonce -and $Script:AutoNonce) {
-            Write-Verbose "Setting Module Nonce to $($result.NextNonce)";
-            $Script:Nonce = $result.NextNonce;
-        }
-
         return $result;
     }
 

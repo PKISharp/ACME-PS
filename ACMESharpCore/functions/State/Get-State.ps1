@@ -1,4 +1,4 @@
-function Initialize-State {
+function Get-State {
     <#
         .SYNOPSIS
             Initializes state from saved date.
@@ -8,12 +8,8 @@ function Initialize-State {
             Use this if you already have an exported account key and an account.
 
 
-        .PARAMETER DirectoryPath
+        .PARAMETER Path
             Path to an exported service directory
-
-        .PARAMETER AccountKeyPath
-            Path to an exported account key
-
 
         .EXAMPLE
             PS> Initialize-AutomaticHandlers C:\myServiceDirectory.xml C:\myKey.json
@@ -23,22 +19,12 @@ function Initialize-State {
         [Parameter(Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $DirectoryPath,
-
-        [Parameter(Position = 1)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $AccountKeyPath
+        $Path
     )
 
     $ErrorActionPreference = 'Stop';
 
-    $state = New-State
-
-    Get-ServiceDirectory -State $state -Path $DirectoryPath
-    New-Nonce -State $state
-    Import-AccountKey -State $state -Path $AccountKeyPath
-    Get-Account -State $state
-
+    Write-Verbose "Loading AcmeSharpCore state from $Path";
+    $state = [AcmeState]::FromPath($Path);
     return $state;
 }

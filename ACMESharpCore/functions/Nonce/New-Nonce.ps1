@@ -18,7 +18,7 @@ function New-Nonce {
             PS> New-Nonce -Uri "https://acme-staging-v02.api.letsencrypt.org/acme/new-nonce"
     #>
     [CmdletBinding()]
-    [OutputType("AcmeNonce")]
+    [OutputType("string")]
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
@@ -31,12 +31,16 @@ function New-Nonce {
         $PassThrough
     )
 
-    $Url = $State.ServiceDirectory.NewNonce;
+    $Url = $State.GetServiceDirectory().NewNonce;
 
     $response = Invoke-AcmeWebRequest $Url -Method Head
-    $nonce = [AcmeNonce]::new($response.NextNonce);
+    $nonce = $response.NextNonce;
 
-    $State.Nonce = $nonce;
+    if(-not $nonce) {
+        throw "Could not retreive new nonce";
+    } 
+
+    $State.SetNonce($nonce);
 
     if($PassThrough) {
         return $nonce;

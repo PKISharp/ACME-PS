@@ -16,13 +16,13 @@ function Set-AccountKey {
     )
 
     $innerPayload = @{
-        "account" = $State.Account.KeyId;
-        "oldKey" = $State.AccountKey.ExportPuplicKey()
+        "account" = $State.GetAccount().KeyId;
+        "oldKey" = $State.GetAccountKey().ExportPuplicKey()
     };
 
     $payload = New-SignedMessage -Url $Url -AccountKey $NewAccountKey -Payload $innerPayload;
     Invoke-SignedWebRequest $Url -$State $payload -ErrorAction 'Stop';
 
-    $State.AccountKey = $NewAccountKey
+    $State.Set($NewAccountKey);
     return Get-Account -Url $TargetAccount.ResourceUrl -State $State -KeyId $Account.KeyId
 }

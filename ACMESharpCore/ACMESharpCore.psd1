@@ -3,13 +3,16 @@
 	ModuleVersion = '2.0.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
+	CompatiblePSEditions = @("Core")
+	PowershellVersion = "6.0"
+
 	Author = 'https://github.com/PKISharp/ACMESharpCore-PowerShell/graphs/contributors'
 	CompanyName = 'https://github.com/PKISharp'
 	Copyright = '(c) 2018 Thomas Glatzer, Eugene Bekker. All rights reserved.'
 
 	Description = "PowerShell client module for the ACME protocol"
 
-	ScriptsToProcess = @(
+	NestedModules = @(
 		"./TypeDefinitions.ps1"
 	)
 
@@ -52,7 +55,7 @@
 		"Get-ServiceDirectory",
 		"Get-TermsOfService",
 
-		"Initialize-State",
+		"Get-State",
 		"New-State"
 	)
 
@@ -103,12 +106,6 @@
 
 	# Format files (.ps1xml) to be loaded when importing this module
 	# FormatsToProcess = @()
-
-	# Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-	# NestedModules = @()
-
-	# Functions to export from this module
-	# FunctionsToExport = '*'
 
 	# Variables to export from this module
 	# VariablesToExport = '*'

@@ -26,7 +26,7 @@ function Show-Challenge {
                 Select-Object -First 1 | Show-Challenge -AccountKey $AccountKey);
         }
 
-        $accountKey = $State.AccountKey;
+        $accountKey = $State.GetAccountKey();
 
         switch($Challenge.Type) {
             "http-01" { Show-Http01Challenge $Challenge $AccountKey; }

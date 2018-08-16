@@ -77,15 +77,7 @@ function New-AccountKey {
         [int]
         $ECDsaHashSize = 256,
 
-        [Parameter()]
-        [string]
-        $Path,
-
-        [Parameter()]
-        [switch]
-        $SkipKeyExport,
-
-        [Parameter(Mandatory = $true, Position = 0)]
+        [Parameter(Position = 0)]
         [ValidateNotNull()]
         [AcmeState]
         $State,
@@ -95,13 +87,6 @@ function New-AccountKey {
         $PassThrough
     )
 
-    if(-not $SkipKeyExport) {
-        if(-not $Path) {
-            Write-Error "Path was null or empty. Provide a path for the key to be exported or specify SkipKeyExport";
-            return;
-        }
-    }
-
     if($PSCmdlet.ParameterSetName -eq "ECDsa") {
         $accountKey = [IAccountKey]([ECDsaAccountKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa account key with hash size $ECDsaHashSize";
@@ -110,16 +95,11 @@ function New-AccountKey {
         Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
     }
 
-    if($SkipKeyExport) {
-        Write-Warning "The account key will not be exported. Make sure you save the account key or you might loose access to your ACME account.";
-
-        $State.AccountKey = $accountKey;
-
-        if($PassThrough) {
-            return $accountKey;
-        }
+    if($State) {
+        $State.Set($accountKey);
     }
 
-    Export-AccountKey -AccountKey $accountKey -Path $Path | Out-Null
-    Import-AccountKey -State $State -Path $Path -PassThrough:$PassThrough
+    if($PassThrough -or -not $State) {
+        return $accountKey;
+    }
 }

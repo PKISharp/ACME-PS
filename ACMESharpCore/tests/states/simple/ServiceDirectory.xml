@@ -1,0 +1,40 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>AcmeDirectory</T>
+      <T>System.Object</T>
+    </TN>
+    <ToString>AcmeDirectory</ToString>
+    <Props>
+      <S N="ResourceUrl">https://service.acme/directory</S>
+      <S N="NewAccount">https://service.acme/acme/new-acct</S>
+      <S N="NewAuthz"></S>
+      <S N="NewNonce">https://service.acme/acme/new-nonce</S>
+      <S N="NewOrder">https://service.acme/acme/new-order</S>
+      <S N="KeyChange">https://service.acme/acme/key-change</S>
+      <S N="RevokeCert">https://service.acme/acme/revoke-cert</S>
+      <Obj N="Meta" RefId="1">
+        <TN RefId="1">
+          <T>AcmeDirectoryMeta</T>
+          <T>System.Object</T>
+        </TN>
+        <ToString>AcmeDirectoryMeta</ToString>
+        <Props>
+          <Obj N="CaaIdentites" RefId="2">
+            <TN RefId="2">
+              <T>System.String[]</T>
+              <T>System.Array</T>
+              <T>System.Object</T>
+            </TN>
+            <LST>
+              <S>service.acme</S>
+            </LST>
+          </Obj>
+          <S N="TermsOfService">https://service.acme/documents/TOS.pdf</S>
+          <S N="Website">https://service.acme/docs/staging-environment/</S>
+        </Props>
+      </Obj>
+    </Props>
+  </Obj>
+</Objs>
+<!-- This directory has been modified - it's unusable beyond unit tests -->

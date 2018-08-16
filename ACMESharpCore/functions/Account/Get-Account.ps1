@@ -13,7 +13,7 @@ function Get-Account {
         [switch]
         $PassThrough,
 
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName="GetAccount")]
+        [Parameter(Mandatory = $true, Position = 1, ParameterSetName="GetAccount")]
         [ValidateNotNull()]
         [uri] $AccountUrl,
 
@@ -23,7 +23,7 @@ function Get-Account {
     )
 
     if($PSCmdlet.ParameterSetName -eq "FindAccount") {
-        $requestUrl = $State.ServiceDirectory.NewAccount;
+        $requestUrl = $State.GetServiceDirectory().NewAccount;
         $payload = @{"onlyReturnExisting" = $true};
         $response = Invoke-SignedWebRequest $requestUrl $State $payload
 
