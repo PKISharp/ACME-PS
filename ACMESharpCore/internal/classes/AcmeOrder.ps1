@@ -7,9 +7,9 @@ class AcmeOrder {
 
         $this.Identifiers = $obj.Identifiers | ForEach-Object { [AcmeIdentifier]::new($_) };
 
-        $this.AuthorizationUrls = $obj.Authorizations;
-        $this.FinalizeUrl = $obj.Finalize;
-        $this.CertificateUrl = $obj.Certificate;
+        $this.AuthorizationUrls = $obj.AuthorizationUrls;
+        $this.FinalizeUrl = $obj.FinalizeUrl;
+        $this.CertificateUrl = $obj.CertificateUrl;
 
         $this.ResourceUrl = $obj.ResourceUrl;
     }
