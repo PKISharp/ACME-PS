@@ -55,8 +55,8 @@ class AcmeState {
             $accountKeyPath = $this.Filenames.AccountKey;
             $this.AccountKey | Export-AccountKey $accountKeyPath -Force;
         } elseif(-not $this.IsInitializing) {
-            Write-Warning "The account key will not be exported."+
-                "Make sure you save the account key or you might loose access to your ACME account.";
+            Write-Warning "The account key will not be exported.`n" + `
+            "Make sure you save the account key or you might loose access to your ACME account.";
         }
     }
     [void] Set([AcmeAccount] $account) {
