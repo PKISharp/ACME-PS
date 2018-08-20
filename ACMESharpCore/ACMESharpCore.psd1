@@ -41,7 +41,7 @@
 
 		"Complete-Challenge",
 		"Get-Challenge",
-		"Show-Challenge",
+		"Initialize-Challenge",
 
 		"Get-Nonce",
 		"New-Nonce",
