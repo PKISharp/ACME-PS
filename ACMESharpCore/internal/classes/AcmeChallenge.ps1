@@ -12,4 +12,6 @@ class AcmeChallenge {
     [string] $Token;
 
     [AcmeIdentifier] $Identifier;
+
+    [PSCustomObject] $Data;
 }
