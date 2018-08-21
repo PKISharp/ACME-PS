@@ -58,7 +58,7 @@ class ECDsaAccountKey : ECDsaKeyBase, IAccountKey {
 
     [string] JwsAlgorithmName() { return "ES$($this.HashSize)" }
 
-    [hashtable] ExportPublicJwk() {
+    [System.Collections.Specialized.OrderedDictionary] ExportPublicJwk() {
         $keyParams = $this.ECDsa.ExportParameters($false);
 
         <#

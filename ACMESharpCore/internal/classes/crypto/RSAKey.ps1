@@ -48,7 +48,7 @@ class RSAAccountKey : RSAKeyBase, IAccountKey {
 
     [string] JwsAlgorithmName() { return "RS$($this.HashSize)" }
 
-    [hashtable] ExportPublicJwk() {
+    [System.Collections.Specialized.OrderedDictionary] ExportPublicJwk() {
         $keyParams = $this.RSA.ExportParameters($false);
 
         <#

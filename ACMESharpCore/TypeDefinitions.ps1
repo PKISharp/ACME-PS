@@ -2,7 +2,7 @@ $interfaces = @"
 public interface IAccountKey
 {
     string JwsAlgorithmName();
-    System.Collections.Hashtable ExportPublicJwk();
+    System.Collections.Specialized.OrderedDictionary ExportPublicJwk();
 
     byte[] Sign(byte[] inputBytes);
     byte[] Sign(string inputString);
