@@ -65,7 +65,7 @@ class ECDsaAccountKey : ECDsaKeyBase, IAccountKey {
             As per RFC 7638 Section 3, these are the *required* elements of the
             JWK and are sorted in lexicographic order to produce a canonical form
         #>
-        $publicJwk = @{
+        $publicJwk = [ordered]@{
             "crv" = $this.CurveName;
             "kty" = "EC"; # https://tools.ietf.org/html/rfc7518#section-6.2
             "x" = ConvertTo-UrlBase64 -InputBytes $keyParams.Q.X;
