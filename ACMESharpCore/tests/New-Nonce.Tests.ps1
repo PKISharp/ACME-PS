@@ -12,7 +12,7 @@ InModuleScope ACMESharpCore {
         $state = Get-State -Path $PSScriptRoot\states\simple
         $state.AutoSave = $false;   
 
-        $nonce = New-Nonce $state -PassThrough;
+        $nonce = New-Nonce $state -PassThru;
 
         It 'called the ACME service' {
             Assert-VerifiableMock

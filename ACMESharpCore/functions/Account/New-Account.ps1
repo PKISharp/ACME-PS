@@ -11,7 +11,7 @@ function New-Account {
         .PARAMETER State
             The account will be written into the provided state instance.
 
-        .PARAMETER PassThrough
+        .PARAMETER PassThru
             If set, the account will be returned to the pipeline.
 
         .PARAMETER AcceptTOS
@@ -41,7 +41,7 @@ function New-Account {
 
         [Parameter()]
         [switch]
-        $PassThrough,
+        $PassThru,
 
         [Switch]
         $AcceptTOS,
@@ -73,7 +73,7 @@ function New-Account {
 
                 $keyId = $response.Headers["Location"][0];
 
-                return Get-Account -AccountUrl $keyId -KeyId $keyId -State $State -PassThrough:$PassThrough
+                return Get-Account -AccountUrl $keyId -KeyId $keyId -State $State -PassThru:$PassThru
             } else {
                 Write-Error "JWK had already been registiered for an account."
             }
@@ -82,7 +82,7 @@ function New-Account {
         $account = [AcmeAccount]::new($response, $response.Headers["Location"][0]);
         $State.Set($account);
 
-        if($PassThrough) {
+        if($PassThru) {
             return $result;
         }
     }

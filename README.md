@@ -29,7 +29,7 @@ PS> Import-Module AcmeSharpCore
 PS> $state = New-AcmeState -Path C:\Temp\AcmeState
 
 # This will load the service directoy for Let's-Encrypt-Staging and save.
-PS> Get-AcmeServiceDirectory $state -PassThrough | Export-Clixml -Path C:\AcmeTemp\ServiceDirectory.xml
+PS> Get-AcmeServiceDirectory $state -PassThru | Export-Clixml -Path C:\AcmeTemp\ServiceDirectory.xml
 
 # Create and export RSA account key
 PS> New-AcmeAccountKey $state -Path C:\AcmeTemp\AccountKey.xml

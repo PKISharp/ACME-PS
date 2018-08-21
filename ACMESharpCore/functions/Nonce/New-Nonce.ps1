@@ -10,7 +10,7 @@ function New-Nonce {
         .PARAMETER State
             The nonce will be written into the provided state instance.
 
-        .PARAMETER PassThrough
+        .PARAMETER PassThru
             If set, the nonce will be returned to the pipeline.
 
 
@@ -28,7 +28,7 @@ function New-Nonce {
 
         [Parameter()]
         [switch]
-        $PassThrough
+        $PassThru
     )
 
     $Url = $State.GetServiceDirectory().NewNonce;
@@ -42,7 +42,7 @@ function New-Nonce {
 
     $State.SetNonce($nonce);
 
-    if($PassThrough) {
+    if($PassThru) {
         return $nonce;
     }
 }

@@ -13,7 +13,7 @@ function Update-Order {
         .PARAMETER Order
             The order to be updated.
 
-        .PARAMETER PassThrough
+        .PARAMETER PassThru
             If present, the updated order will be written to the output.
     #>
     [CmdletBinding()]
@@ -32,14 +32,14 @@ function Update-Order {
 
         [Parameter()]
         [switch]
-        $PassThrough
+        $PassThru
     )
 
     $response = Invoke-AcmeWebRequest $Order.ResourceUrl -Method GET;
     $Order.UpdateOrder($response);
     $State.SetOrder($Order);
 
-    if($PassThrough) {
+    if($PassThru) {
         return $Order;
     }
 }

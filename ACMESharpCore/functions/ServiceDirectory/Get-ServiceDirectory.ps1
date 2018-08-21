@@ -20,7 +20,7 @@ function Get-ServiceDirectory {
         .PARAMETER State
             If present, the service directory will be written into the provided state instance.
 
-        .PARAMETER PassThrough
+        .PARAMETER PassThru
             If set, the service directory will be returned to the pipeline.
 
 
@@ -28,7 +28,7 @@ function Get-ServiceDirectory {
             PS> Get-ServiceDirectory $myState
 
         .EXAMPLE
-            PS> Get-ServiceDirectory "LetsEncrypt" $myState -PassThrough
+            PS> Get-ServiceDirectory "LetsEncrypt" $myState -PassThru
 
         .EXAMPLE
             PS> Get-ServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org" $myState
@@ -56,7 +56,7 @@ function Get-ServiceDirectory {
 
         [Parameter()]
         [switch]
-        $PassThrough
+        $PassThru
     )
 
     begin {
@@ -98,7 +98,7 @@ function Get-ServiceDirectory {
 
         $State.Set($result);
 
-        if($PassThrough) {
+        if($PassThru) {
             return $result;
         }
     }

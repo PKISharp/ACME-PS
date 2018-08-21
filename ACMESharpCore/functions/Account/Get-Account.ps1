@@ -11,7 +11,7 @@ function Get-Account {
 
         [Parameter()]
         [switch]
-        $PassThrough,
+        $PassThru,
 
         [Parameter(Mandatory = $true, Position = 1, ParameterSetName="GetAccount")]
         [ValidateNotNull()]

@@ -37,7 +37,7 @@ function New-AccountKey {
         .PARAMETER State
             The account key will be written into the provided state instance.
 
-        .PARAMETER PassThrough
+        .PARAMETER PassThru
             If set, the account key will be returned to the pipeline.
 
 
@@ -84,7 +84,7 @@ function New-AccountKey {
 
         [Parameter()]
         [switch]
-        $PassThrough
+        $PassThru
     )
 
     if($PSCmdlet.ParameterSetName -eq "ECDsa") {
@@ -99,7 +99,7 @@ function New-AccountKey {
         $State.Set($accountKey);
     }
 
-    if($PassThrough -or -not $State) {
+    if($PassThru -or -not $State) {
         return $accountKey;
     }
 }

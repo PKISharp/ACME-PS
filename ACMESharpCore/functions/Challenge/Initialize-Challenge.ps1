@@ -17,12 +17,12 @@ function Initialize-Challenge {
 
         [Parameter()]
         [switch]
-        $PassThrough
+        $PassThru
     )
 
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
-            return ($Authorization.challenges | Initialize-Challenge $State -PassThrough:$PassThrough);
+            return ($Authorization.challenges | Initialize-Challenge $State -PassThru:$PassThru);
         }
 
         $accountKey = $State.GetAccountKey();
@@ -72,7 +72,7 @@ function Initialize-Challenge {
             }
         }
 
-        if($PassThrough) {
+        if($PassThru) {
             return $Challenge;
         }
     }

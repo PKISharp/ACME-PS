@@ -12,7 +12,7 @@ function Import-AccountKey {
         .PARAMETER State
             The account key will be written into the provided state instance.
 
-        .PARAMETER PassThrough
+        .PARAMETER PassThru
             If set, the account key will be returned to the pipeline.
     #>
     param(
@@ -29,7 +29,7 @@ function Import-AccountKey {
 
         [Parameter()]
         [switch]
-        $PassThrough
+        $PassThru
     )
 
     process {
@@ -46,7 +46,7 @@ function Import-AccountKey {
             $State.Set($accountKey);
         }
 
-        if($PassThrough -or -not $State) {
+        if($PassThru -or -not $State) {
             return $accountKey;
         }
     }

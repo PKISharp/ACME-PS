@@ -9,7 +9,7 @@ function Set-AccountKey {
 
         [Parameter()]
         [switch]
-        $PassThrough,
+        $PassThru,
 
         [Parameter(Mandatory = $true, ParameterSetName="NewAccountKey")]
         [IAccountKey] $NewAccountKey
