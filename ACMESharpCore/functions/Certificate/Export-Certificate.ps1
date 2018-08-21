@@ -1,4 +1,4 @@
-function Export-PfxCertificate {
+function Export-Certificate {
     <#
         .SYNOPSIS
             Exports an issued certificate as pfx with private and public key.
