@@ -25,6 +25,6 @@ function Import-CertificateKey {
         $imported = Import-Clixml $Path | ConvertTo-OriginalType
     }
 
-    $certificateKey = [ICertificateKey][AlgorithmFactory]::CreateCertificateKey($imported);
+    $certificateKey = [KeyFactory]::CreateCertificateKey($imported);
     return $certificateKey;
 }

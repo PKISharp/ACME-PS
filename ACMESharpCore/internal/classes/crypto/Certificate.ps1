@@ -1,12 +1,15 @@
 class Certificate {
     static [byte[]] ExportPfx([byte[]] $acmeCertificate, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
-        $certifiate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificate);
+        $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificate);
 
-        switch($algorithm.GetType())
-        {
-            [RSA] { $certifiate = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::CopyWithPrivateKey($algorithm); }
-            [ECDsa] { $certifiate = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::CopyWithPrivateKey($algorithm); }
-            default { throw [System.InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to export pfx."); }
+        if($algorithm -is [System.Security.Cryptography.RSA]) {
+            $certifiate = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
+        }
+        elseif($algorithm -is [System.Security.Cryptography.ECDsa]) {
+            $certifiate = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
+        }
+        else {
+            throw [System.InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to export pfx.");
         }
 
         if($password) {
@@ -28,19 +31,21 @@ class Certificate {
             $sanBuilder.AddDnsName($dnsNames);
         }
 
-        $distinguishedName = [X500DistinguishedName]::new("CN=$(dnsNames[0])");
+        $distinguishedName = [X500DistinguishedName]::new("CN=$($dnsNames[0])");
 
         [System.Security.Cryptography.X509Certificates.CertificateRequest]$certRequest = $null;
-        switch($algorithm.GetType())
-        {
-            [RSA] {
-                $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
+
+        if($algorithm -is [System.Security.Cryptography.RSA]) {
+            $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
                     $distinguishedName, $algorithm, $hashName, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1);
-            }
-            [ECDsa] {
-                $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new($distinguishedName, $algorithm, $hashName);
-            }
-            default { throw [System.InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to create CSR."); }
+        } 
+        elseif($algorithm -is [System.Security.Cryptography.ECDsa]) {
+            $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
+                $distinguishedName, $algorithm, $hashName);
+
+        }
+        else {
+            throw [System.InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to create CSR.");
         }
 
         $certRequest.CertificateExtensions.Add($sanBuilder.Build());
