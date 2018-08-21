@@ -30,7 +30,7 @@ function Initialize-Challenge {
         switch($Challenge.Type) {
             "http-01" { 
                 $fileName = $Challenge.Token;
-                $relativePath = "/.well-known/acme-challenges/$fileName"
+                $relativePath = "/.well-known/acme-challenge/$fileName"
                 $fqdn = "$($Challenge.Identifier.Value)$relativePath"
                 $content = [KeyAuthorization]::Compute($AccountKey, $Challenge.Token);
 
