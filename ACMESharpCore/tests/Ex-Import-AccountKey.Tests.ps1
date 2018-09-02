@@ -1,6 +1,6 @@
 InModuleScope ACMESharpCore {
     Describe "UnitTesting Import-AccountKey and Export-AccountKey" -Tag "UnitTest" {
-        Context "Roundtripping XML" {
+        It "Roundtripped XML File will correctly sign data" {
             $tempFile = [System.IO.Path]::GetTempFileName() + ".xml";
             
             $accountKey = New-AccountKey;
@@ -12,11 +12,11 @@ InModuleScope ACMESharpCore {
             $importedKeySignature = $importedKey.Sign("Test");
             
             $importedKeySignature | Should -be $orgiginalKeySignature;
-
+            
             Remove-Item $tempFile;
         }
 
-        Context "Roundtripping JSON" {
+        It "Roundtripped JSON File will correctly sign data" {
             $tempFile = [System.IO.Path]::GetTempFileName() + ".json";
 
             $accountKey = New-AccountKey;
