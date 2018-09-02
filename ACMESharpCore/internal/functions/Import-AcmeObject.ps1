@@ -15,8 +15,10 @@ function Import-AcmeObject {
         $ErrorActionPreference = 'Stop'
 
         if($Path -like "*.json") {
+            Write-Verbose "Importing object from JSON file $Path"
             $imported = Get-Content $Path -Raw | ConvertFrom-Json;
         } else {
+            Write-Verbose "Importing object from CLIXML file $Path"
             $imported = Import-Clixml $Path;
         }
 

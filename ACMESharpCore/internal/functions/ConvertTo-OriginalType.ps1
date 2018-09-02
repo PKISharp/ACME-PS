@@ -15,6 +15,7 @@ function ConvertTo-OriginalType {
             Write-Error "Could not convert inputObject to $TypeName";
         }
 
+        Write-Verbose "Converted input object to type $TypeName";
         return $result;
     }
 }

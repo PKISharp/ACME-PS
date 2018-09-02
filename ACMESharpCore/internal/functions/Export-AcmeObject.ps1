@@ -22,9 +22,11 @@ function Export-AcmeObject {
         }
 
         Write-Debug "Exporting $($InputObject.GetType()) to $Path"
-        if($FileName -like "*.json") {
+        if($Path -like "*.json") {
+            Write-Verbose "Exporting object to JSON file $Path"
             $InputObject | ConvertTo-Json | Out-File -FilePath $Path -Encoding utf8 -Force:$Force;
         } else {
+            Write-Verbose "Exporting object to CLIXML file $Path"
             Export-Clixml $Path -InputObject $InputObject -Force:$Force;
         }
     }
