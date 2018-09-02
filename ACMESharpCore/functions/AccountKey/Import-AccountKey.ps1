@@ -35,12 +35,8 @@ function Import-AccountKey {
     process {
         $ErrorActionPreference = 'Stop'
 
-        if($Path -like "*.json") {
-            $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertTo-OriginalType;
-        } else {
-            $imported = Import-Clixml $Path | ConvertTo-OriginalType;
-        }
-
+        $imported = Import-AcmeObject $Path
+        
         $accountKey = [KeyFactory]::CreateAccountKey($imported);
         if($State) {
             $State.Set($accountKey);
