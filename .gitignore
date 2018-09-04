@@ -1,14 +1,8 @@
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-# build.ps1 -BuildDependencies will create this
-/ACMESharpCore/bin/InterfaceDefinitions/
-
 /ACMESharpCore/internal/AllClasses.ps1
 /ACMESharpCore/internal/AllFunctions.ps1
 /ACMESharpCore/AllFunctions.ps1
-
-/InterfaceDefinitions/bin/
-/InterfaceDefinitions/obj/
 
 /publish
