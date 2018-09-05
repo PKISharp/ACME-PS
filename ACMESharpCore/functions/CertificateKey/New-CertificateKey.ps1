@@ -40,7 +40,7 @@ function New-CertificateKey {
         .EXAMPLE
             PS> New-CertificateKey -ECDsa -HashSize 384 -SkipExport
     #>
-    [CmdletBinding(DefaultParameterSetName="RSA")]
+    [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
     [OutputType("ICertificateKey")]
     param(
         [Parameter(ParameterSetName="RSA")]
@@ -97,6 +97,8 @@ function New-CertificateKey {
         return $certificateKey;
     }
 
-    Export-CertificateKey -CertificateKey $certificateKey -Path $Path -ErrorAction 'Stop' | Out-Null
-    return Import-CertificateKey -Path $Path -ErrorAction 'Stop'
+    if($PSCmdlet.ShouldProcess("CertificateKey", "Store created key to $Path and reload it from there")) {
+        Export-CertificateKey -CertificateKey $certificateKey -Path $Path -ErrorAction 'Stop' | Out-Null
+        return Import-CertificateKey -Path $Path -ErrorAction 'Stop'
+    }
 }

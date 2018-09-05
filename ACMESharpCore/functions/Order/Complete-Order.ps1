@@ -19,6 +19,7 @@ function Complete-Order {
         .EXAMPLE
             PS> Complete-Order -Order $myOrder -CertificateKey $myCertKey
     #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
@@ -34,7 +35,11 @@ function Complete-Order {
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [ICertificateKey]
-        $CertificateKey
+        $CertificateKey,
+
+        [Parameter()]
+        [switch]
+        $PassThru
     )
 
     process {
@@ -46,8 +51,15 @@ function Complete-Order {
         $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) }
 
         $requestUrl = $Order.FinalizeUrl;
-        $response = Invoke-SignedWebRequest $requestUrl $State $payload;
 
-        $Order.UpdateOrder($response);
+        if($PSCmdlet.ShouldProcess("Order", "Finalizing order at ACME service by submitting CSR")) {
+            $response = Invoke-SignedWebRequest $requestUrl $State $payload;
+
+            $Order.UpdateOrder($response);
+        }
+
+        if($PassThru) {
+            return $Order;
+        }
     }
 }

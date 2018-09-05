@@ -17,6 +17,7 @@ function New-Identifier {
         .EXAMPLE
             PS> New-Identifier www.example.com
     #>
+    [CmdletBinding(SupportsShouldProcess=$false)]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]

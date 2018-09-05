@@ -50,7 +50,7 @@ function New-AccountKey {
         .EXAMPLE
             PS> New-AccountKey -ECDsa -HashSize 384 -SkipExport
     #>
-    [CmdletBinding(DefaultParameterSetName="RSA")]
+    [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
     [OutputType("IAccountKey")]
     param(
         [Parameter(ParameterSetName="RSA")]
@@ -95,7 +95,7 @@ function New-AccountKey {
         Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
     }
 
-    if($State) {
+    if($State -and $PSCmdlet.ShouldProcess("AccountKey", "Add created account key to state.")) {
         $State.Set($accountKey);
     }
 

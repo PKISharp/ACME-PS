@@ -17,7 +17,7 @@ function New-Nonce {
         .EXAMPLE
             PS> New-Nonce -Uri "https://acme-staging-v02.api.letsencrypt.org/acme/new-nonce"
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType("string")]
     param(
         [Parameter(Mandatory = $true)]
@@ -40,7 +40,9 @@ function New-Nonce {
         throw "Could not retreive new nonce";
     }
 
-    $State.SetNonce($nonce);
+    if($PSCmdlet.ShouldProcess("Nonce", "Store new nonce into state")) {
+        $State.SetNonce($nonce);
+    }
 
     if($PassThru) {
         return $nonce;

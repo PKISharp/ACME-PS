@@ -26,7 +26,7 @@ function New-Order {
         .EXAMPLE
             PS> New-Order -Identifiers (New-Identifier "dns" "www.test.com")
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
@@ -54,10 +54,13 @@ function New-Order {
     }
 
     $requestUrl = $State.GetServiceDirectory().NewOrder;
-    $response = Invoke-SignedWebRequest $requestUrl $State $payload;
 
-    $order = [AcmeOrder]::new($response);
-    $state.AddOrder($order);
+    if($PSCmdlet.ShouldProcess("Order", "Create new order with ACME Service")) {
+        $response = Invoke-SignedWebRequest $requestUrl $State $payload;
 
-    return $order;
+        $order = [AcmeOrder]::new($response);
+        $state.AddOrder($order);
+
+        return $order;
+    }
 }

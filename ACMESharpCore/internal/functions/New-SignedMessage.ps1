@@ -1,5 +1,5 @@
 function New-SignedMessage {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$false)]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNullOrEmpty()]

@@ -14,6 +14,7 @@ function New-State {
         .EXAMPLE
             PS> New-State
     #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter()]
         [string]
@@ -25,7 +26,9 @@ function New-State {
             Write-Warning "You did not provide a persistency path. State will not be saved automatically."
             return [AcmeState]::new()
         } else {
-            return [AcmeState]::new($Path, $true);
+            if($PSCmdlet.ShouldProcess("State", "Create new state and save it to $Path")) {
+                return [AcmeState]::new($Path, $true);
+            }
         }
     }
 }

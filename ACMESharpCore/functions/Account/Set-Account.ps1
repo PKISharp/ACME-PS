@@ -1,5 +1,5 @@
-function Set-AccountKey {
-    [CmdletBinding()]
+function Set-Account {
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
@@ -21,8 +21,11 @@ function Set-AccountKey {
     };
 
     $payload = New-SignedMessage -Url $Url -AccountKey $NewAccountKey -Payload $innerPayload;
-    Invoke-SignedWebRequest $Url -$State $payload -ErrorAction 'Stop';
 
-    $State.Set($NewAccountKey);
-    return Get-Account -Url $TargetAccount.ResourceUrl -State $State -KeyId $Account.KeyId
+    if($PSCmdlet.ShouldProcess("Account", "Set new AccountKey and store it into state")) {
+        Invoke-SignedWebRequest $Url -$State $payload -ErrorAction 'Stop';
+
+        $State.Set($NewAccountKey);
+        return Get-Account -Url $TargetAccount.ResourceUrl -State $State -KeyId $Account.KeyId
+    }
 }

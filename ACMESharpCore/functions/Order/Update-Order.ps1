@@ -16,7 +16,7 @@ function Update-Order {
         .PARAMETER PassThru
             If present, the updated order will be written to the output.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType("AcmeOrder")]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -35,11 +35,13 @@ function Update-Order {
         $PassThru
     )
 
-    $response = Invoke-AcmeWebRequest $Order.ResourceUrl -Method GET;
-    $Order.UpdateOrder($response);
-    $State.SetOrder($Order);
+    if($PSCmdlet.ShouldProcess("Order", "Get updated order form ACME service and store it to state")) {
+        $response = Invoke-AcmeWebRequest $Order.ResourceUrl -Method GET;
+        $Order.UpdateOrder($response);
+        $State.SetOrder($Order);
 
-    if($PassThru) {
-        return $Order;
+        if($PassThru) {
+            return $Order;
+        }
     }
 }
