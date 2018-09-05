@@ -58,6 +58,6 @@ function New-Order {
 
     $order = [AcmeOrder]::new($response);
     $state.AddOrder($order);
-    
+
     return $order;
 }

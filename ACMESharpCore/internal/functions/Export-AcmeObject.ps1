@@ -16,7 +16,7 @@ function Export-AcmeObject {
 
     process {
         $ErrorActionPreference = 'Stop'
-        
+
         if((Test-Path $Path) -and -not $Force) {
             Write-Error "$Path already exists."
         }

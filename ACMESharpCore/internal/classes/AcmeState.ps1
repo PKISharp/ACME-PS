@@ -10,7 +10,7 @@ class AcmeState {
 
     hidden [AcmeStatePaths] $Filenames;
 
-    AcmeState() { 
+    AcmeState() {
         $this.Filenames = [AcmeStatePaths]::new("");
     }
 
@@ -34,7 +34,7 @@ class AcmeState {
 
     [void] Set([AcmeDirectory] $serviceDirectory) {
         $this.ServiceDirectory = $serviceDirectory;
-        if($this.AutoSave) { 
+        if($this.AutoSave) {
             $directoryPath = $this.Filenames.ServiceDirectory;
 
             Write-Debug "Storing the service directory to $directoryPath";
@@ -50,8 +50,8 @@ class AcmeState {
     }
     [void] Set([IAccountKey] $accountKey) {
         $this.AccountKey = $accountKey;
-        
-        if($this.AutoSave) { 
+
+        if($this.AutoSave) {
             $accountKeyPath = $this.Filenames.AccountKey;
             $this.AccountKey | Export-AccountKey $accountKeyPath -Force;
         } elseif(-not $this.IsInitializing) {
@@ -62,7 +62,7 @@ class AcmeState {
     [void] Set([AcmeAccount] $account) {
         $this.Account = $account;
         if($this.AutoSave) {
-            $accountPath = $this.Filenames.Account; 
+            $accountPath = $this.Filenames.Account;
             $this.Account | Export-AcmeObject $accountPath;
         }
     }
@@ -76,7 +76,7 @@ class AcmeState {
         $noncePath = $this.Filenames.Nonce;
         $accountKeyPath = $this.Filenames.AccountKey;
         $accountPath = $this.Filenames.Account;
-        
+
         if(Test-Path $directoryPath) {
             Get-ServiceDirectory $this -Path $directoryPath
         } else {
@@ -106,7 +106,7 @@ class AcmeState {
         } else {
             Write-Verbose "Could not find saved account at $accountPath";
         }
-        
+
         $this.AutoSave = $true;
         $this.IsInitializing = $false
     }
@@ -140,7 +140,7 @@ class AcmeState {
 
         return $null;
     }
-    
+
     [void] AddOrder([AcmeOrder] $order) {
         $this.SetOrder($order);
     }
@@ -152,7 +152,7 @@ class AcmeState {
 
             if(-not (Test-Path $order)) {
                 $orderListFile = $this.Filenames.OrderList;
-                
+
                 foreach ($id in $order.Identifiers) {
                     if(-not (Test-Path $orderListFile)) {
                         New-Item $orderListFile -Force;

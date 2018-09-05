@@ -1,16 +1,16 @@
 InModuleScope ACMESharpCore {
     Describe "UnitTesting New-Nonce" -Tag "UnitTest" {
-        Mock Invoke-AcmeWebRequest { 
+        Mock Invoke-AcmeWebRequest {
             $mockResult = [AcmeHttpResponse]::new();
             $mockResult.NextNonce = "MyNewNonce";
             return  $mockResult;
-        } -Verifiable -ParameterFilter { 
-            $Url -eq $state.GetServiceDirectory().NewNonce -and 
+        } -Verifiable -ParameterFilter {
+            $Url -eq $state.GetServiceDirectory().NewNonce -and
             $Method -eq "HEAD"
         }
-        
+
         $state = Get-State -Path $PSScriptRoot\states\simple
-        $state.AutoSave = $false;   
+        $state.AutoSave = $false;
 
         $nonce = New-Nonce $state -PassThru;
 

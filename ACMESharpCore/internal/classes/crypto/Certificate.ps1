@@ -38,7 +38,7 @@ class Certificate {
         if($algorithm -is [System.Security.Cryptography.RSA]) {
             $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
                     $distinguishedName, $algorithm, $hashName, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1);
-        } 
+        }
         elseif($algorithm -is [System.Security.Cryptography.ECDsa]) {
             $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
                 $distinguishedName, $algorithm, $hashName);

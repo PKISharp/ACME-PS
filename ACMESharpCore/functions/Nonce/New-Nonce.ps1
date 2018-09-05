@@ -38,7 +38,7 @@ function New-Nonce {
 
     if(-not $nonce) {
         throw "Could not retreive new nonce";
-    } 
+    }
 
     $State.SetNonce($nonce);
 
