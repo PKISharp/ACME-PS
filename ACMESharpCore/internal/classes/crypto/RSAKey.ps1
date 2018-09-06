@@ -22,7 +22,7 @@ class RSAKeyBase : KeyBase
         $this.RSA = [System.Security.Cryptography.RSA]::Create($keyParameters);
     }
 
-    [RSAKeyExport] ExportKey() {
+    [object] ExportKey() {
         $rsaParams = $this.RSA.ExportParameters($true);
 
         $keyExport = [RSAKeyExport]::new();

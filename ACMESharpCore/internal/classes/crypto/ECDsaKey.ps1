@@ -38,7 +38,7 @@ class ECDsaKeyBase : KeyBase
         return $null;
     }
 
-    [ECDsaKeyExport] ExportKey() {
+    [object] ExportKey() {
         $ecParams = $this.ECDsa.ExportParameters($true);
         $keyExport = [ECDsaKeyExport]::new();
 
