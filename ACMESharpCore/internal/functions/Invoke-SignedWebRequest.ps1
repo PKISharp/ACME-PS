@@ -23,7 +23,7 @@ function Invoke-SignedWebRequest {
         $keyId = $(if($account -and -not $SupressKeyId) { $account.KeyId });
         $nonce = $State.GetNonce();
 
-        $requestBody = New-SignedMessage -Url $Url -AccountKey $accountKey -KeyId $keyId -Nonce $nonce -Payload $Payload
+        $requestBody = New-SignedMessage -Url $Url -SigningKey $accountKey -KeyId $keyId -Nonce $nonce -Payload $Payload
         $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST
 
         if($null -ne $response -and $response.NextNonce) {

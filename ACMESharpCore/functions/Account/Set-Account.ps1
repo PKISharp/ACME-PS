@@ -20,7 +20,7 @@ function Set-Account {
         "oldKey" = $State.GetAccountKey().ExportPuplicKey()
     };
 
-    $payload = New-SignedMessage -Url $Url -AccountKey $NewAccountKey -Payload $innerPayload;
+    $payload = New-SignedMessage -Url $Url -SigningKey $NewAccountKey -Payload $innerPayload;
 
     if($PSCmdlet.ShouldProcess("Account", "Set new AccountKey and store it into state")) {
         Invoke-SignedWebRequest $Url -$State $payload -ErrorAction 'Stop';

@@ -90,7 +90,7 @@ class RSAAccountKey : RSAKeyBase, IAccountKey {
     }
 }
 
-class RSACertificateKey : RSAKeyBase, ICertificateKey {
+class RSACertificateKey : RSAAccountKey, ICertificateKey {
     RSACertificateKey([int] $hashSize, [int] $keySize) : base($hashSize, $keySize) { }
     RSACertificateKey([int] $hashSize, [System.Security.Cryptography.RSAParameters] $keyParameters) : base($hashSize, $keyParameters) { }
 

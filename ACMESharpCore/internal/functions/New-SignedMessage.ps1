@@ -6,7 +6,7 @@ function New-SignedMessage {
         [string] $Url,
 
         [Parameter(Mandatory = $true, Position = 1)]
-        [IAccountKey] $AccountKey,
+        [ISigningKey] $SigningKey,
 
         [Parameter(Position = 2)]
         [string] $KeyId,
@@ -20,7 +20,7 @@ function New-SignedMessage {
     )
 
     $headers = @{};
-    $headers.Add("alg", $AccountKey.JwsAlgorithmName());
+    $headers.Add("alg", $SigningKey.JwsAlgorithmName());
     $headers.Add("url", $Url);
 
     if($Nonce) {
@@ -35,7 +35,7 @@ function New-SignedMessage {
 
     if(-not ($KeyId)) {
         Write-Debug "No KeyId present, addind JWK.";
-        $headers.Add("jwk", $AccountKey.ExportPublicJwk());
+        $headers.Add("jwk", $SigningKey.ExportPublicJwk());
     }
 
     if($Payload -is [string]) {
@@ -56,7 +56,7 @@ function New-SignedMessage {
     $signedPayload.add("header", $null);
     $signedPayload.add("protected", ($jsonHeaders | ConvertTo-UrlBase64));
     $signedPayload.add("payload", ($messagePayload | ConvertTo-UrlBase64));
-    $signedPayload.add("signature", (ConvertTo-UrlBase64 -InputBytes $AccountKey.Sign("$($signedPayload.Protected).$($signedPayload.Payload)")));
+    $signedPayload.add("signature", (ConvertTo-UrlBase64 -InputBytes $SigningKey.Sign("$($signedPayload.Protected).$($signedPayload.Payload)")));
 
     $result = $signedPayload | ConvertTo-Json;
     Write-Debug "Created signed message`n: $result";

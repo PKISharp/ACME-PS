@@ -4,7 +4,7 @@ public interface IKey
     object ExportKey();
 }
 
-public interface IAccountKey : IKey
+public interface ISigningKey : IKey
 {
     string JwsAlgorithmName();
     System.Collections.Specialized.OrderedDictionary ExportPublicJwk();
@@ -13,7 +13,11 @@ public interface IAccountKey : IKey
     byte[] Sign(string inputString);
 }
 
-public interface ICertificateKey : IKey
+public interface IAccountKey : ISigningKey
+{
+}
+
+public interface ICertificateKey : ISigningKey
 {
     byte[] ExportPfx(byte[] acmeCertificate, System.Security.SecureString password);
     byte[] GenerateCsr(string[] dnsNames);
