@@ -5,7 +5,7 @@ class RSAKeyBase : KeyBase
 
     RSAKeyBase([int] $hashSize, [int] $keySize) : base($hashSize)
     {
-        if ($this.GetType() -eq [KeyBase]) {
+        if ($this.GetType() -eq [RSAKeyBase]) {
             throw [System.InvalidOperationException]::new("Class must be inherited");
         }
 
@@ -15,7 +15,7 @@ class RSAKeyBase : KeyBase
     RSAKeyBase([int] $hashSize, [System.Security.Cryptography.RSAParameters] $keyParameters)
         :base($hashSize)
     {
-        if ($this.GetType() -eq [KeyBase]) {
+        if ($this.GetType() -eq [RSAKeyBase]) {
             throw [System.InvalidOperationException]::new("Class must be inherited");
         }
 

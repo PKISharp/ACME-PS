@@ -6,7 +6,7 @@ class ECDsaKeyBase : KeyBase
 
     ECDsaKeyBase([int] $hashSize) : base($hashSize)
     {
-        if ($this.GetType() -eq [KeyBase]) {
+        if ($this.GetType() -eq [ECDsaKeyBase]) {
             throw [System.InvalidOperationException]::new("Class must be inherited");
         }
 
@@ -19,7 +19,7 @@ class ECDsaKeyBase : KeyBase
     ECDsaKeyBase([int] $hashSize,[System.Security.Cryptography.ECParameters] $keyParameters)
         :base($hashSize)
     {
-        if ($this.GetType() -eq [KeyBase]) {
+        if ($this.GetType() -eq [ECDsaKeyBase]) {
             throw [System.InvalidOperationException]::new("Class must be inherited");
         }
 
