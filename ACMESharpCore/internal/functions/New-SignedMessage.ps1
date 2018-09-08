@@ -1,5 +1,7 @@
 function New-SignedMessage {
     [CmdletBinding(SupportsShouldProcess=$false)]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        "PSUseShouldProcessForStateChangingFunctions", "", Scope="Function", Target="*")]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNullOrEmpty()]

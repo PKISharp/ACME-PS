@@ -18,6 +18,8 @@ function New-Identifier {
             PS> New-Identifier www.example.com
     #>
     [CmdletBinding(SupportsShouldProcess=$false)]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        "PSUseShouldProcessForStateChangingFunctions", "", Scope="Function", Target="*")]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
