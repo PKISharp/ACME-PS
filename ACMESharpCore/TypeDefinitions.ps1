@@ -1,5 +1,5 @@
 $interfaces = @"
-public interface IKey 
+public interface IKey
 {
     object ExportKey();
 }
@@ -13,9 +13,7 @@ public interface ISigningKey : IKey
     byte[] Sign(string inputString);
 }
 
-public interface IAccountKey : ISigningKey
-{
-}
+public interface IAccountKey : ISigningKey { }
 
 public interface ICertificateKey : ISigningKey
 {
