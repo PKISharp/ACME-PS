@@ -5,6 +5,8 @@ class AcmeHttpResponse {
         $this.RequestUri = $responseMessage.RequestMessage.RequestUri;
         $this.StatusCode = $responseMessage.StatusCode;
 
+        $this.IsError = $this.StatusCode -ge 400;
+
         if($stringContent) {
             $this.Content = $stringContent | ConvertFrom-Json;
         }
@@ -21,6 +23,7 @@ class AcmeHttpResponse {
 
     [string] $RequestUri;
     [int] $StatusCode;
+    [bool] $IsError;
 
     [PSCustomObject] $Content;
     [hashtable] $Headers;
