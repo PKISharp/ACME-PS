@@ -3,8 +3,8 @@
 	ModuleVersion = '1.0.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
-	CompatiblePSEditions = @("Core")
-	PowershellVersion = "6.0"
+	CompatiblePSEditions = @("Core", "Desktop")
+	PowershellVersion = "5.1"
 
 	Author = 'https://github.com/PKISharp/ACMESharpCore-PowerShell/graphs/contributors'
 	CompanyName = 'https://github.com/PKISharp'
@@ -13,6 +13,7 @@
 	Description = "PowerShell client module for the ACME protocol Version 2"
 
 	NestedModules = @(
+		"./Prerequisites.ps1",
 		"./TypeDefinitions.ps1"
 	)
 

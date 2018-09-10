@@ -29,8 +29,11 @@ Import-Module "$PSScriptRoot/ACMESharpCore" -Force -ErrorAction 'Stop' -Verbose:
 Write-Information "Copying $ModuleSourcePath/ACMESharpCore.psd1"
 Copy-Item -Path "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/" -Force;
 
-Write-Information "Copying $ModuleSourcePath/TypeDefinitions.psd1"
+Write-Information "Copying $ModuleSourcePath/TypeDefinitions.ps1"
 Copy-Item -Path "$ModuleSourcePath/TypeDefinitions.ps1" -Destination "$ModuleOutPath/" -Force;
+
+Write-Information "Copying $ModuleSourcePath/Prerequisites.ps1"
+Copy-Item -Path "$ModuleSourcePath/Prerequisites.ps1" -Destination "$ModuleOutPath/" -Force;
 
 $ModuleFiles = @(
     "internal/AllClasses.ps1",
