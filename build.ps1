@@ -47,7 +47,7 @@ $ModuleFiles | ForEach-Object { Get-Content "$ModuleSourcePath/$_" } | Set-Conte
 if($SignModule) {
     Write-Information "Signing all *.ps* files"
     $files = "$ModuleOutPath/*.ps*"
-    $cert = Get-Item Cert:\CurrentUser\My\017E67F53FCB161D63E7881F1F96A8452859200D
+    $cert = Get-Item Cert:\CurrentUser\My\39BCA611578AD62BA5126A406DBD4CC5DAFB859C
 
     Set-AuthenticodeSignature -FilePath $files -Certificate $cert | Out-Null
 }
