@@ -11,7 +11,7 @@ param(
 $ErrorActionPreference = 'Stop';
 $InformationPreference = 'Continue';
 
-$ModuleSourcePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACMESharpCore"));
+$ModuleSourcePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "./ACME-PS"));
 $ModuleOutPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $ModuleOutPath));
 
 <# Clean Publish folder #>
@@ -24,10 +24,10 @@ if(Test-Path $ModuleOutPath) {
 }
 
 <# Publish the module #>
-Import-Module "$PSScriptRoot/ACMESharpCore" -Force -ErrorAction 'Stop' -Verbose:$false # This will create the All* files.
+Import-Module "$PSScriptRoot/ACME-PS" -Force -ErrorAction 'Stop' -Verbose:$false # This will create the All* files.
 
-Write-Information "Copying $ModuleSourcePath/ACMESharpCore.psd1"
-Copy-Item -Path "$ModuleSourcePath/ACMESharpCore.psd1" -Destination "$ModuleOutPath/" -Force;
+Write-Information "Copying $ModuleSourcePath/ACME-PS.psd1"
+Copy-Item -Path "$ModuleSourcePath/ACME-PS.psd1" -Destination "$ModuleOutPath/" -Force;
 
 Write-Information "Copying $ModuleSourcePath/TypeDefinitions.ps1"
 Copy-Item -Path "$ModuleSourcePath/TypeDefinitions.ps1" -Destination "$ModuleOutPath/" -Force;
@@ -42,7 +42,7 @@ $ModuleFiles = @(
 )
 
 Write-Information "Merging Module content files $([string]::Join(", ", $ModuleFiles))"
-$ModuleFiles | ForEach-Object { Get-Content "$ModuleSourcePath/$_" } | Set-Content "$ModuleOutPath/ACMESharpCore.psm1";
+$ModuleFiles | ForEach-Object { Get-Content "$ModuleSourcePath/$_" } | Set-Content "$ModuleOutPath/ACME-PS.psm1";
 
 if($SignModule) {
     Write-Information "Signing all *.ps* files"

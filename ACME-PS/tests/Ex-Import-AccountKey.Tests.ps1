@@ -1,4 +1,4 @@
-InModuleScope ACMESharpCore {
+InModuleScope ACME-PS {
     Describe "UnitTesting Import-AccountKey and Export-AccountKey" -Tag "UnitTest" {
         Context "Roundtripping XML" {
             $tempFile = [System.IO.Path]::GetTempFileName() + ".xml";

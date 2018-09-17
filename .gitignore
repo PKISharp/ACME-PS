@@ -1,8 +1,8 @@
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-/ACMESharpCore/internal/AllClasses.ps1
-/ACMESharpCore/internal/AllFunctions.ps1
-/ACMESharpCore/AllFunctions.ps1
+/ACME-PS/internal/AllClasses.ps1
+/ACME-PS/internal/AllFunctions.ps1
+/ACME-PS/AllFunctions.ps1
 
 /publish

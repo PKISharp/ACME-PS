@@ -1,4 +1,4 @@
-InModuleScope ACMESharpCore {
+InModuleScope ACME-PS {
     Describe "UnitTesting New-Nonce" -Tag "UnitTest" {
         Mock Invoke-AcmeWebRequest {
             $mockResult = [AcmeHttpResponse]::new();
