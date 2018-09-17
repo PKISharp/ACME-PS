@@ -1,6 +1,7 @@
 # ACME-PS-PowerShell
 
 A PowerShell module supporting ACME v2 certificate management.
+You can download it via https://www.powershellgallery.com/packages/ACME-PS/
 
 ## How to create the published module
 
