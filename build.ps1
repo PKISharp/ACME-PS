@@ -2,7 +2,7 @@
 param(
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string] $ModuleOutPath = "./publish",
+    [string] $ModuleOutPath = "./publish/ACME-PS",
 
     [Parameter()]
     [Switch] $SignModule
