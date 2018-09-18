@@ -1,5 +1,5 @@
 @{
-	RootModule = 'ACMESharpCore.psm1'
+	RootModule = 'ACME-PS.psm1'
 	ModuleVersion = '1.0.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 

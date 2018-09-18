@@ -1,4 +1,4 @@
-InModuleScope ACMESharpCore {
+InModuleScope ACME-PS {
     Describe "UnitTesting New-AccountKey" -Tag "UnitTest" {
         Context "Key-Creation" {
             It "Creates RSA Keys" {

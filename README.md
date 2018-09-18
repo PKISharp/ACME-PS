@@ -1,4 +1,4 @@
-# ACMESharpCore-PowerShell
+# ACME-PS-PowerShell
 
 A PowerShell module supporting ACME v2 certificate management.
 
@@ -15,7 +15,7 @@ PS> & build.ps1
 To run the Pester-Tests call:
 
 ```
-PS> & .\AcmeSharpCore\tests\A-Manual-Test-Run.ps1
+PS> & .\ACME-PS\tests\A-Manual-Test-Run.ps1
 ```
 
 ## How to use the module
@@ -23,7 +23,7 @@ PS> & .\AcmeSharpCore\tests\A-Manual-Test-Run.ps1
 This sequence will create a new account and account keys, to further usage.
 
 ```
-PS> Import-Module AcmeSharpCore
+PS> Import-Module ACME-PS
 
 # Create a acme state instance, which will make passing around of neccessary informations easy.
 PS> $state = New-AcmeState -Path C:\Temp\AcmeState
@@ -41,7 +41,7 @@ PS> New-AcmeAccount $state -AcceptTOS -EmailAddresses "mail@example.com"
 From here we'll start over with the existing key and account.
 
 ```
-PS> Import-Moduel AcmeSharpCore
+PS> Import-Moduel ACME-PS
 
 # Initialize state with existing data (loads service directory, account key, nonce and your account)
 PS> $state = Get-AcmeState -Path C:\Temp\AcmeState
