@@ -27,7 +27,7 @@ function Complete-Order {
         [AcmeState]
         $State,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [ValidateNotNull()]
         [AcmeOrder]
         $Order,
