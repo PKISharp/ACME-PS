@@ -1,13 +1,12 @@
 function New-AccountKey {
     <#
         .SYNOPSIS
-            Creates a new account key, that can will used to sign ACME operations.
+            Creates a new account key, that will be used to sign ACME operations.
             Provide a path where to save the key, since being able to restore it is crucial.
 
         .DESCRIPTION
             Creates and stores a new account key, that can be used for ACME operations.
             The key will first be created, than exported and imported again to make sure, it has been saved.
-            You can skip the export by providing the SkipExport switch.
 
 
         .PARAMETER RSA
@@ -29,9 +28,6 @@ function New-AccountKey {
 
         .PARAMETER Path
             The path where the keys will be stored.
-
-        .PARAMETER SkipExport
-            Allows you to skip exporting the account key. Use with care.
 
 
         .PARAMETER State
@@ -96,7 +92,9 @@ function New-AccountKey {
     }
 
     if($State -and $PSCmdlet.ShouldProcess("AccountKey", "Add created account key to state.")) {
-        $State.Set($accountKey);
+        if($State.GetAccountKey() -eq $null -or $PSCmdlet.ShouldContinue("The existing account key will be overriden. Do you want to continue?", "Replace account key")) {
+            $State.Set($accountKey);
+        }
     }
 
     if($PassThru -or -not $State) {
