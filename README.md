@@ -1,90 +1,174 @@
-# ACME-PS-PowerShell
+# ACME-PS
 
-A PowerShell module supporting ACME v2 certificate management.
+A PowerShell module supporting ACME v2. The module tries to provide you with all means neccessary
+to enable you to write a script or module which uses an ACME v2 service to create certificates.
 
-## How to create the published module
+## Synopsis
+
+ - ACME service
+
+   The ACME service or ACME directory is the server, which will issue certificates to you.
+
+ - Account Key
+
+   The account key is used to authenticate yourself to the ACME service. After registering it with   the server make sure you do not lose the key.  
+   The module supports RSA and ECDSA keys with different sizes.
+
+ - Account
+
+   The account is associated with your account key. It stores informations like contact addresses on the ACME service. As long as you have the account key, you can identify yourself as the owner of the account.
+
+ - Identifier
+
+   An Identifier is used to describe what the certificate will be used for. It has the form `dns:www.example.com`.
+
+ - Order
+
+   The order is the main object during certificate issuance. It has a collection of identifiers, defining all subject alternate names of the certificate.  
+   Also it contains an authroization object for each identifier as well as some links allowing you to send the actual certificate signing request and acquiring the certificate.
+
+ - Authroization
+
+   An authorization is associated with an identifier. It contains a collection of challenges, of which you have to satisfy one. An authorization will be valid if one challenge is successful.
+
+ - Challenge
+
+   A challenge provides data about what you have to do, to prove that you own the dns names you provided as identifiers via the order. The challenge needs to be completed, so the authorization is also valid and thus the order will be ready to be used for certificate issuance.
+
+ - Certificate Key
+
+   To complete the order you need to create a key for the certificate itself. This is the public and private key for your certificate. You should keep it save until the certificate is exported.
+
+ - Service directory
+
+   The service directory is a collection of URLs describing the endpoints of an ACME service.
+
+ - Nonce
+
+   The nonce is used as an anti-replay token. A nonce will be send whenever you communicate with the ACME service and the service will send back a nonce which can be used with the next request.
+
+ - State
+
+   The state is a local storage of information neccessary to make handling of request easier.
+
+## Samples
+
+These samples can be used to create an ACME account, create an order, fullfill a http-01 challenge and issue a certificate for using it. Modify the variables to suit your needs.
+
+```
+$stateDir = "C:\Temp\AcmeState";
+
+$serviceName = "LetsEncrypt-Staging"
+$contactMail = "mail@example.com";
+
+$dnsName = "www.example.com";
+$wwwRoot = "C:\inetpub\wwwroot"
+```
+
+### Create an ACME account
+
+This snippet will create an account key and register it with the ACME service.
+
+```
+Import-Module ACME-PS;
+
+# Create a state object and save it to the harddrive
+$state = New-ACMEState -Path $stateDir
+
+# Fetch the service directory and save it in the state
+Get-ServiceDirectory $state -ServiceName $serviceName -PassThru;
+
+# Create an account key. The state will make sure it's stored.
+New-ACMEAccountKey $state -PassThru;
+
+# Register the account key with the acme service. The account key will automatically be read from the state
+New-ACMEAccount $state -EmailAddresses $contactMail -AcceptTOS;
+```
+
+### Issue a certificate
+
+This snippet will create an order and prepare the http-01 challenge to be resolved.
+Make sure to read and understand what happens, since the script makes assumptions:
+
+ - It's a single machine (not a farm)
+ - The machine is reachable via http for the given $dnsName
+ - The website is in $wwwRoot 
+
+```
+# Load an state object to have service directory and account keys available
+$state = Get-ACMEState -Path $stateDir;
+
+# It might be neccessary to acquire a new nonce, so we'll just do it for the sake of the example.
+New-ACMENonce $state -PassThru;
+
+# Create the identifier for the DNS name
+$identifier = New-ACMEIdentifier $dnsName;
+
+# Create the order object at the ACME service.
+$order = New-ACMEOrder $state -Identifiers $identifier;
+
+# Fetch the authorizations for that order
+$authZ = Get-ACMEAuthorization -Order $order;
+
+# Select a challenge to fullfill
+$challange = Get-ACMEChallenge $state $authZ "http-01";
+
+# Inspect the challange data
+$challenge.Data;
+
+# Create the file requested by the challenge
+$fileName = $wwwRoot + $challenge.Data.RelativeUrl;
+Set-Content -Path $fileName -Value $challange.Data.Content -NoNewLine;
+
+# Check if the challenge is readable
+Invoke-WebRequest $challange.Data.AbsoluteUrl;
+
+## Stop here if the Invoke-WebRequest fails and make sure it passes
+Read-Host -Prompt "Press Enter if Invoke-WebRequest succeeded, else [CTRL]+[C]";
+
+# Signal the ACME server that the challenge is ready
+$challenge | Complete-ACMEChallenge $state;
+
+# Wait a little bit and update the order, until we see the states
+while($order.Status -notin ("ready","invalid")) {
+    Start-Sleep -Seconds 10;
+    $order | Update-ACMEOrder $state -PassThru;
+}
+
+# We should have a valid order now and should be able to complete it
+# Therefore we need a certificate key
+$certKey = New-ACMECertificateKey -Path "$stateDir\$dnsName.key.xml";
+
+# Complete the order - this will issue a certificate singing request
+Complete-ACMEOrder $state -Order $order -CertificateKey $certKey;
+
+# Now we wait until the ACME service provides the certificate url
+while(-not $order.CertificateUrl) {
+    Start-Sleep -Seconds 15
+    $order | Update-Order $state -PassThru
+}
+
+# As soon as the url shows up we can create the PFX
+Export-ACMECertificate -Order $order -CertificateKey $certKey -Path "$stateDir\$dnsName.pfx";
+```
+
+Now you have a ready to use certificate containing the public and private keys.
+If any problems arise, feel free to open an issue.
+
+## How to
+
+### Build the module
 
 To create the output, which will be released to PSGallery, call :
 
 ```
-PS> & build.ps1
+PS> & .\build.ps1
 ```
 
-## How to test the module
+### Test the module
 
 To run the Pester-Tests call:
 
 ```
 PS> & .\ACME-PS\tests\A-Manual-Test-Run.ps1
-```
-
-## How to use the module
-
-This sequence will create a new account and account keys, to further usage.
-
-```
-PS> Import-Module ACME-PS
-
-# Create a acme state instance, which will make passing around of neccessary informations easy.
-PS> $state = New-AcmeState -Path C:\Temp\AcmeState
-
-# This will load the service directoy for Let's-Encrypt-Staging and save.
-PS> Get-AcmeServiceDirectory $state -PassThru | Export-Clixml -Path C:\AcmeTemp\ServiceDirectory.xml
-
-# Create and export RSA account key
-PS> New-AcmeAccountKey $state -Path C:\AcmeTemp\AccountKey.xml
-
-# Register account with ACME service
-PS> New-AcmeAccount $state -AcceptTOS -EmailAddresses "mail@example.com"
-```
-
-From here we'll start over with the existing key and account.
-
-```
-PS> Import-Moduel ACME-PS
-
-# Initialize state with existing data (loads service directory, account key, nonce and your account)
-PS> $state = Get-AcmeState -Path C:\Temp\AcmeState
-
-# Create Identifier(s)
-PS> $identifier = New-AcmeIdentifier "www.example.com"
-
-# Create Order
-PS> $order = New-AcmeOrder -Identifiers $identifier
-
-# Read Authoriatzions
-PS> $authZ = $order | Get-Authorizations
-
-# Pick a challenge
-PS> $challenge = $authZ | Get-AcmeChallenge http-01
-PS> $challenge | Show-AcmeChallenge
-```
-
-This will create a hashtable with all information neccessary to fullfill the challenge. The module does currently not provide tools to handle the challenge, but we are open to PRs adding functions to handle whatever is neccessary.
-
-```
-# After preparing the challenge
-PS> $challenge | Complete-AcmeChallenge
-
-# After a while we should be able to see the order state changes to valid
-
-PS> Start-Sleep 60
-PS> Update-AcmeOrder $order
-
-# Create certificate key
-PS> $certKey = New-AcmeCertificateKey -Path C:\AcmeTemp\CertKey_www.example.com.xml
-
-# Complete the order
-PS> Complete-Order -Order $order -CertificateKey $certKey
-
-# Check for Certificate Url
-PS> while (-not $order.CertificateUrl) {
-    Start-Sleep 60;
-    Update-AcmeOrder $order
-} ;
-
-# Get Certificate
-PS> Export-AcmeCertificate -Order $order -CertificateKey $certKey -Path C:\AcmeTemp\www.example.com.pfx
-
-# Use the certificate (milage may vary, since you might create key and cert PEMs from PFX via openssl).
 ```
