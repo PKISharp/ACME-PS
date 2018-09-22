@@ -1,5 +1,8 @@
 function Get-Account {
     <#
+        .PARAMETER State
+            The state object, that is used in this module, to provide easy access to the ACME service directory,
+            your account key, the associated account and the replay nonce.
     #>
     [CmdletBinding(DefaultParameterSetName = "FindAccount")]
     param(

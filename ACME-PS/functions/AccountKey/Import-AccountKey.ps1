@@ -10,7 +10,8 @@ function Import-AccountKey {
             The path where the key has been exported to.
 
         .PARAMETER State
-            The account key will be written into the provided state instance.
+            The state object, that is used in this module, to provide easy access to the ACME service directory,
+            your account key, the associated account and the replay nonce.
 
         .PARAMETER PassThru
             If set, the account key will be returned to the pipeline.

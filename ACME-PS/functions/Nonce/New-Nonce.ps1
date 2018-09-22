@@ -8,7 +8,8 @@ function New-Nonce {
 
 
         .PARAMETER State
-            The nonce will be written into the provided state instance.
+            The state object, that is used in this module, to provide easy access to the ACME service directory,
+            your account key, the associated account and the replay nonce.
 
         .PARAMETER PassThru
             If set, the nonce will be returned to the pipeline.

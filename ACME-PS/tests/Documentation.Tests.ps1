@@ -11,7 +11,7 @@ InModuleScope ACME-PS {
         foreach($cmdName in $module.ExportedCommands.Keys) {
             $cmd = $module.ExportedCommands[$cmdName];
 
-            Context "-$($cmd.Name) documents all properties" {
+            Context "$($cmd.Name) documents all properties" {
                 $cmdParameters = $cmd.Parameters.Keys | Where-Object { $_ -NotIn $defaultParameters }
                 
                 $cmdHelp = Get-Help $cmd;
@@ -23,7 +23,7 @@ InModuleScope ACME-PS {
                 }
 
                 foreach($p in $cmdParameters) {
-                    It "$p documentation exists" {
+                    It "-$p documentation exists" {
                         $cmdHelpParameters | Should -Contain $p
                     }
                 }

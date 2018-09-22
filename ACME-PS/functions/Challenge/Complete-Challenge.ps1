@@ -1,7 +1,8 @@
 function Complete-Challenge {
     <#
         .PARAMETER State
-            State instance containing service directory, account key, account and nonce.
+            The state object, that is used in this module, to provide easy access to the ACME service directory,
+            your account key, the associated account and the replay nonce.
 
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]

@@ -9,7 +9,8 @@ function New-Account {
 
 
         .PARAMETER State
-            The account will be written into the provided state instance.
+            The state object, that is used in this module, to provide easy access to the ACME service directory,
+            your account key, the associated account and the replay nonce.
 
         .PARAMETER PassThru
             If set, the account will be returned to the pipeline.

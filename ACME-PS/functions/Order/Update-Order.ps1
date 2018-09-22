@@ -8,7 +8,8 @@ function Update-Order {
             The result will be used to update the order stored in the state object
 
         .PARAMETER State
-            State instance containing service directory, account key, account and nonce.
+            The state object, that is used in this module, to provide easy access to the ACME service directory,
+            your account key, the associated account and the replay nonce.
 
         .PARAMETER Order
             The order to be updated.
