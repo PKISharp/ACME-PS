@@ -27,7 +27,7 @@ InModuleScope ACME-PS {
             $state.AutoSave = $false;
 
             It "Creates and stores Key the key to state" {
-                $key = New-ACMEAccountKey -State $state -PassThru -WarningAction 'SilentlyContinue'
+                $key = New-ACMEAccountKey -State $state -PassThru -WarningAction 'SilentlyContinue' -Force
 
                 $key | Should -not -Be $null
                 $key | Should -Be $state.GetAccountKey()
