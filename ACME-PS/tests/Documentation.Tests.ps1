@@ -11,12 +11,22 @@ InModuleScope ACME-PS {
         foreach($cmdName in $module.ExportedCommands.Keys) {
             $cmd = $module.ExportedCommands[$cmdName];
 
-            Context "$($cmd.Name) documents all properties" {
+            Context "$($cmd.Name) documentation should be complete" {
                 $cmdParameters = $cmd.Parameters.Keys | Where-Object { $_ -NotIn $defaultParameters }
                 
                 $cmdHelp = Get-Help $cmd;
                 $cmdHelpParameters = $cmdHelp.Parameters.parameter | 
                     Where-Object { $_.description } | Select-Object -ExpandProperty name
+
+                It 'has synopsis' {
+                    $cmdHelp.Synopsis | Should -Be $true
+                }
+                It 'has description' {
+                    $cmdHelp.Description | Should -Be $true
+                }
+                It 'has examples' {
+                    $cmdHelp.Examples.Example.Count | Should -Not -Be 0
+                }
 
                 It 'property and help counts are equal' {
                     $cmdHelpParameters.Count | Should -Be $cmdParameters.Count
