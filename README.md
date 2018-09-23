@@ -3,6 +3,8 @@
 A PowerShell module supporting ACME v2. The module tries to provide you with all means neccessary
 to enable you to write a script or module which uses an ACME v2 service to create certificates.
 
+Download the Module via Powershell-Gallery https://www.powershellgallery.com/packages/ACME-PS/
+
 ## Synopsis
 
  - ACME service
