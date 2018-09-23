@@ -22,7 +22,7 @@ function Get-ServiceDirectory {
             your account key, the associated account and the replay nonce.
 
         .PARAMETER PassThru
-            If set, the service directory will be returned to the pipeline.
+            Forces the service directory to be returned to the pipeline.
 
 
         .EXAMPLE

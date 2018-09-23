@@ -12,7 +12,7 @@ function New-Nonce {
             your account key, the associated account and the replay nonce.
 
         .PARAMETER PassThru
-            If set, the nonce will be returned to the pipeline.
+            Forces the nonce to be returned to the pipeline.
 
 
         .EXAMPLE

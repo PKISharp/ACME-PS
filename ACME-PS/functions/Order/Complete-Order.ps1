@@ -1,24 +1,28 @@
 function Complete-Order {
     <#
         .SYNOPSIS
-            Finalizes an acme order
+            Completes an order process at the ACME service, so the certificate will be issued.
 
         .DESCRIPTION
-            Finalizes the acme order by submitting a CSR to the acme service.
+            Completes an order process by submitting a certificate signing request to the ACME service.
+
 
         .PARAMETER State
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
 
         .PARAMETER Order
-            The order to be finalized.
+            The order to be completed.
 
         .PARAMETER CertificateKey
-            The certificate key to be used to create a CSR.
+            The certificate key to be used to create the certificate signing request.
+
+        .PARAMETER PassThru
+            Forces the order to be returned to the pipeline.
 
 
         .EXAMPLE
-            PS> Complete-Order -Order $myOrder -CertificateKey $myCertKey
+            PS> Complete-Order -State $myState -Order $myOrder -CertificateKey $myCertKey
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

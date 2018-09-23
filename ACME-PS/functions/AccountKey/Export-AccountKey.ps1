@@ -13,7 +13,10 @@ function Export-AccountKey {
         .PARAMETER AccountKey
             The account key that will be exported to the Path. If AutomaticAccountKeyHandling is enabled it will export the registered account key.
 
+        .PARAMETER Force
+            Allow the command to override an existing account key.
 
+            
         .EXAMPLE
             PS> Export-AccountKey -Path "C:\myExportPath.xml" -AccountKey $myAccountKey
     #>

@@ -6,7 +6,7 @@ function New-AccountKey {
 
         .DESCRIPTION
             Creates and stores a new account key, that can be used for ACME operations.
-            The key will first be created, than exported and imported again to make sure, it has been saved.
+            The key will be added to the state.
 
 
         .PARAMETER RSA
@@ -33,19 +33,23 @@ function New-AccountKey {
         .PARAMETER State
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
+            The account key will be stored into the state, if present.
 
         .PARAMETER PassThru
-            If set, the account key will be returned to the pipeline.
+            Forces the new account key to be returned to the pipeline, even if state is set.
 
-
-        .EXAMPLE
-            PS> New-AccountKey -Path C:\myKeyExport.xml
-
-        .EXAMPLE
-            PS> New-AccountKey -Path C:\myKeyExport.json -RSA -HashSize 512
+        .PARAMETER Force
+            If there's already a key present in the state, you need to provide the force switch to override the
+            existing account key.
 
         .EXAMPLE
-            PS> New-AccountKey -ECDsa -HashSize 384 -SkipExport
+            PS> New-AccountKey -State $myState
+
+        .EXAMPLE
+            PS> New-AccountKey -State $myState -RSA -HashSize 512
+
+        .EXAMPLE
+            PS> New-AccountKey -ECDsa -HashSize 384
     #>
     [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
     [OutputType("IAccountKey")]

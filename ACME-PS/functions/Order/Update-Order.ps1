@@ -15,7 +15,7 @@ function Update-Order {
             The order to be updated.
 
         .PARAMETER PassThru
-            If present, the updated order will be written to the output.
+            Forces the updated order to be returned to the pipeline.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType("AcmeOrder")]

@@ -13,7 +13,7 @@ function New-Account {
             your account key, the associated account and the replay nonce.
 
         .PARAMETER PassThru
-            If set, the account will be returned to the pipeline.
+            Forces the account to be returned to the pipeline.
 
         .PARAMETER AcceptTOS
             If you set this, you accepted the Terms-of-service.
