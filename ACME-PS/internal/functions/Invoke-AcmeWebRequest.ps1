@@ -36,7 +36,7 @@ function Invoke-ACMEWebRequest {
     $response = $httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
     if($httpResponse.Content.Headers.ContentType -eq "application/problem+json") {
-        Write-Error "Server returned Problem: $response"
+        Write-Error "Server returned Problem: $response" -TargetObject $response
     }
 
     if($httpRequest.StatusCode -lt 500) {

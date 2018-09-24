@@ -18,7 +18,7 @@ function Export-AcmeObject {
         $ErrorActionPreference = 'Stop'
 
         if((Test-Path $Path) -and -not $Force) {
-            Write-Error "$Path already exists."
+            Write-Error "$Path already exists." -RecommendedAction "Use -Force or choose another Filename"
         }
 
         Write-Debug "Exporting $($InputObject.GetType()) to $Path"

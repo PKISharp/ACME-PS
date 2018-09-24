@@ -75,7 +75,7 @@ function Get-ServiceDirectory {
                 $acmeBaseUrl = $KnownEndpoints[$ServiceName];
                 if($null -eq $acmeBaseUrl) {
                     $knownNames = $KnownEndpoints.Keys -join ", "
-                    throw "The ACME-Service-Name $ServiceName is not known. Known names are $knownNames."
+                    Write-Error "The ACME-Service-Name $ServiceName is not known. Known names are $knownNames."
                 }
 
                 $serviceDirectoryUrl = "$acmeBaseUrl/directory"
