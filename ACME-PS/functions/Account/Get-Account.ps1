@@ -1,8 +1,32 @@
 function Get-Account {
     <#
+        .SYNOPSIS
+            Loads account data from the ACME service.
+
+        .DESCRIPTION
+            If you do not provide additional parameters, this will search the account with the account key
+            present in the state object. If an KeyId or Url is provided, they'll be used to load the account
+            from that.
+
         .PARAMETER State
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
+
+        .PARAMETER PassThru
+            Forces the retreieved account to be returned to the pipeline.
+
+        .PARAMETER AccountUrl
+            The rescource url of the account to load.
+
+        .PARAMETER KeyId
+            The KeyId of the account to load.
+
+        
+        .EXAMPLE
+            PS> Get-Account -State $myState -PassThru
+
+        .EXAMPLE
+            PS> Get-Account -State $myState -KeyId 12345
     #>
     [CmdletBinding(DefaultParameterSetName = "FindAccount")]
     param(

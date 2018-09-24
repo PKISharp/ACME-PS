@@ -30,6 +30,9 @@ function New-CertificateKey {
         .PARAMETER Path
             The path where the keys will be stored.
 
+        .PARAMETER SkipKeyExport
+            Allows you to suppress the export of the certificate key.
+
 
         .EXAMPLE
             PS> New-CertificateKey -Path C:\myKeyExport.xml -AutomaticCertificateKeyHandling
@@ -38,7 +41,7 @@ function New-CertificateKey {
             PS> New-CertificateKey -Path C:\myKeyExport.json -RSA -HashSize 512
 
         .EXAMPLE
-            PS> New-CertificateKey -ECDsa -HashSize 384 -SkipExport
+            PS> New-CertificateKey -ECDsa -HashSize 384 -SkipKeyExport
     #>
     [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
     [OutputType("ICertificateKey")]

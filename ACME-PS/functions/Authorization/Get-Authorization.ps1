@@ -3,7 +3,7 @@ function Get-Authorization {
         .SYNOPSIS
             Fetches authorizations from acme service.
 
-        .DESCIPTION
+        .DESCRIPTION
             Fetches all authorizations for an order or an single authorizatin by its resource url.
 
 

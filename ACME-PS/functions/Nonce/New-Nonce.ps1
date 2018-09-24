@@ -16,7 +16,7 @@ function New-Nonce {
 
 
         .EXAMPLE
-            PS> New-Nonce -Uri "https://acme-staging-v02.api.letsencrypt.org/acme/new-nonce"
+            PS> New-Nonce -State $state
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType("string")]

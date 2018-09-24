@@ -1,8 +1,27 @@
 function Initialize-Challenge {
     <#
+        .SYNOPSIS
+            Prepares a challange with the data explaining how to complete it.
+
+        .DESCRIPTION
+            Provides the data how to resolve the challange into the challanges data property.
+
         .PARAMETER State
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
+
+        .PARAMETER Authorization
+            The authorization of which all challanges will be initialized.
+
+        .PARAMETER Challenge
+            The challenge which should be initialized.
+
+        .PARAMETER PassThru
+            Forces the command to return the data to the pipeline.
+
+        
+        .EXAMPLE
+            PS> Initialize-Challange $myState -Challange $challange
     #>
     [CmdletBinding()]
     param(

@@ -11,7 +11,7 @@ function Export-CertificateKey {
             The path where the key should be exported to. Uses json if path ends with .json. Will use clixml in other cases.
 
         .PARAMETER CertificateKey
-            The certificate key that will be exported to the Path. If AutomaticCertificateKeyHandling is enabled it will export the registered certificate key.
+            The certificate key that will be exported to the Path.
 
 
         .EXAMPLE

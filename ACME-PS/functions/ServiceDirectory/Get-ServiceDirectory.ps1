@@ -8,8 +8,8 @@ function Get-ServiceDirectory {
             Alternatively the directory can be loaded from a path, when it has been stored with Export-CliXML or as Json.
 
 
-        .PARAMETER EndpointName
-            The Name of an Well-Known ACME-Endpoint.
+        .PARAMETER ServiceName
+            The Name of an Well-Known ACME service provider.
 
         .PARAMETER DirectoryUrl
             Url of an ACME Directory.

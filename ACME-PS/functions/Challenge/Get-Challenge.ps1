@@ -1,8 +1,25 @@
 function Get-Challenge {
     <#
+        .SYNOPSIS
+            Gets the challange from the ACME service.
+
+        .DESCRIPTION
+            Gets the challange of the specified type from the specified authorization and prepares it with
+            data needed to complete the challange
+
         .PARAMETER State
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
+
+        .PARAMETER Authorization
+            The authorization for which the challange will be fetched.
+
+        .PARAMETER Type
+            The challange type to fetch. One of http-01,dns-01,tls-alpn-01
+
+
+        .EXAMPLE
+            PS> $myAuthorization | Get-Challange -State $myState -Type "http-01"
     #>
     [CmdletBinding()]
     param(

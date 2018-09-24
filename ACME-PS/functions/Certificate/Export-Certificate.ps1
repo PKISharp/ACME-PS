@@ -14,10 +14,17 @@ function Export-Certificate {
             The key which was used to create the orders CSR.
 
         .PARAMETER Path
-            The path where the key will be saved.
+            The path where the certificate will be saved.
 
         .PARAMETER Password
             The password used to secure the certificate.
+
+        .PARAMETER Force
+            Allows the operation to override existing a certificate.
+
+        
+        .EXAMPLE
+            PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>
     param(
         [Parameter(Mandatory = $true)]
@@ -37,7 +44,7 @@ function Export-Certificate {
 
         [Parameter()]
         [SecureString]
-        $Passsword,
+        $Password,
 
         [Parameter()]
         [switch]

@@ -6,6 +6,7 @@ function Import-AccountKey {
         .DESCRIPTION
             Imports an account key that has been exported with Export-AccountKey. If requested, the key is registered for automatic key handling.
 
+
         .PARAMETER Path
             The path where the key has been exported to.
 
@@ -15,6 +16,10 @@ function Import-AccountKey {
 
         .PARAMETER PassThru
             If set, the account key will be returned to the pipeline.
+
+
+        .EXAMPLE
+            PS> Import-AccountKey -State $myState -Path C:\AcmeTemp\AccountKey.xml
     #>
     param(
         # Specifies a path to one or more locations.

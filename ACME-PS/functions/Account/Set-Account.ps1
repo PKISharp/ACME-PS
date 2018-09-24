@@ -1,8 +1,24 @@
 function Set-Account {
     <#
+        .SYNOPSIS
+            Updates an ACME account
+
+        .DESCRIPTION
+            Updates the ACME account, by sending the update information to the ACME service.
+
         .PARAMETER State
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
+
+        .PARAMETER PassThru
+            Forces the updated account to be returned to the pipeline.
+
+        .PARAMETER NewAccountKey
+            New account key to be associated with the account.
+
+
+        .EXAMPLE
+            PS> Set-Account -State $myState -NewAccountKey $myNewAccountKey
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -31,6 +47,12 @@ function Set-Account {
         Invoke-SignedWebRequest $Url -$State $payload -ErrorAction 'Stop';
 
         $State.Set($NewAccountKey);
-        return Get-Account -Url $TargetAccount.ResourceUrl -State $State -KeyId $Account.KeyId
+        $account = Get-Account -Url $TargetAccount.ResourceUrl -State $State -KeyId $Account.KeyId
+
+        $State.Set($account);
+
+        if($PassThru) {
+            return $account;
+        }
     }
 }

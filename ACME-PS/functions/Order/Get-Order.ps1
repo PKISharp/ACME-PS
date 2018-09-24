@@ -9,6 +9,10 @@ function Get-Order {
 
         .PARAMETER Url
             The resource url of the order to be fetched.
+
+        
+        .EXAMPLE
+            PS> Get-Order -Url "https://service.example.com/kid/213/order/123"
     #>
     [CmdletBinding()]
     [OutputType("AcmeOrder")]

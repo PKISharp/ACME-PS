@@ -7,6 +7,7 @@ function Update-Order {
             Updates the given order instance by querying the acme service.
             The result will be used to update the order stored in the state object
 
+
         .PARAMETER State
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
@@ -16,6 +17,10 @@ function Update-Order {
 
         .PARAMETER PassThru
             Forces the updated order to be returned to the pipeline.
+
+
+        .EXAMPLE
+            PS> $myOrder | Update-Order -State $myState -PassThru
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType("AcmeOrder")]
