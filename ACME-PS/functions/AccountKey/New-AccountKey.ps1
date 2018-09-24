@@ -100,7 +100,7 @@ function New-AccountKey {
         Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
     }
 
-    if($State -and $PSCmdlet.ShouldProcess("AccountKey", "Add created account key to state.", 
+    if($State -and $PSCmdlet.ShouldProcess("AccountKey", "Add created account key to state.",
         "The created account key will now be added to the state object."))
     {
         if($null -eq $State.GetAccountKey() -or $Force -or

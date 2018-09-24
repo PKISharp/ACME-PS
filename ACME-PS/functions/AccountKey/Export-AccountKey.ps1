@@ -16,7 +16,7 @@ function Export-AccountKey {
         .PARAMETER Force
             Allow the command to override an existing account key.
 
-            
+          
         .EXAMPLE
             PS> Export-AccountKey -Path "C:\myExportPath.xml" -AccountKey $myAccountKey
     #>

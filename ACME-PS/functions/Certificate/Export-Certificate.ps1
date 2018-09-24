@@ -22,7 +22,7 @@ function Export-Certificate {
         .PARAMETER Force
             Allows the operation to override existing a certificate.
 
-        
+      
         .EXAMPLE
             PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>

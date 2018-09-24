@@ -13,7 +13,7 @@ Download the Module via Powershell-Gallery https://www.powershellgallery.com/pac
 
  - Account Key
 
-   The account key is used to authenticate yourself to the ACME service. After registering it with   the server make sure you do not lose the key.  
+   The account key is used to authenticate yourself to the ACME service. After registering it with   the server make sure you do not lose the key.
    The module supports RSA and ECDSA keys with different sizes.
 
  - Account
@@ -26,7 +26,7 @@ Download the Module via Powershell-Gallery https://www.powershellgallery.com/pac
 
  - Order
 
-   The order is the main object during certificate issuance. It has a collection of identifiers, defining all subject alternate names of the certificate.  
+   The order is the main object during certificate issuance. It has a collection of identifiers, defining all subject alternate names of the certificate.
    Also it contains an authroization object for each identifier as well as some links allowing you to send the actual certificate signing request and acquiring the certificate.
 
  - Authroization
@@ -94,7 +94,7 @@ Make sure to read and understand what happens, since the script makes assumption
 
  - It's a single machine (not a farm)
  - The machine is reachable via http for the given $dnsName
- - The website is in $wwwRoot 
+ - The website is in $wwwRoot
 
 ```
 # Load an state object to have service directory and account keys available

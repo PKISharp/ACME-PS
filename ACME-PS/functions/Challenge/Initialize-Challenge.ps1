@@ -19,7 +19,7 @@ function Initialize-Challenge {
         .PARAMETER PassThru
             Forces the command to return the data to the pipeline.
 
-        
+      
         .EXAMPLE
             PS> Initialize-Challange $myState -Challange $challange
     #>

@@ -1,7 +1,7 @@
 InModuleScope ACME-PS {
     Describe 'Checking Documentation for Completeness' {
         $module = Get-Module "ACME-PS";
-        
+      
         $defaultParameters = @("Verbose","Debug",
             "ErrorAction","WarningAction","InformationAction",
             "ErrorVariable","WarningVariable","InformationVariable",
@@ -13,9 +13,9 @@ InModuleScope ACME-PS {
 
             Context "$($cmd.Name) documentation should be complete" {
                 $cmdParameters = $cmd.Parameters.Keys | Where-Object { $_ -NotIn $defaultParameters }
-                
+              
                 $cmdHelp = Get-Help $cmd;
-                $cmdHelpParameters = $cmdHelp.Parameters.parameter | 
+                $cmdHelpParameters = $cmdHelp.Parameters.parameter |
                     Where-Object { $_.description } | Select-Object -ExpandProperty name
 
                 It 'has synopsis' {
@@ -38,7 +38,7 @@ InModuleScope ACME-PS {
                     }
                 }
             }
-            
-        } 
+          
+        }
     }
 }
