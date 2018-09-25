@@ -36,7 +36,7 @@ function Invoke-ACMEWebRequest {
     $response = $httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
     if($httpResponse.Content.Headers.ContentType -eq "application/problem+json") {
-        Write-Error "Server returned Problem: $response" -TargetObject $response
+        throw "Server returned Problem: $response"
     }
 
     if($httpRequest.StatusCode -lt 500) {
@@ -44,6 +44,6 @@ function Invoke-ACMEWebRequest {
         return $result;
     }
 
-    Write-Error "Unexpected response from server: $($httpResponse.StatusCode), with content:`n$response"
+    throw "Unexpected response from server: $($httpResponse.StatusCode), with content:`n$response"
     return $response;
 }

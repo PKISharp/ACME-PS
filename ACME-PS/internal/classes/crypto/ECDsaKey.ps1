@@ -32,7 +32,7 @@ class ECDsaKeyBase : KeyBase
             256 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP256; }
             384 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP384; }
             512 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP521; }
-            Default { Write-Error [System.ArgumentOutOfRangeException]::new("Cannot use hash size to create curve."); }
+            Default { throw [System.ArgumentOutOfRangeException]::new("Cannot use hash size to create curve."); }
         }
 
         return $null;

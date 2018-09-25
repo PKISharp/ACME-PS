@@ -32,7 +32,7 @@ function Export-CertificateKey {
 
     process {
         if(Test-Path $Path) {
-            Write-Error "$Path already exists. This method will not override existing files"
+            throw "$Path already exists. This method will not override existing files"
         }
 
         if($Path -like "*.json") {

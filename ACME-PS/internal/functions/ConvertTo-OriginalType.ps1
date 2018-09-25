@@ -12,7 +12,7 @@ function ConvertTo-OriginalType {
     process {
         $result = $inputObject -as ([type]$TypeName);
         if(-not $result) {
-            Write-Error "Could not convert inputObject to $TypeName";
+            throw "Could not convert inputObject to $TypeName";
         }
 
         Write-Verbose "Converted input object to type $TypeName";

@@ -82,8 +82,7 @@ function New-CertificateKey {
 
     if(-not $SkipKeyExport) {
         if(-not $Path) {
-            Write-Error "Path was null or empty. Provide a path for the key to be exported or specify SkipKeyExport";
-            return;
+            throw "Path was null or empty. Provide a path for the key to be exported or specify SkipKeyExport";
         }
     }
 

@@ -28,7 +28,7 @@ class KeyFactory
         $factory = [KeyFactory]::Factories | Where-Object { $_.TargetType -eq $targetType -and $_.KeyType -eq $keyType } | Select-Object -First 1
 
         if ($null -eq $factory) {
-            Write-Error [InvalidOperationException]::new("Unknown KeyParameters-Type.");
+            throw [InvalidOperationException]::new("Unknown KeyParameters-Type.");
         }
 
         return $factory.Create.Invoke($keyParameters);

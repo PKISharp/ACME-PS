@@ -38,7 +38,7 @@ function New-Nonce {
     $nonce = $response.NextNonce;
 
     if(-not $nonce) {
-        Write-Error "Could not retreive new nonce";
+        throw "Could not retreive new nonce";
     }
 
     if($PSCmdlet.ShouldProcess("Nonce", "Store new nonce into state")) {

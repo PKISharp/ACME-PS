@@ -77,6 +77,7 @@ function New-Account {
                 return Get-Account -AccountUrl $keyId -KeyId $keyId -State $State -PassThru:$PassThru
             } else {
                 Write-Error "JWK had already been registiered for an account."
+                return;
             }
         }
 

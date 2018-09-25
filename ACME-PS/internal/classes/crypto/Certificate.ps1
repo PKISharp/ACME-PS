@@ -45,7 +45,7 @@ class Certificate {
 
         }
         else {
-            Write-Error [System.InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to create CSR.");
+            throw [System.InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to create CSR.");
         }
 
         $certRequest.CertificateExtensions.Add($sanBuilder.Build());

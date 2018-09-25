@@ -92,7 +92,7 @@ function Initialize-Challenge {
             }
 
             Default {
-                Write-Error "Cannot show how to resolve challange of unknown type $($Challenge.Type)"
+                throw "Cannot show how to resolve challange of unknown type $($Challenge.Type)"
             }
         }
 

@@ -57,7 +57,7 @@ function Export-Certificate {
         if($Force) {
             Clear-Content $Path;
         } else {
-            Write-Error "$Path did already exist."
+            throw "$Path does already exist."
         }
     }
 
