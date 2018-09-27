@@ -60,10 +60,6 @@
 		"New-State"
 	)
 
-	AliasesToExport = @(
-		"Import-AccountKey"
-	)
-
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 	PrivateData = @{
 		PSData = @{
@@ -82,48 +78,7 @@
 
 			# ReleaseNotes of this module
 			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACMESharpCore-PowerShell/releases'
-
-			#Prerelease = 'Beta2'
 		} # End of PSData hashtable
 
 	} # End of PrivateData hashtable
-
-
-	############################################################
-	## Unused manifest elements reserved for possible future use
-	############################################################
-
-	# HelpInfo URI of this module for updateable help
-	# HelpInfoURI = ''
-
-	# Modules that must be imported into the global environment prior to importing this module
-	# RequiredModules = @()
-
-	# Script files (.ps1) that are run in the caller's environment prior to importing this module.
-	# ScriptsToProcess = @()
-
-	# Type files (.ps1xml) to be loaded when importing this module
-	# TypesToProcess = @()
-
-	# Format files (.ps1xml) to be loaded when importing this module
-	# FormatsToProcess = @()
-
-	# Variables to export from this module
-	# VariablesToExport = '*'
-
-	# Cmdlets to export from this module
-	# CmdletsToExport = '*'
-
-	# Aliases to export from this module
-	# AliasesToExport = '*'
-
-	# DSC resources to export from this module
-	# DscResourcesToExport = @()
-
-	# List of all modules packaged with this module
-	# ModuleList = @()
-
-	# List of all files packaged with this module
-	# FileList = @()
-
 }
