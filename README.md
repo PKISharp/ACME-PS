@@ -80,6 +80,9 @@ $state = New-ACMEState -Path $stateDir
 # Fetch the service directory and save it in the state
 Get-ServiceDirectory $state -ServiceName $serviceName -PassThru;
 
+# Get the first anti-replay nonce
+New-ACMENonce $state;
+
 # Create an account key. The state will make sure it's stored.
 New-ACMEAccountKey $state -PassThru;
 
