@@ -116,17 +116,17 @@ $order = New-ACMEOrder $state -Identifiers $identifier;
 $authZ = Get-ACMEAuthorization -Order $order;
 
 # Select a challenge to fullfill
-$challange = Get-ACMEChallenge $state $authZ "http-01";
+$challenge = Get-ACMEChallenge $state $authZ "http-01";
 
-# Inspect the challange data
+# Inspect the challenge data
 $challenge.Data;
 
 # Create the file requested by the challenge
 $fileName = $wwwRoot + $challenge.Data.RelativeUrl;
-Set-Content -Path $fileName -Value $challange.Data.Content -NoNewLine;
+Set-Content -Path $fileName -Value $challenge.Data.Content -NoNewLine;
 
 # Check if the challenge is readable
-Invoke-WebRequest $challange.Data.AbsoluteUrl;
+Invoke-WebRequest $challenge.Data.AbsoluteUrl;
 
 ## Stop here if the Invoke-WebRequest fails and make sure it passes
 Read-Host -Prompt "Press Enter if Invoke-WebRequest succeeded, else [CTRL]+[C]";
