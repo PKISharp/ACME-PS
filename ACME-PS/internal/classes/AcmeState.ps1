@@ -202,33 +202,41 @@ class AcmeState {
     }
 
     [bool] Validate() {
-        return $null -ne $this.ServiceDirectory -and
-            $null -ne $this.Nonce -and
-            $null -ne $this.AccountKey -and
-            $null -ne $this.Account;
+        return $this.Validate("Account");
     }
 
     [bool] Validate([string] $field) {
-        if($field -eq "ServiceDirectory") {
-            return $null -ne $this.ServiceDirectory;
+        $isValid = $true;
+        
+        if($field -in @("ServiceDirectory", "Nonce", "AccountKey", "Account")) {
+            if($null -eq $this.ServiceDirectory) {
+                $isValid = $false;
+                Write-Warning "State does not contain a service directory. Run Get-ACMEServiceDirectory to get one."
+            }
         }
 
-        if($field -eq "Nonce") {
-            return $null -ne $this.ServiceDirectory -and
-                $null -ne $this.Nonce;
+        if($field -in @("Nonce", "AccountKey", "Account")) {
+            if($null -eq $this.Nonce) {
+                $isValid = $false;
+                Write-Warning "State does not contain a nonce. Run New-ACMENonce to get one."
+            }
         }
 
-        if($field -eq "AccountKey") {
-            return $null -ne $this.ServiceDirectory -and
-                $null -ne $this.Nonce -and
-                $null -ne $this.AccountKey;
+        if($field -in @("AccountKey", "Account")) {
+            if($null -eq $this.AccountKey) {
+                $isValid = $false;
+                Write-Warning "State does not contain an account key. Run New-ACMEAccountKey to create one."
+            }
         }
 
-        if($field -eq "Account") {
-            return $this.Validate();
+        if($field -in @("Account")) {
+            if($null -eq $this.Account) {
+                $isValid = $false;
+                Write-Warning "State does not contain an account. Register one by running New-ACMEAccount."
+            }
         }
 
-        return false;
+        return $isValid;
     }
 
     static [AcmeState] FromPath([string] $Path) {
