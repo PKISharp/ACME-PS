@@ -130,6 +130,10 @@ if(-not (Test-Path $challengePath)) {
 
 Set-Content -Path $fileName -Value $challange.Data.Content -NoNewLine;
 
+## If you use IIS as I did - make sure theres a mimetype for files without ending.
+## The mimetype can be added with extension="." and type="text/plain" in your IIS configuration.
+Read-Host -Prompt "Press Enter if your web server supports extension-less files, else [CTRL]+[C]";
+
 # Check if the challenge is readable
 Invoke-WebRequest $challange.Data.AbsoluteUrl;
 
