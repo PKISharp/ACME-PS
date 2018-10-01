@@ -60,7 +60,7 @@ These samples can be used to create an ACME account, create an order, fullfill a
 ```
 $stateDir = "C:\Temp\AcmeState";
 
-$serviceName = "LetsEncrypt-Staging"
+$serviceName = "LetsEncrypt-Staging" # This will issue Fake Certificates - use this for testing!
 $contactMail = "mail@example.com";
 
 $dnsName = "www.example.com";
@@ -123,6 +123,11 @@ $challenge.Data;
 
 # Create the file requested by the challenge
 $fileName = $wwwRoot + $challenge.Data.RelativeUrl;
+$challengePath = [System.IO.Path]::GetDirectoryName($filename);
+if(-not (Test-Path $challengePath)) {
+  New-Item -Path $challengePath -ItemType Directory
+}
+
 Set-Content -Path $fileName -Value $challange.Data.Content -NoNewLine;
 
 # Check if the challenge is readable
@@ -159,6 +164,12 @@ Export-ACMECertificate -Order $order -CertificateKey $certKey -Path "$stateDir\$
 
 Now you have a ready to use certificate containing the public and private keys.
 If any problems arise, feel free to open an issue.
+
+#### Certificate Chain
+
+The certificate chain is not part of the issued certifcate. To get a correct certificate chain,
+you'll need to import the intermediate certificates from your acme service.
+For Lets Encrypt you can obtain them via https://letsencrypt.org/certificates/.
 
 ## How to
 
