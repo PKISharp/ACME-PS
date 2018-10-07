@@ -64,5 +64,5 @@ function Export-Certificate {
     $response = Invoke-WebRequest $Order.CertificateUrl -UseBasicParsing;
     $certicate = [byte[]]$response.Content;
 
-    $CertificateKey.ExportPfx($certicate, $Passsword) | Set-Content $Path -Encoding byte
+    $CertificateKey.ExportPfx($certicate, $Password) | Set-Content $Path -Encoding byte
 }
