@@ -28,7 +28,7 @@ class Certificate {
 
         $sanBuilder = [System.Security.Cryptography.X509Certificates.SubjectAlternativeNameBuilder]::new();
         foreach ($dnsName in $dnsNames) {
-            $sanBuilder.AddDnsName($dnsNames);
+            $sanBuilder.AddDnsName($dnsName);
         }
 
         $distinguishedName = [X500DistinguishedName]::new("CN=$($dnsNames[0])");
