@@ -17,12 +17,8 @@ function Complete-Order {
         .PARAMETER CertificateKey
             The certificate key to be used to create the certificate signing request.
 
-        .PARAMETER PrimaryDomain
-            The domain to be used for the Subject of the certificate. If not supplied, the information supplied to New-Order will be used instead.
-
         .PARAMETER PassThru
             Forces the order to be returned to the pipeline.
-
 
         .EXAMPLE
             PS> Complete-Order -State $myState -Order $myOrder -CertificateKey $myCertKey
@@ -46,11 +42,6 @@ function Complete-Order {
         $CertificateKey,
 
         [Parameter()]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $PrimaryDomain,
-
-        [Parameter()]
         [switch]
         $PassThru
     )
@@ -60,14 +51,8 @@ function Complete-Order {
 
         $dnsNames = $Order.Identifiers | ForEach-Object { $_.Value }
 
-        if ($PrimaryDomain -and $dnsNames -icontains $PrimaryDomain) {
-            Write-Verbose "Generating CSR for $PrimaryDomain"
-            $csr = $CertificateKey.GenerateCsr($PrimaryDomain, $dnsNames);
-        }
-        else {
-            Write-Verbose "Generating CSR for $($Order.PrimaryDomain)"
-            $csr = $CertificateKey.GenerateCsr($Order.PrimaryDomain, $dnsNames);
-        }
+        Write-Verbose "Generating CSR for $($Order.PrimaryDomain)"
+        $csr = $CertificateKey.GenerateCsr($Order.PrimaryDomain, $dnsNames);
 
         $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) }
 
