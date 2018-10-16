@@ -6,6 +6,9 @@ class AcmeOrder {
         $this.NotAfter = $obj.NotAfter;
 
         $this.Identifiers = $obj.Identifiers | ForEach-Object { [AcmeIdentifier]::new($_) };
+        if ([string]::IsNullOrWhiteSpace($this.PrimaryDomain)) {
+            $this.PrimaryDomain = $this.Identifiers[0].Value
+        }
 
         $this.AuthorizationUrls = $obj.AuthorizationUrls;
         $this.FinalizeUrl = $obj.FinalizeUrl;
@@ -27,6 +30,9 @@ class AcmeOrder {
         $this.NotAfter = $httpResponse.Content.NotAfter;
 
         $this.Identifiers = $httpResponse.Content.Identifiers | ForEach-Object { [AcmeIdentifier]::new($_) };
+        if ([string]::IsNullOrWhiteSpace($this.PrimaryDomain)) {
+            $this.PrimaryDomain = $this.Identifiers[0].Value
+        }
 
         $this.AuthorizationUrls = $httpResponse.Content.Authorizations;
         $this.FinalizeUrl = $httpResponse.Content.Finalize;
@@ -49,6 +55,7 @@ class AcmeOrder {
     [Nullable[System.DateTimeOffset]] $NotAfter;
 
     [AcmeIdentifier[]] $Identifiers;
+    [string] $PrimaryDomain
 
     [string[]] $AuthorizationUrls;
     [string] $FinalizeUrl;
