@@ -14,6 +14,9 @@ function New-Order {
         .PARAMETER Identifiers
             The list of identifiers, which will be covered by the certificates subject alternative names.
 
+        .PARAMETER PrimaryDomain
+            The domain to be used for the Subject of the certificate. If not supplied, the first Identifier will be used instead.
+
         .PARAMETER NotBefore
             Earliest date the certificate should be considered valid.
 
@@ -22,7 +25,7 @@ function New-Order {
 
 
         .EXAMPLE
-            PS> New-Order -Directory $myDirectory -AccountKey $myAccountKey -KeyId $myKid -Nonce $myNonce -Identifiers $myIdentifiers
+            PS> New-Order -Identifiers (New-Identifier "dns" "www.test.com"), (New-Identifier "dns" "www.test2.com") -PrimaryDomain "www.test2.com"
 
         .EXAMPLE
             PS> New-Order -Identifiers (New-Identifier "dns" "www.test.com")
@@ -37,6 +40,11 @@ function New-Order {
 
         [Parameter(Mandatory = $true)]
         [AcmeIdentifier[]] $Identifiers,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $PrimaryDomain,
 
         [Parameter()]
         [System.DateTimeOffset] $NotBefore,
@@ -60,6 +68,14 @@ function New-Order {
         $response = Invoke-SignedWebRequest $requestUrl $State $payload;
 
         $order = [AcmeOrder]::new($response);
+
+        if ($PrimaryDomain -and $order.Identifiers.Value -icontains $PrimaryDomain) {
+            $order.PrimaryDomain = $PrimaryDomain
+        }
+        else {
+            $order.PrimaryDomain = $Identifiers[0].Value
+        }
+
         $state.AddOrder($order);
 
         return $order;
