@@ -19,6 +19,7 @@ public interface ICertificateKey : ISigningKey
 {
     byte[] ExportPfx(byte[] acmeCertificate, System.Security.SecureString password);
     byte[] GenerateCsr(string[] dnsNames);
+    byte[] GenerateCsr(string primaryDomain, string[] dnsNames);
 }
 "@
 

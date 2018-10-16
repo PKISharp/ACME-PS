@@ -102,6 +102,10 @@ class RSACertificateKey : RSAAccountKey, ICertificateKey {
         return [Certificate]::GenerateCsr($dnsNames, $this.RSA, $this.HashName);
     }
 
+    [byte[]] GenerateCsr([string] $primaryDomain, [string[]] $dnsNames) {
+        return [Certificate]::GenerateCsr($primaryDomain, $dnsNames, $this.RSA, $this.HashName);
+    }
+
     static [ICertificateKey] Create([RSAKeyExport] $keyExport) {
         $keyParameters = [System.Security.Cryptography.RSAParameters]::new();
 

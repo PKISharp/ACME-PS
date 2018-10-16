@@ -43,6 +43,11 @@ function Complete-Order {
         $CertificateKey,
 
         [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $PrimaryDomain,
+
+        [Parameter()]
         [switch]
         $PassThru
     )
@@ -52,7 +57,15 @@ function Complete-Order {
 
         $dnsNames = $Order.Identifiers | ForEach-Object { $_.Value }
 
-        $csr = $CertificateKey.GenerateCsr($dnsNames);
+        if ($PrimaryDomain -and $dnsNames -icontains $PrimaryDomain) {
+            Write-Verbose "Generating CSR for $PrimaryDomain"
+            $csr = $CertificateKey.GenerateCsr($PrimaryDomain, $dnsNames);
+        }
+        else {
+            Write-Verbose "Generating CSR"
+            $csr = $CertificateKey.GenerateCsr($dnsNames);
+        }
+
         $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) }
 
         $requestUrl = $Order.FinalizeUrl;

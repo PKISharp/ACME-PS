@@ -19,7 +19,7 @@ class Certificate {
         }
     }
 
-    static [byte[]] GenerateCsr([string[]] $dnsNames,
+    static [byte[]] GenerateCsr([string] $primaryDomain, [string[]] $dnsNames,
         [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [System.Security.Cryptography.HashAlgorithmName] $hashName)
     {
         if(-not $dnsNames) {
@@ -31,17 +31,17 @@ class Certificate {
             $sanBuilder.AddDnsName($dnsName);
         }
 
-        $distinguishedName = [X500DistinguishedName]::new("CN=$($dnsNames[0])");
+        $distinguishedName = [X500DistinguishedName]::new("CN=$primaryDomain");
 
         [System.Security.Cryptography.X509Certificates.CertificateRequest]$certRequest = $null;
 
         if($algorithm -is [System.Security.Cryptography.RSA]) {
             $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
-                    $distinguishedName, $algorithm, $hashName, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1);
+                    $distinguishedName.Name, $algorithm, $hashName, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1);
         }
         elseif($algorithm -is [System.Security.Cryptography.ECDsa]) {
             $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
-                $distinguishedName, $algorithm, $hashName);
+                $distinguishedName.Name, $algorithm, $hashName);
 
         }
         else {
@@ -51,4 +51,17 @@ class Certificate {
         $certRequest.CertificateExtensions.Add($sanBuilder.Build());
         return $certRequest.CreateSigningRequest();
     }
+
+    static [byte[]] GenerateCsr( [string[]] $dnsNames,
+        [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [System.Security.Cryptography.HashAlgorithmName] $hashName)
+    {
+        if(-not $dnsNames) {
+            throw [System.ArgumentException]::new("You need to provide at least one DNSName", "dnsNames");
+        }
+
+        return GenerateCsr($dnsNames[0], $dnsNames, $algorithm, $hashName)
+
+    }
+
+
 }
