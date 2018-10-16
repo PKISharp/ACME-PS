@@ -105,14 +105,9 @@ class ECDsaCertificateKey : ECDsaAccountKey, ICertificateKey {
         return [Certificate]::ExportPfx($acmeCertificate, $this.ECDsa, $password);
     }
 
-    [byte[]] GenerateCsr([string[]] $dnsNames) {
-        return [Certificate]::GenerateCsr($dnsNames, $this.ECDsa, $this.HashName);
-    }
-
     [byte[]] GenerateCsr([string] $primaryDomain, [string[]] $dnsNames) {
         return [Certificate]::GenerateCsr($primaryDomain, $dnsNames, $this.ECDsa, $this.HashName);
     }
-
 
     static [ICertificateKey] Create([ECDsaKeyExport] $keyExport) {
         $keyParameters = [System.Security.Cryptography.ECParameters]::new();

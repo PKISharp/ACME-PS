@@ -98,10 +98,6 @@ class RSACertificateKey : RSAAccountKey, ICertificateKey {
         return [Certificate]::ExportPfx($acmeCertificate, $this.RSA, $password);
     }
 
-    [byte[]] GenerateCsr([string[]] $dnsNames) {
-        return [Certificate]::GenerateCsr($dnsNames, $this.RSA, $this.HashName);
-    }
-
     [byte[]] GenerateCsr([string] $primaryDomain, [string[]] $dnsNames) {
         return [Certificate]::GenerateCsr($primaryDomain, $dnsNames, $this.RSA, $this.HashName);
     }

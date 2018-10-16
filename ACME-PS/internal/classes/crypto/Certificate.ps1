@@ -51,17 +51,4 @@ class Certificate {
         $certRequest.CertificateExtensions.Add($sanBuilder.Build());
         return $certRequest.CreateSigningRequest();
     }
-
-    static [byte[]] GenerateCsr( [string[]] $dnsNames,
-        [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [System.Security.Cryptography.HashAlgorithmName] $hashName)
-    {
-        if(-not $dnsNames) {
-            throw [System.ArgumentException]::new("You need to provide at least one DNSName", "dnsNames");
-        }
-
-        return GenerateCsr($dnsNames[0], $dnsNames, $algorithm, $hashName)
-
-    }
-
-
 }
