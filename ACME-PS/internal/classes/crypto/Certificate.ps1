@@ -19,11 +19,15 @@ class Certificate {
         }
     }
 
-    static [byte[]] GenerateCsr([string[]] $dnsNames,
-        [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [System.Security.Cryptography.HashAlgorithmName] $hashName)
+    static [byte[]] GenerateCsr([string[]] $dnsNames, [string]$distinguishedName,
+        [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, 
+        [System.Security.Cryptography.HashAlgorithmName] $hashName)
     {
         if(-not $dnsNames) {
             throw [System.ArgumentException]::new("You need to provide at least one DNSName", "dnsNames");
+        }
+        if(-not $distinguishedName) {
+            thtow [System.ArgumentException]::new("Provide a distinguishedName for the Certificate")
         }
 
         $sanBuilder = [System.Security.Cryptography.X509Certificates.SubjectAlternativeNameBuilder]::new();
@@ -31,17 +35,17 @@ class Certificate {
             $sanBuilder.AddDnsName($dnsName);
         }
 
-        $distinguishedName = [X500DistinguishedName]::new("CN=$($dnsNames[0])");
+        $certDN = [X500DistinguishedName]::new($distinguishedName);
 
         [System.Security.Cryptography.X509Certificates.CertificateRequest]$certRequest = $null;
 
         if($algorithm -is [System.Security.Cryptography.RSA]) {
             $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
-                    $distinguishedName, $algorithm, $hashName, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1);
+                    $certDN, $algorithm, $hashName, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1);
         }
         elseif($algorithm -is [System.Security.Cryptography.ECDsa]) {
             $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
-                $distinguishedName, $algorithm, $hashName);
+                $certDN, $algorithm, $hashName);
 
         }
         else {
