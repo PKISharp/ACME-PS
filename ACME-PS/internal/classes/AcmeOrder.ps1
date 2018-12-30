@@ -12,19 +12,29 @@ class AcmeOrder {
         $this.CertificateUrl = $obj.CertificateUrl;
 
         $this.ResourceUrl = $obj.ResourceUrl;
-        $this.CSROptions = if($obj.CSROptions) {$obj.CSROptions} else {@{}};
+
+        if($obj.CSROptions) {
+            $this.CSROptions = [AcmeCsrOptions]::new($obj.CSROptions)
+        } else {
+            $this.CSROptions = [AcmeCsrOptions]::new()
+        }
     }
 
     AcmeOrder([AcmeHttpResponse] $httpResponse)
     {
         $this.UpdateOrder($httpResponse)
-        $this.CSROptions = @{}
+        $this.CSROptions = [AcmeCsrOptions]::new();
     }
 
-    AcmeOrder([AcmeHttpResponse] $httpResponse, [hashtable] $csrOptions)
+    AcmeOrder([AcmeHttpResponse] $httpResponse, [AcmeCsrOptions] $csrOptions)
     {
         $this.UpdateOrder($httpResponse)
-        $this.CSROptions = if($csrOptions) {$csrOptions} else {@{}};
+
+        if($csrOptions) {
+            $this.CSROptions = $csrOptions;
+        } else {
+            $this.CSROptions = [AcmeCSROptions]::new()
+        }
     }
 
     [void] UpdateOrder([AcmeHttpResponse] $httpResponse) {
@@ -57,10 +67,11 @@ class AcmeOrder {
     [Nullable[System.DateTimeOffset]] $NotAfter;
 
     [AcmeIdentifier[]] $Identifiers;
-    [hashtable] $CSROptions;
 
     [string[]] $AuthorizationUrls;
     [string] $FinalizeUrl;
 
     [string] $CertificateUrl;
+
+    [AcmeCsrOptions] $CSROptions;
 }
