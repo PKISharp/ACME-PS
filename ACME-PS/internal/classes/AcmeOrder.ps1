@@ -12,11 +12,19 @@ class AcmeOrder {
         $this.CertificateUrl = $obj.CertificateUrl;
 
         $this.ResourceUrl = $obj.ResourceUrl;
+        $this.CSROptions = if($obj.CSROptions) {$obj.CSROptions} else {@{}};
     }
 
     AcmeOrder([AcmeHttpResponse] $httpResponse)
     {
         $this.UpdateOrder($httpResponse)
+        $this.CSROptions = @{}
+    }
+
+    AcmeOrder([AcmeHttpResponse] $httpResponse, [hashtable] $csrOptions)
+    {
+        $this.UpdateOrder($httpResponse)
+        $this.CSROptions = if($csrOptions) {$csrOptions} else {@{}};
     }
 
     [void] UpdateOrder([AcmeHttpResponse] $httpResponse) {
@@ -49,6 +57,7 @@ class AcmeOrder {
     [Nullable[System.DateTimeOffset]] $NotAfter;
 
     [AcmeIdentifier[]] $Identifiers;
+    [hashtable] $CSROptions;
 
     [string[]] $AuthorizationUrls;
     [string] $FinalizeUrl;
