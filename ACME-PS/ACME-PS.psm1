@@ -65,6 +65,7 @@ $classes = @(
     "AcmeAccount",
     "AcmeIdentifier",
     "AcmeChallenge",
+    "AcmeCsrOptions"
     "AcmeOrder",
     "AcmeAuthorization",
     "AcmeState"
