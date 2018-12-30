@@ -20,6 +20,10 @@ function New-Order {
         .PARAMETER NotAfter
             Latest date the certificate should be considered valid.
 
+        .PARAMETER CertDN
+            If set, this will be used as Distinguished Name for the CSR that will be send to the ACME service by Complete-Order.
+            If not set, the first identifier will be used as CommonName (CN=Identifier).
+            Make sure to provide a valid X500DistinguishedName.
 
         .EXAMPLE
             PS> New-Order -Directory $myDirectory -AccountKey $myAccountKey -KeyId $myKid -Nonce $myNonce -Identifiers $myIdentifiers
@@ -36,13 +40,17 @@ function New-Order {
         $State,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [AcmeIdentifier[]] $Identifiers,
 
         [Parameter()]
         [System.DateTimeOffset] $NotBefore,
 
         [Parameter()]
-        [System.DateTimeOffset] $NotAfter
+        [System.DateTimeOffset] $NotAfter,
+
+        [Parameter()]
+        [string] $CertDN
     )
 
     $payload = @{
@@ -55,11 +63,24 @@ function New-Order {
     }
 
     $requestUrl = $State.GetServiceDirectory().NewOrder;
+    $csrOptions = [AcmeCsrOptions]::new()
+
+    if(-not [string]::IsNullOrWhiteSpace($CertDN)) {
+        try {
+            [X500DistinguishedName]::new($CertDN) | Out-Null;
+        } catch {
+            throw "'$CertDN' is not a valid X500 distinguished name";
+        }
+        
+        $csrOptions.DistinguishedName = $CertDN;
+    } else {
+        $csrOptions.DistinguishedName = "CN=$($Identifiers[0].Value)";
+    }
 
     if($PSCmdlet.ShouldProcess("Order", "Create new order with ACME Service")) {
         $response = Invoke-SignedWebRequest $requestUrl $State $payload;
 
-        $order = [AcmeOrder]::new($response);
+        $order = [AcmeOrder]::new($response, $csrOptions);
         $state.AddOrder($order);
 
         return $order;

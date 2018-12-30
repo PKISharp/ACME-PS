@@ -24,8 +24,6 @@ if(Test-Path $ModuleOutPath) {
 }
 
 <# Publish the module #>
-Import-Module "$PSScriptRoot/ACME-PS" -Force -ErrorAction 'Stop' -Verbose:$false # This will create the All* files.
-
 Write-Information "Copying $ModuleSourcePath/ACME-PS.psd1"
 Copy-Item -Path "$ModuleSourcePath/ACME-PS.psd1" -Destination "$ModuleOutPath/" -Force;
 
@@ -34,6 +32,9 @@ Copy-Item -Path "$ModuleSourcePath/TypeDefinitions.ps1" -Destination "$ModuleOut
 
 Write-Information "Copying $ModuleSourcePath/Prerequisites.ps1"
 Copy-Item -Path "$ModuleSourcePath/Prerequisites.ps1" -Destination "$ModuleOutPath/" -Force;
+
+
+Import-Module "$PSScriptRoot/ACME-PS" -Force -ErrorAction 'Stop' -Verbose:$false # This will create the All* files.
 
 $ModuleFiles = @(
     "internal/AllClasses.ps1",

@@ -12,11 +12,29 @@ class AcmeOrder {
         $this.CertificateUrl = $obj.CertificateUrl;
 
         $this.ResourceUrl = $obj.ResourceUrl;
+
+        if($obj.CSROptions) {
+            $this.CSROptions = [AcmeCsrOptions]::new($obj.CSROptions)
+        } else {
+            $this.CSROptions = [AcmeCsrOptions]::new()
+        }
     }
 
     AcmeOrder([AcmeHttpResponse] $httpResponse)
     {
         $this.UpdateOrder($httpResponse)
+        $this.CSROptions = [AcmeCsrOptions]::new();
+    }
+
+    AcmeOrder([AcmeHttpResponse] $httpResponse, [AcmeCsrOptions] $csrOptions)
+    {
+        $this.UpdateOrder($httpResponse)
+
+        if($csrOptions) {
+            $this.CSROptions = $csrOptions;
+        } else {
+            $this.CSROptions = [AcmeCSROptions]::new()
+        }
     }
 
     [void] UpdateOrder([AcmeHttpResponse] $httpResponse) {
@@ -54,4 +72,6 @@ class AcmeOrder {
     [string] $FinalizeUrl;
 
     [string] $CertificateUrl;
+
+    [AcmeCsrOptions] $CSROptions;
 }

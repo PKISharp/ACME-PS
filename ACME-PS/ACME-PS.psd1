@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.0.4'
+	ModuleVersion = '1.0.5'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -63,7 +63,6 @@
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 	PrivateData = @{
 		PSData = @{
-
 			# Tags applied to this module. These help with module discovery in online galleries.
 			Tags = @('pki','ssl','tls','security','certificates','letsencrypt','acme','powershell','acmesharp')
 
@@ -78,6 +77,9 @@
 
 			# ReleaseNotes of this module
 			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACMESharpCore-PowerShell/releases'
+
+			# Prerelase
+			Prerelease = 'beta1'
 		} # End of PSData hashtable
 
 	} # End of PrivateData hashtable
