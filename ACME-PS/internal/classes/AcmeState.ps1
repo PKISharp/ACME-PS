@@ -164,7 +164,7 @@ class AcmeState {
 
             $order | Export-AcmeObject $orderFileName -Force;
         } else {
-            Write-Warning "auto saving the state has been disabled, so set order is a no-op".
+            Write-Warning "auto saving the state has been disabled, so set order is a no-op."
         }
     }
 
@@ -180,7 +180,7 @@ class AcmeState {
             $orderListFile = $this.Filenames.OrderList;
             Set-Content -Path $orderListFile -Value (Get-Content -Path $orderListFile | Select-String -Pattern "=$orderHash" -NotMatch -SimpleMatch)
         } else {
-            Write-Warning "auto saving the state has been disabled, so set order is a no-op".
+            Write-Warning "auto saving the state has been disabled, so set order is a no-op."
         }
     }
 
