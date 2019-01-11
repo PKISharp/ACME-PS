@@ -90,7 +90,7 @@ class ECDsaAccountKey : ECDsaKeyBase, IAccountKey {
 
         $keyParameters.Curve = [ECDsaKeyBase]::GetCurve($keyExport.HashSize);
         $keyParameters.D = $keyExport.D;
-        
+
         $q = [System.Security.Cryptography.ECPoint]::new();
         $q.X = $keyExport.X;
         $q.Y = $keyExport.Y;
@@ -117,7 +117,7 @@ class ECDsaCertificateKey : ECDsaAccountKey, ICertificateKey {
 
         $keyParameters.Curve = [ECDsaKeyBase]::GetCurve($keyExport.HashSize);
         $keyParameters.D = $keyExport.D;
-        
+
         $q = [System.Security.Cryptography.ECPoint]::new();
         $q.X = $keyExport.X;
         $q.Y = $keyExport.Y;

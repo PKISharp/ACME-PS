@@ -23,7 +23,6 @@ InModuleScope ACME-PS {
             It 'called the ACME service' {
                 Assert-VerifiableMock
             }
-    
             It 'sets the nonce in $state' {
                 $state.GetNonce() | Should -Be "NextNonce";
             }
@@ -32,7 +31,7 @@ InModuleScope ACME-PS {
                 $order.CSROptions.DistinguishedName | Should -Be "CN=www.example2.com";
             }
         }
-        
+
         Context 'Mandatory parameters and CertDN' {
             $order = New-Order $state -Identifiers $identifiers -CertDN "CN=MyTestDN"
 

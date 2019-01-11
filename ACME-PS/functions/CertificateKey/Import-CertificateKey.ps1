@@ -10,7 +10,7 @@ function Import-CertificateKey {
         .PARAMETER Path
             The path where the key has been exported to.
 
-      
+
         .EXAMPLE
             PS> Import-CertificateKey -Path C:\AcmeCertKeys\example.key.xml;
     #>

@@ -21,7 +21,7 @@ function Get-Account {
         .PARAMETER KeyId
             The KeyId of the account to load.
 
-      
+
         .EXAMPLE
             PS> Get-Account -State $myState -PassThru
 
