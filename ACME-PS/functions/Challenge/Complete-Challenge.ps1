@@ -2,7 +2,7 @@ function Complete-Challenge {
     <#
         .SYNOPSIS
             Signals a challenge to be checked by the ACME service.
-      
+
         .DESCRIPTION
             The ACME service will be called to signal, that the challenge is ready to be validated.
             The result of the operation will be returned.
@@ -15,10 +15,10 @@ function Complete-Challenge {
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
 
-      
+
         .EXAMPLE
             PS> Complete-Challange $myState $myChallange
-      
+
         .EXAMPLE
             PS> $myChallenge | Complete-Challenge $myState
     #>

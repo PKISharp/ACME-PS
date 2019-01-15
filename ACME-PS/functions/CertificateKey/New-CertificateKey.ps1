@@ -86,7 +86,7 @@ function New-CertificateKey {
     }
 
     if($PSCmdlet.ParameterSetName -eq "ECDsa") {
-        $certificateKey = [ICertificateKey]([ECDsaCertifiaceKey]::new($ECDsaHashSize));
+        $certificateKey = [ICertificateKey]([ECDsaCertificateKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa certificate key with hash size $ECDsaHashSize";
     } else {
         if($RSAKeySize -lt 2048 -or $RSAKeySize -gt 4096 -or ($RSAKeySize%8) -ne 0) {

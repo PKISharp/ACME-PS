@@ -207,7 +207,7 @@ class AcmeState {
 
     [bool] Validate([string] $field) {
         $isValid = $true;
-        
+
         if($field -in @("ServiceDirectory", "Nonce", "AccountKey", "Account")) {
             if($null -eq $this.ServiceDirectory) {
                 $isValid = $false;

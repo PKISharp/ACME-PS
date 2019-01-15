@@ -71,7 +71,7 @@ function New-Order {
         } catch {
             throw "'$CertDN' is not a valid X500 distinguished name";
         }
-        
+
         $csrOptions.DistinguishedName = $CertDN;
     } else {
         $csrOptions.DistinguishedName = "CN=$($Identifiers[0].Value)";

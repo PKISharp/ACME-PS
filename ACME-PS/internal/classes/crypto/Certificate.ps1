@@ -20,7 +20,7 @@ class Certificate {
     }
 
     static [byte[]] GenerateCsr([string[]] $dnsNames, [string]$distinguishedName,
-        [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, 
+        [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm,
         [System.Security.Cryptography.HashAlgorithmName] $hashName)
     {
         if(-not $dnsNames) {

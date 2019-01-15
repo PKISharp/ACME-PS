@@ -79,7 +79,7 @@
 			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACMESharpCore-PowerShell/releases'
 
 			# Prerelase
-			Prerelease = 'beta1'
+			#Prerelease = 'beta2'
 		} # End of PSData hashtable
 
 	} # End of PrivateData hashtable
