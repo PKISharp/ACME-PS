@@ -56,7 +56,6 @@ function New-CertificateKey {
         $RSAHashSize = 256,
 
         [Parameter(ParameterSetName="RSA")]
-        [ValidateSet(2048)]
         [int]
         $RSAKeySize = 2048,
 
@@ -90,6 +89,10 @@ function New-CertificateKey {
         $certificateKey = [ICertificateKey]([ECDsaCertifiaceKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa certificate key with hash size $ECDsaHashSize";
     } else {
+        if($RSAKeySize -lt 2048 -or $RSAKeySize -gt 4096 -or ($RSAKeySize%8) -ne 0) {
+            throw "The RSAKeySize must be between 2048 and 4096 and must be divisible by 8";
+        }
+
         $certificateKey = [ICertificateKey]([RSACertificateKey]::new($RSAHashSize, $RSAKeySize));
         Write-Verbose "Created new RSA certificate key with hash size $RSAHashSize and key size $RSAKeySize";
     }
