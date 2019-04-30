@@ -85,7 +85,7 @@ function New-Account {
         $State.Set($account);
 
         if($PassThru) {
-            return $result;
+            return $account;
         }
     }
 }
