@@ -84,7 +84,7 @@ function Get-ServiceDirectory {
                 $serviceDirectoryUrl = $DirectoryUrl
             }
 
-            $response = Invoke-WebRequest $serviceDirectoryUrl;
+            $response = Invoke-WebRequest $serviceDirectoryUrl -UseBasicParsing;
 
             $result = [AcmeDirectory]::new(($response.Content | ConvertFrom-Json));
             $result.ResourceUrl = $serviceDirectoryUrl;
