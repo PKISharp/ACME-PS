@@ -78,7 +78,7 @@ Import-Module ACME-PS;
 $state = New-ACMEState -Path $stateDir
 
 # Fetch the service directory and save it in the state
-Get-ServiceDirectory $state -ServiceName $serviceName -PassThru;
+Get-ACMEServiceDirectory $state -ServiceName $serviceName -PassThru;
 
 # Get the first anti-replay nonce
 New-ACMENonce $state;
