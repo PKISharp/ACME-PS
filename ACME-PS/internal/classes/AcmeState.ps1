@@ -63,7 +63,7 @@ class AcmeState {
         $this.Account = $account;
         if($this.AutoSave) {
             $accountPath = $this.Filenames.Account;
-            $this.Account | Export-AcmeObject $accountPath;
+            $this.Account | Export-AcmeObject $accountPath -Force;
         }
     }
 
