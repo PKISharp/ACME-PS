@@ -9,10 +9,9 @@ function Invoke-SignedWebRequest {
         [Parameter(Mandatory = $true, Position = 1)]
         [AcmeState] $State,
 
-        <# TODO: Allowing null might be usable to implement POST-as-GET #>
-        [Parameter(Mandatory = $true, Position = 2)]
+        [Parameter(Position = 2)]
         [ValidateNotNull()]
-        [object] $Payload,
+        [object] $Payload = @{},
 
         [Parameter()]
         [switch] $SupressKeyId
