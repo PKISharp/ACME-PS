@@ -7,6 +7,10 @@ function Export-Certificate {
             Exports an issued certificate by downloading it from the acme service and combining it with the private key.
 
 
+        .PARAMETER State
+            The state object, that is used in this module, to provide easy access to the ACME service directory,
+            your account key, the associated account and the replay nonce.
+
         .PARAMETER Order
             The order which contains the issued certificate.
 
@@ -27,6 +31,12 @@ function Export-Certificate {
             PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>
     param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNull()]
+        [ValidateScript({$_.Validate()})]
+        [AcmeState]
+        $State,
+
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [AcmeOrder]
@@ -61,7 +71,7 @@ function Export-Certificate {
         }
     }
 
-    $response = Invoke-WebRequest $Order.CertificateUrl -UseBasicParsing;
+    $response = Invoke-SignedWebRequest $Order.CertificateUrl $State;
     $certicate = [byte[]]$response.Content;
 
     if($PSVersionTable.PSVersion -ge "6.0") {
