@@ -13,12 +13,16 @@ function Get-Authorization {
         .PARAMETER Url
             The authorization resource url to fetch the data.
 
+        .PARAMETER State
+            The state object, that is used in this module, to provide easy access to the ACME service directory,
+            your account key, the associated account and the replay nonce.
+
 
         .EXAMPLE
-            PS> Get-Authorization $myOrder
+            PS> Get-Authorization $myOrder $myState
 
         .EXAMPLE
-            PS> Get-Authorization https://acme.server/authz/1243
+            PS> Get-Authorization https://acme.server/authz/1243 $myState
     #>
     [CmdletBinding()]
     param(
@@ -30,17 +34,22 @@ function Get-Authorization {
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "FromUrl")]
         [ValidateNotNullOrEmpty()]
         [uri]
-        $Url
+        $Url,
+
+        [Parameter(Mandatory = $true, Position = 1)]
+        [ValidateNotNull()]
+        [ValidateScript({$_.Validate()})]
+        [AcmeState]
+        $State
     )
 
     process {
         switch ($PSCmdlet.ParameterSetName) {
             "FromOrder" {
-                $Order.AuthorizationUrls | ForEach-Object { Get-Authorization -Url $_ }
+                $Order.AuthorizationUrls | ForEach-Object { Get-Authorization -Url $_ $State }
             }
             Default {
-                <# TODO: Replace through POST-as-GET #>
-                $response = Invoke-AcmeWebRequest $Url -Method GET;
+                $response = Invoke-SignedWebRequest $Url $State
                 return [AcmeAuthorization]::new($response);
             }
         }
