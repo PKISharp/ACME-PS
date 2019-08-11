@@ -23,6 +23,7 @@ function Get-Order {
         $Url
     )
 
+    <# TODO: Replace through POST-as-GET #>
     $response = Invoke-AcmeWebRequest $Url -Method GET;
     return [AcmeOrder]::new($response);
 }

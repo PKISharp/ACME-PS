@@ -42,6 +42,7 @@ function Update-Order {
     )
 
     if($PSCmdlet.ShouldProcess("Order", "Get updated order form ACME service and store it to state")) {
+        <# TODO: Replace through POST-as-GET / Get-Order #>
         $response = Invoke-AcmeWebRequest $Order.ResourceUrl -Method GET;
         $Order.UpdateOrder($response);
         $State.SetOrder($Order);

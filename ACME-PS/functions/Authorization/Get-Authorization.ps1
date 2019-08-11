@@ -39,6 +39,7 @@ function Get-Authorization {
                 $Order.AuthorizationUrls | ForEach-Object { Get-Authorization -Url $_ }
             }
             Default {
+                <# TODO: Replace through POST-as-GET #>
                 $response = Invoke-AcmeWebRequest $Url -Method GET;
                 return [AcmeAuthorization]::new($response);
             }
