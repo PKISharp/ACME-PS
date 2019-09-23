@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.0.7'
+	ModuleVersion = '1.0.8'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -79,7 +79,7 @@
 			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACMESharpCore-PowerShell/releases'
 
 			# Prerelase
-			# Prerelease = 'beta'
+			Prerelease = 'alpha'
 		} # End of PSData hashtable
 
 	} # End of PrivateData hashtable
