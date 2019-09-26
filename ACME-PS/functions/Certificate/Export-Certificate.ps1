@@ -72,11 +72,11 @@ function Export-Certificate {
     }
 
     $response = Invoke-SignedWebRequest $Order.CertificateUrl $State;
-    $certicate = [byte[]]$response.Content;
+    $certificate = $response.Content;
 
     if($PSVersionTable.PSVersion -ge "6.0") {
-        $CertificateKey.ExportPfx($certicate, $Password) | Set-Content $Path -AsByteStream
+        $CertificateKey.ExportPfx($certificate, $Password) | Set-Content $Path -AsByteStream
     } else {
-        $CertificateKey.ExportPfx($certicate, $Password) | Set-Content $Path -Encoding Byte
+        $CertificateKey.ExportPfx($certificate, $Password) | Set-Content $Path -Encoding Byte
     }
 }
