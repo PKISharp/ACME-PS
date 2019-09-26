@@ -40,7 +40,7 @@ function New-SignedMessage {
         $headers.Add("jwk", $SigningKey.ExportPublicJwk());
     }
 
-    if($Payload -eq $null -or $Payload -is [string]) {
+    if($null -eq $Payload -or $Payload -is [string]) {
         Write-Debug "Payload was string, using without Conversion."
         $messagePayload = $Payload;
     } else {
@@ -57,7 +57,7 @@ function New-SignedMessage {
 
     $signedPayload.add("header", $null);
     $signedPayload.add("protected", (ConvertTo-UrlBase64 -InputText $jsonHeaders));
-    if($messagePayload -eq $null -or $messagePayload.Length -eq 0) {
+    if($null -eq $messagePayload -or $messagePayload.Length -eq 0) {
         $signedPayload.add("payload", "");
     } else {
         $signedPayload.add("payload", (ConvertTo-UrlBase64 -InputText $messagePayload));
