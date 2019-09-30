@@ -1,11 +1,11 @@
 function ConvertTo-UrlBase64 {
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true, ParameterSetName="FromString")]
-        [ValidateNotNullOrEmpty()]
+        [ValidateNotNull()]
         [string] $InputText,
 
         [Parameter(Mandatory = $true, ParameterSetName="FromByteArray")]
-        [ValidateNotNullOrEmpty()]
+        [ValidateNotNull()]
         [byte[]] $InputBytes
     )
 

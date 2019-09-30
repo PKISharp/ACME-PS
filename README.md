@@ -3,7 +3,13 @@
 A PowerShell module supporting ACME v2. The module tries to provide you with all means neccessary
 to enable you to write a script or module which uses an ACME v2 service to create certificates.
 
-Download the Module via Powershell-Gallery https://www.powershellgallery.com/packages/ACME-PS/
+Download the Module via Powershell-Gallery <https://www.powershellgallery.com/packages/ACME-PS/>
+
+## Breaking Change in Version 1.1
+
+Due to changes in RFC 8555 requiring POST-as-GET requests on multiple occasions, we decided to introduce a breaking change.
+Most commands will now need the `State` parameter to work correctly. Be aware, that this might not be compatible with non-updated
+versions of ACME-Servers.
 
 ## Synopsis
 
@@ -57,7 +63,7 @@ Download the Module via Powershell-Gallery https://www.powershellgallery.com/pac
 
 These samples can be used to create an ACME account, create an order, fullfill a http-01 challenge and issue a certificate for using it. Modify the variables to suit your needs.
 
-```
+```powershell
 $stateDir = "C:\Temp\AcmeState";
 
 $serviceName = "LetsEncrypt-Staging" # This will issue Fake Certificates - use this for testing!
@@ -71,7 +77,7 @@ $wwwRoot = "C:\inetpub\wwwroot"
 
 This snippet will create an account key and register it with the ACME service.
 
-```
+```powershell
 Import-Module ACME-PS;
 
 # Create a state object and save it to the harddrive
@@ -95,11 +101,11 @@ New-ACMEAccount $state -EmailAddresses $contactMail -AcceptTOS;
 This snippet will create an order and prepare the http-01 challenge to be resolved.
 Make sure to read and understand what happens, since the script makes assumptions:
 
- - It's a single machine (not a farm)
- - The machine is reachable via http for the given $dnsName
- - The website is in $wwwRoot
+- It's a single machine (not a farm)
+- The machine is reachable via http for the given $dnsName
+- The website is in $wwwRoot
 
-```
+```powershell
 # Load an state object to have service directory and account keys available
 $state = Get-ACMEState -Path $stateDir;
 
@@ -113,7 +119,7 @@ $identifier = New-ACMEIdentifier $dnsName;
 $order = New-ACMEOrder $state -Identifiers $identifier;
 
 # Fetch the authorizations for that order
-$authZ = Get-ACMEAuthorization -Order $order;
+$authZ = Get-ACMEAuthorization -State $state -Order $order;
 
 # Select a challenge to fullfill
 $challenge = Get-ACMEChallenge $state $authZ "http-01";
@@ -163,7 +169,7 @@ while(-not $order.CertificateUrl) {
 }
 
 # As soon as the url shows up we can create the PFX
-Export-ACMECertificate -Order $order -CertificateKey $certKey -Path "$stateDir\$dnsName.pfx";
+Export-ACMECertificate $state -Order $order -CertificateKey $certKey -Path "$stateDir\$dnsName.pfx";
 ```
 
 Now you have a ready to use certificate containing the public and private keys.
@@ -173,7 +179,7 @@ If any problems arise, feel free to open an issue.
 
 The certificate chain is not part of the issued certifcate. To get a correct certificate chain,
 you'll need to import the intermediate certificates from your acme service.
-For Lets Encrypt you can obtain them via https://letsencrypt.org/certificates/.
+For Lets Encrypt you can obtain them via <https://letsencrypt.org/certificates/.>
 
 ## How to
 
@@ -181,7 +187,7 @@ For Lets Encrypt you can obtain them via https://letsencrypt.org/certificates/.
 
 To create the output, which will be released to PSGallery, call :
 
-```
+```powershell
 PS> & .\build.ps1
 ```
 
@@ -189,6 +195,6 @@ PS> & .\build.ps1
 
 To run the Pester-Tests call:
 
-```
+```powershell
 PS> & .\ACME-PS\tests\A-Manual-Test-Run.ps1
 ```

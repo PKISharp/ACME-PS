@@ -10,6 +10,10 @@ function Get-Order {
         .PARAMETER Url
             The resource url of the order to be fetched.
 
+        .PARAMETER State
+            The state object, that is used in this module, to provide easy access to the ACME service directory,
+            your account key, the associated account and the replay nonce.
+
 
         .EXAMPLE
             PS> Get-Order -Url "https://service.example.com/kid/213/order/123"
@@ -20,9 +24,15 @@ function Get-Order {
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "FromUrl")]
         [ValidateNotNullOrEmpty()]
         [uri]
-        $Url
+        $Url,
+
+        [Parameter(Mandatory = $true, Position = 1)]
+        [ValidateNotNull()]
+        [ValidateScript({$_.Validate()})]
+        [AcmeState]
+        $State
     )
 
-    $response = Invoke-AcmeWebRequest $Url -Method GET;
+    $response = Invoke-SignedWebRequest $Url $State;
     return [AcmeOrder]::new($response);
 }

@@ -37,6 +37,9 @@ function New-Nonce {
     $response = Invoke-AcmeWebRequest $Url -Method Head
     $nonce = $response.NextNonce;
 
+    if($response.IsError) {
+        throw "$($result.ErrorMessage)`n$($result.Content)";
+    }
     if(-not $nonce) {
         throw "Could not retreive new nonce";
     }

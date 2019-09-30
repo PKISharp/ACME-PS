@@ -33,17 +33,7 @@ function Invoke-ACMEWebRequest {
     $httpClient = [System.Net.Http.HttpClient]::new();
 
     $httpResponse = $httpClient.SendAsync($httpRequest).GetAwaiter().GetResult();
-    $response = $httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-    if($httpResponse.Content.Headers.ContentType -eq "application/problem+json") {
-        throw "Server returned Problem: $response"
-    }
-
-    if($httpRequest.StatusCode -lt 500) {
-        $result = [AcmeHttpResponse]::new($httpResponse, $response);
-        return $result;
-    }
-
-    throw "Unexpected response from server: $($httpResponse.StatusCode), with content:`n$response"
-    return $response;
+    $result = [AcmeHttpResponse]::new($httpResponse);
+    return $result;
 }
