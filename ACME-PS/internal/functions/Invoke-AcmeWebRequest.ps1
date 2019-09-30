@@ -35,9 +35,5 @@ function Invoke-ACMEWebRequest {
     $httpResponse = $httpClient.SendAsync($httpRequest).GetAwaiter().GetResult();
 
     $result = [AcmeHttpResponse]::new($httpResponse);
-    if($result.IsError) {
-        throw "Server returned Problem or error: $response, StatusCode: $($result.StatusCode)";
-    }
-
     return $result;
 }
