@@ -11,7 +11,7 @@ function Invoke-SignedWebRequest {
 
         [Parameter(Position = 2)]
         [ValidateNotNull()]
-        [object] $Payload = @{},
+        [object] $Payload = "",
 
         [Parameter()]
         [switch] $SupressKeyId
@@ -31,7 +31,7 @@ function Invoke-SignedWebRequest {
         }
 
         if($response.IsError) {
-            throw $response;
+            throw "$($result.ErrorMessage)`n$($result.Content)";
         }
 
         return $response;
