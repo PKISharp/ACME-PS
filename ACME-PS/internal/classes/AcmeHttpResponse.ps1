@@ -27,7 +27,7 @@ class AcmeHttpResponse {
         } elseif ($contentType -ieq "application/pem-certificate-chain"){
             $this.Content = [byte[]]$responseMessage.Content;
         } else {
-            $this.IsError = true;
+            $this.IsError = $true;
             $this.Content = "Unexpected server response."
         }
     }
