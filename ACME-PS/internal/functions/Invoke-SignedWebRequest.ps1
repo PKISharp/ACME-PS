@@ -31,7 +31,7 @@ function Invoke-SignedWebRequest {
         }
 
         if($response.IsError) {
-            throw "$($result.ErrorMessage)`n$($result.Content)";
+            throw "$($response.ErrorMessage)`n$($response.Content)";
         }
 
         return $response;
