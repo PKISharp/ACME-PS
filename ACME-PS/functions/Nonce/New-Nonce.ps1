@@ -38,7 +38,7 @@ function New-Nonce {
     $nonce = $response.NextNonce;
 
     if($response.IsError) {
-        throw "$($result.ErrorMessage)`n$($result.Content)";
+        throw "$($response.ErrorMessage)`n$($response.Content)";
     }
     if(-not $nonce) {
         throw "Could not retreive new nonce";
