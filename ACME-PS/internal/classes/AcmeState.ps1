@@ -1,18 +1,4 @@
 class AcmeState {
-    [ValidateNotNull()] hidden [AcmeDirectory] $ServiceDirectory;
-    [ValidateNotNull()] hidden [string] $Nonce;
-    [ValidateNotNull()] hidden [IAccountKey] $AccountKey;
-    [ValidateNotNull()] hidden [AcmeAccount] $Account;
-
-    hidden [string] $SavePath;
-    hidden [bool] $AutoSave;
-    hidden [bool] $IsInitializing;
-
-    hidden [AcmeStatePaths] $Filenames;
-
-    AcmeState() {
-        $this.Filenames = [AcmeStatePaths]::new("");
-    }
 
     AcmeState([string] $savePath, [bool]$autoSave) {
         $this.Filenames = [AcmeStatePaths]::new($savePath);
@@ -26,10 +12,6 @@ class AcmeState {
     }
 
 
-    [AcmeDirectory] GetServiceDirectory() { return $this.ServiceDirectory; }
-    [string] GetNonce() { return $this.Nonce; }
-    [IAccountKey] GetAccountKey() { return $this.AccountKey; }
-    [AcmeAccount] GetAccount() { return $this.Account; }
 
 
     [void] Set([AcmeDirectory] $serviceDirectory) {
@@ -247,7 +229,40 @@ class AcmeState {
     }
 }
 
+<# abstract #> class AcmeStateBase {
+    AcmeStateBase() {
+        if ($this.GetType() -eq [AcmeStateBase]) {
+            throw [System.InvalidOperationException]::new("This is intended to be abstract - inherit from it.");
+        }
+    }
+
+    static [AcmeStateBase] FromPath([string] $path) {
+        return [AcmeStateBase]::FromPaths([AcmeStatePaths]::new($path));
+    }
+
+    static [AcmeStateBase] FromPaths([AcmeStatePaths] $paths) {
+        return [AcmeDiskPersistedState]::new($paths);
+    }
+
+    <# abstract #> [string]        GetNonce()            { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmeDirectory] GetServiceDirectory() { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [IAccountKey]   GetAccountKey()       { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmeAccount]   GetAccount()          { throw [System.NotImplementedException]::new(); }
+
+    <# abstract #> [void] SetNonce([string] $value)   { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([AcmeDirectory] $value) { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([IAccountKey] $value)   { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([AcmeAccount] $value)   { throw [System.NotImplementedException]::new(); }
+
+    <# abstract #> [AcmeOrder] GetOrder([object] $params)      { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmeOrder] FindOrder([string[]] $dnsNames) { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] AddOrder([object] $params)           { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] SetOrder([object] $params)           { throw [System.NotImplementedException]::new(); }
+}
+
 class AcmeStatePaths {
+    [string] $BasePath;
+    
     [string] $ServiceDirectory;
     [string] $Nonce;
     [string] $AccountKey;
@@ -257,12 +272,52 @@ class AcmeStatePaths {
     [string] $Order;
 
     AcmeStatePaths([string] $basePath) {
-        $this.ServiceDirectory = "$basePath/ServiceDirectory.xml";
-        $this.Nonce = "$basePath/NextNonce.txt";
-        $this.AccountKey = "$basePath/AccountKey.xml";
-        $this.Account = "$basePath/Account.xml";
+        $this.BasePath = Resolve-Path $basePath
 
-        $this.OrderList = "$basePath/Orders/OrderList.txt"
-        $this.Order = "$basePath/Orders/Order-[hash].xml";
+        $this.ServiceDirectory = "$($this.BasePath)/ServiceDirectory.xml";
+        $this.Nonce = "$($this.BasePath)/NextNonce.txt";
+        $this.AccountKey = "$($this.BasePath)AccountKey.xml";
+        $this.Account = "$($this.BasePath)Account.xml";
+
+        $this.OrderList = "$($this.BasePath)Orders/OrderList.txt"
+        $this.Order = "$($this.BasePath)Orders/Order-[hash].xml";
     }
+}
+
+class AcmeDiskPersistedState {
+    hidden [AcmeStatePaths] $Filenames;
+
+    AcmeDiskPersistedState(AcmeStatePaths $paths) {
+        $Filenames = $paths;
+
+        #TODO: do a test, if we can write there.
+    }
+}
+
+class AcmeEphemeralState {
+    [ValidateNotNull()] hidden [AcmeDirectory] $ServiceDirectory;
+    [ValidateNotNull()] hidden [string] $Nonce;
+    [ValidateNotNull()] hidden [IAccountKey] $AccountKey;
+    [ValidateNotNull()] hidden [AcmeAccount] $Account;
+
+    hidden [hashtable] $Orders = @{};
+
+    AcmeEphemeralState() {
+        Write-Warning "Using an ephemeral state-object might lead to data loss."
+    }
+
+    [AcmeDirectory] GetServiceDirectory() { return $this.ServiceDirectory; }
+    [string] GetNonce() { return $this.Nonce; }
+    [IAccountKey] GetAccountKey() { return $this.AccountKey; }
+    [AcmeAccount] GetAccount() { return $this.Account; }
+
+    [void] SetNonce([string] $value)   { $this.Nonce = $value; }
+    [void] Set([AcmeDirectory] $value) { $this.ServiceDirectory = $value; }
+    [void] Set([IAccountKey] $value)   { $this.AccountKey = $value; }
+    [void] Set([AcmeAccount] $value)   { $this.Account = $value; }
+
+    [AcmeOrder] GetOrder([object] $params) { throw [System.NotImplementedException]::new(); }
+    [AcmeOrder] FindOrder([string[]] $dnsNames) { throw [System.NotImplementedException]::new(); }
+    [void] AddOrder([object] $params) { throw [System.NotImplementedException]::new(); }
+    [void] SetOrder([object] $params) { throw [System.NotImplementedException]::new(); }
 }
