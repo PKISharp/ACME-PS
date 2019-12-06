@@ -1,97 +1,4 @@
-class AcmeState {
-
-    AcmeState([string] $savePath, [bool]$autoSave) {
-        $this.Filenames = [AcmeStatePaths]::new($savePath);
-
-        if(-not (Test-Path $savePath)) {
-            New-Item $savePath -ItemType Directory -Force;
-        }
-
-        $this.AutoSave = $autoSave;
-        $this.SavePath = Resolve-Path $savePath;
-    }
-
-
-
-
-    [void] Set([AcmeDirectory] $serviceDirectory) {
-        $this.ServiceDirectory = $serviceDirectory;
-        if($this.AutoSave) {
-            $directoryPath = $this.Filenames.ServiceDirectory;
-
-            Write-Debug "Storing the service directory to $directoryPath";
-            $this.ServiceDirectory | Export-AcmeObject $directoryPath -Force;
-        }
-    }
-    [void] SetNonce([string] $nonce) {
-        $this.Nonce = $nonce;
-        if($this.AutoSave) {
-            $noncePath = $this.Filenames.Nonce;
-            Set-Content $noncePath -Value $nonce -NoNewLine;
-        }
-    }
-    [void] Set([IAccountKey] $accountKey) {
-        $this.AccountKey = $accountKey;
-
-        if($this.AutoSave) {
-            $accountKeyPath = $this.Filenames.AccountKey;
-            $this.AccountKey | Export-AccountKey $accountKeyPath -Force;
-        } elseif(-not $this.IsInitializing) {
-            Write-Warning "The account key will not be exported."
-            Write-Information "Make sure you save the account key or you might loose access to your ACME account.";
-        }
-    }
-    [void] Set([AcmeAccount] $account) {
-        $this.Account = $account;
-        if($this.AutoSave) {
-            $accountPath = $this.Filenames.Account;
-            $this.Account | Export-AcmeObject $accountPath;
-        }
-    }
-
-    hidden [void] LoadFromPath()
-    {
-        $this.IsInitializing = $true;
-        $this.AutoSave = $false;
-
-        $directoryPath = $this.Filenames.ServiceDirectory;
-        $noncePath = $this.Filenames.Nonce;
-        $accountKeyPath = $this.Filenames.AccountKey;
-        $accountPath = $this.Filenames.Account;
-
-        if(Test-Path $directoryPath) {
-            Get-ServiceDirectory $this -Path $directoryPath
-        } else {
-            Write-Verbose "Could not find saved service directory at $directoryPath";
-        }
-
-        if(Test-Path $noncePath) {
-            $importedNonce = Get-Content $noncePath -Raw
-            if($importedNonce) {
-                $this.SetNonce($importedNonce);
-            } else {
-                New-Nonce $this;
-            }
-        } else {
-            Write-Verbose "Could not find saved nonce at $noncePath";
-        }
-
-        if(Test-Path $accountKeyPath) {
-            Import-AccountKey $this -Path $accountKeyPath
-        } else {
-            Write-Verbose "Could not find saved account key at $accountKeyPath";
-        }
-
-        if(Test-Path $accountPath) {
-            $importedAccount = Import-AcmeObject -Path $accountPath -TypeName "AcmeAccount"
-            $this.Set($importedAccount);
-        } else {
-            Write-Verbose "Could not find saved account at $accountPath";
-        }
-
-        $this.AutoSave = $true;
-        $this.IsInitializing = $false
-    }
+class AcmeStateX {
 
     hidden [string] GetOrderHash([AcmeOrder] $order) {
         $orderIdentifiers = $order.Identifiers | Foreach-Object { $_.ToString() } | Sort-Object;
@@ -108,10 +15,7 @@ class AcmeState {
             $sha256.Dispose();
         }
     }
-    hidden [string] GetOrderFileName([string] $orderHash) {
-        $fileName = $this.Filenames.Order.Replace("[hash]", $orderHash);
-        return $fileName;
-    }
+    
 
     hidden [AcmeOrder] LoadOrder([string] $orderHash) {
         $orderFile = $this.GetOrderFileName($orderHash);
@@ -183,81 +87,83 @@ class AcmeState {
         return $this.LoadOrder($orderHash);
     }
 
-    [bool] Validate() {
-        return $this.Validate("Account");
-    }
 
-    [bool] Validate([string] $field) {
-        $isValid = $true;
-
-        if($field -in @("ServiceDirectory", "Nonce", "AccountKey", "Account")) {
-            if($null -eq $this.ServiceDirectory) {
-                $isValid = $false;
-                Write-Warning "State does not contain a service directory. Run Get-ACMEServiceDirectory to get one."
-            }
-        }
-
-        if($field -in @("Nonce", "AccountKey", "Account")) {
-            if($null -eq $this.Nonce) {
-                $isValid = $false;
-                Write-Warning "State does not contain a nonce. Run New-ACMENonce to get one."
-            }
-        }
-
-        if($field -in @("AccountKey", "Account")) {
-            if($null -eq $this.AccountKey) {
-                $isValid = $false;
-                Write-Warning "State does not contain an account key. Run New-ACMEAccountKey to create one."
-            }
-        }
-
-        if($field -in @("Account")) {
-            if($null -eq $this.Account) {
-                $isValid = $false;
-                Write-Warning "State does not contain an account. Register one by running New-ACMEAccount."
-            }
-        }
-
-        return $isValid;
-    }
-
-    static [AcmeState] FromPath([string] $Path) {
-        $state = [AcmeState]::new($Path, $false);
-        $state.LoadFromPath();
-
-        return $state;
-    }
 }
 
-<# abstract #> class AcmeStateBase {
+<# abstract #> class AcmeState {
+    static [AcmeState] FromPath([string] $path) {
+        return [AcmeState]::FromPaths([AcmeStatePaths]::new($path));
+    }
+
+    static [AcmeState] FromPaths([AcmeStatePaths] $paths) {
+        return [AcmeDiskPersistedState]::new($paths, $false, $true);
+    }
+
+    
     AcmeStateBase() {
-        if ($this.GetType() -eq [AcmeStateBase]) {
+        if ($this.GetType() -eq [AcmeState]) {
             throw [System.InvalidOperationException]::new("This is intended to be abstract - inherit from it.");
         }
     }
 
-    static [AcmeStateBase] FromPath([string] $path) {
-        return [AcmeStateBase]::FromPaths([AcmeStatePaths]::new($path));
-    }
 
-    static [AcmeStateBase] FromPaths([AcmeStatePaths] $paths) {
-        return [AcmeDiskPersistedState]::new($paths);
-    }
+    <# abstract #> [string]        GetNonce()                  { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmeDirectory] GetServiceDirectory()       { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [IAccountKey]   GetAccountKey()             { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmeAccount]   GetAccount()                { throw [System.NotImplementedException]::new(); }
 
-    <# abstract #> [string]        GetNonce()            { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [AcmeDirectory] GetServiceDirectory() { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [IAccountKey]   GetAccountKey()       { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [AcmeAccount]   GetAccount()          { throw [System.NotImplementedException]::new(); }
-
-    <# abstract #> [void] SetNonce([string] $value)   { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] Set([AcmeDirectory] $value) { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] Set([IAccountKey] $value)   { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] Set([AcmeAccount] $value)   { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] SetNonce([string] $value)            { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([AcmeDirectory] $value)          { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([IAccountKey] $value)            { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([AcmeAccount] $value)            { throw [System.NotImplementedException]::new(); }
 
     <# abstract #> [AcmeOrder] GetOrder([object] $params)      { throw [System.NotImplementedException]::new(); }
     <# abstract #> [AcmeOrder] FindOrder([string[]] $dnsNames) { throw [System.NotImplementedException]::new(); }
     <# abstract #> [void] AddOrder([object] $params)           { throw [System.NotImplementedException]::new(); }
     <# abstract #> [void] SetOrder([object] $params)           { throw [System.NotImplementedException]::new(); }
+
+
+    [bool] DirectoryExists() {
+        if ($null -eq $this.GetServiceDirectory()) {
+            Write-Warning "State does not contain a service directory. Run Get-ACMEServiceDirectory to get one."
+            return $false;
+        }
+
+        return $true;
+    }
+
+    [bool] NonceExists() {
+        $exists = $this.DirectoryExists();
+
+        if($null -eq $this.Nonce) {
+            Write-Warning "State does not contain a nonce. Run New-ACMENonce to get one."
+            return $false;
+        }
+
+        return $exists;
+    }
+
+    [bool] AccountKeyExists() {
+        $exists = $this.NonceExists();
+
+        if($null -eq $this.AccountKey) {
+            Write-Warning "State does not contain an account key. Run New-ACMEAccountKey to create one."
+            return $false;
+        }
+
+        return $exists;
+    }
+
+    [bool] AccountExists() {
+        $exists = $this.AccountKeyExists();
+
+        if($null -eq $this.Account) {
+            Write-Warning "State does not contain an account. Register one by running New-ACMEAccount."
+            return $false;
+        }
+
+        return $exists;
+    }
 }
 
 class AcmeStatePaths {
@@ -269,7 +175,7 @@ class AcmeStatePaths {
     [string] $Account;
 
     [string] $OrderList;
-    [string] $Order;
+    hidden [string] $Order;
 
     AcmeStatePaths([string] $basePath) {
         $this.BasePath = Resolve-Path $basePath
@@ -282,15 +188,139 @@ class AcmeStatePaths {
         $this.OrderList = "$($this.BasePath)Orders/OrderList.txt"
         $this.Order = "$($this.BasePath)Orders/Order-[hash].xml";
     }
+
+    [string] GetOrderFileName([string] $orderHash) {
+        return $this.Order.Replace("[hash]", $orderHash);
+    }
 }
 
 class AcmeDiskPersistedState {
     hidden [AcmeStatePaths] $Filenames;
 
-    AcmeDiskPersistedState(AcmeStatePaths $paths) {
-        $Filenames = $paths;
+    AcmeDiskPersistedState([AcmeStatePaths] $paths, [bool] $createState, [bool] $allowLateInit) {
+        $this.Filenames = $paths;
 
-        #TODO: do a test, if we can write there.
+        if(-not (Test-Path $this.Filenames.BasePath)) {
+            if ($createState) {
+                New-Item $this.Filenames.BasePath -ItemType Directory -Force -ErrorAction 'Stop';    
+            } else {
+                throw "$($this.Filenames.BasePath) does not exist.";
+            }
+        }
+
+        $flagFile = "$($this.Filenames.BasePath)/.acme-ps-state";
+        if(-not (Test-Path $flagFile)) {
+            if($allowLateInit -or $createState) {
+                New-Item $flagFile -ItemType File
+            } else {
+                throw "Could not find $flagFile identifying the state directory. You can create an empty file, to fix this.";
+            }
+        } else {
+            # Test, if the path seems writable.
+            Set-Content -Path $flagFile -Value (Get-Date) -ErrorAction 'Stop';
+        }
+    }
+
+    
+    <# Getters #>
+    [string] GetNonce() {
+        $fileName = $this.Filenames.Nonce;
+    
+        if(Test-Path $fileName) {
+            $result = Get-Content $fileName -Raw
+            return $result;
+        }
+
+        Write-Verbose "Could not find saved nonce at $fileName";
+        return $null;
+    }
+
+    [AcmeDirectory] GetServiceDirectory() {
+        $fileName = $this.Filenames.ServiceDirectory;
+        
+        if(Test-Path $fileName) {
+            if($fileName -like "*.json") {
+                $result = [ACMEDirectory](Get-Content $Path | ConvertFrom-Json)
+            } else {
+                $result = [AcmeDirectory](Import-Clixml $Path)
+            }
+
+            return $result;
+        }
+
+        Write-Verbose "Could not find saved service directory at $fileName";
+        return $null;
+    }
+
+    [IAccountKey] GetAccountKey() {
+        $fileName = $this.Filenames.AccountKey;
+
+        if(Test-Path $fileName) {
+            $result = Import-AccountKEy -Path $fileName;
+            return $result;
+        }
+
+        Write-Verbose "Could not find saved account key at $fileName."
+        return $null;
+    }
+
+    [AcmeAccount] GetAccount() {
+        $fileName = $this.Filenames.AccountKey;
+
+        if(Test-Path $fileName) {
+            $result = Import-AcmeObject -Path $fileName -TypeName "AcmeAccount";
+            return $result;
+        }
+
+        Write-Verbose "Could not find saved account key at $fileName."
+        return $null;
+    }
+
+
+    <# Setters #>
+    [void] SetNonce([string] $value) {
+        $fileName = $this.Filenames.Nonce;
+
+        Write-Debug "Storing the nonce to $fileName"
+        Set-Content $fileName -Value $value -NoNewLine;
+    }
+
+    [void] Set([AcmeDirectory] $value) {
+        $fileName = $this.Filenames.ServiceDirectory;
+
+        Write-Debug "Storing the service directory to $fileName";
+        $value | Export-AcmeObject $fileName -Force;
+    }
+    
+    [void] Set([IAccountKey] $value) {
+        $fileName = $this.Filenames.AccountKey;
+
+        Write-Debug "Storing the account key to $fileName";
+        $value | Export-AccountKey $accountKeyPath -Force;
+    }
+    
+    [void] Set([AcmeAccount] $value) {
+        $fileName = $this.Filenames.Account;
+
+        Write-Debug "Storing the account data to $fileName";
+        $value | Export-AcmeObject $accountPath;
+    }
+
+    <# Orders #>
+    [AcmeOrder] GetOrder([object] $params) {
+        throw [System.NotImplementedException]::new();
+    }
+    
+    [AcmeOrder] FindOrder([string[]] $dnsNames) {
+        throw [System.NotImplementedException]::new();
+    }
+
+    [void] AddOrder([object] $params) {
+        throw [System.NotImplementedException]::new();
+    }
+
+    [void] SetOrder([object] $params) {
+        throw [System.NotImplementedException]::new();
     }
 }
 
