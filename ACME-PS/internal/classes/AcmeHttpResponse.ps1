@@ -3,7 +3,7 @@ class AcmeHttpResponse {
 
     AcmeHttpResponse([System.Net.Http.HttpResponseMessage] $responseMessage) {
         $this.RequestUri = $responseMessage.RequestMessage.RequestUri;
-        
+
         $this.StatusCode = $responseMessage.StatusCode;
         if($this.StatusCode -ge 400) {
             Write-Debug "StatusCode was > 400, Setting IsError true."
@@ -31,7 +31,7 @@ class AcmeHttpResponse {
                 $this.IsError = $true;
                 $this.ErrorMessage = "Server returned problem (Status: $($this.StatusCode))."
             }
-        } 
+        }
         elseif ($contentType -ieq "application/pem-certificate-chain") {
             $this.Content = [byte[]]$responseMessage.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
         }
@@ -50,7 +50,7 @@ class AcmeHttpResponse {
 
     [string] $RequestUri;
     [int] $StatusCode;
-    
+
     [string] $NextNonce;
 
     [hashtable] $Headers;

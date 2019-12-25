@@ -7,7 +7,7 @@
         return [AcmeDiskPersistedState]::new($paths, $false, $true);
     }
 
-    
+
     AcmeStateBase() {
         if ($this.GetType() -eq [AcmeState]) {
             throw [System.InvalidOperationException]::new("This is intended to be abstract - inherit from it.");
@@ -76,7 +76,7 @@
 
 class AcmeStatePaths {
     [string] $BasePath;
-    
+
     [string] $ServiceDirectory;
     [string] $Nonce;
     [string] $AccountKey;
@@ -110,7 +110,7 @@ class AcmeDiskPersistedState {
 
         if(-not (Test-Path $this.Filenames.BasePath)) {
             if ($createState) {
-                New-Item $this.Filenames.BasePath -ItemType Directory -Force -ErrorAction 'Stop';    
+                New-Item $this.Filenames.BasePath -ItemType Directory -Force -ErrorAction 'Stop';
             } else {
                 throw "$($this.Filenames.BasePath) does not exist.";
             }
@@ -129,11 +129,11 @@ class AcmeDiskPersistedState {
         }
     }
 
-    
+
     <# Getters #>
     [string] GetNonce() {
         $fileName = $this.Filenames.Nonce;
-    
+
         if(Test-Path $fileName) {
             $result = Get-Content $fileName -Raw
             return $result;
@@ -145,12 +145,12 @@ class AcmeDiskPersistedState {
 
     [AcmeDirectory] GetServiceDirectory() {
         $fileName = $this.Filenames.ServiceDirectory;
-        
+
         if(Test-Path $fileName) {
             if($fileName -like "*.json") {
-                $result = [ACMEDirectory](Get-Content $Path | ConvertFrom-Json)
+                $result = [ACMEDirectory](Get-Content $fileName | ConvertFrom-Json)
             } else {
-                $result = [AcmeDirectory](Import-Clixml $Path)
+                $result = [AcmeDirectory](Import-Clixml $fileName)
             }
 
             return $result;
@@ -199,19 +199,19 @@ class AcmeDiskPersistedState {
         Write-Debug "Storing the service directory to $fileName";
         $value | Export-AcmeObject $fileName -Force;
     }
-    
+
     [void] Set([IAccountKey] $value) {
         $fileName = $this.Filenames.AccountKey;
 
         Write-Debug "Storing the account key to $fileName";
-        $value | Export-AccountKey $accountKeyPath -Force;
+        $value | Export-AccountKey $fileName -Force;
     }
-    
+
     [void] Set([AcmeAccount] $value) {
         $fileName = $this.Filenames.Account;
 
         Write-Debug "Storing the account data to $fileName";
-        $value | Export-AcmeObject $accountPath;
+        $value | Export-AcmeObject $fileName;
     }
 
     <# Orders #>
@@ -266,7 +266,7 @@ class AcmeDiskPersistedState {
     [void] AddOrder([AcmeOrder] $order) {
         $this.SetOrder($order);
     }
-    
+
     [void] SetOrder([AcmeOrder] $order) {
         $orderHash = $this.GetOrderHash($order);
         $orderFileName = $this.GetOrderFileName($orderHash);
@@ -329,7 +329,7 @@ class AcmeEphemeralState {
     [void] AddOrder([AcmeOrder] $order) {
         $this.Orders.Add($order);
     }
-    
+
     [void] SetOrder([AcmeOrder] $order) {
          if(-not $this.Orders.Contains($order)) {
             $this.Orders.Add($order);

@@ -71,7 +71,7 @@ function Export-Certificate {
         }
     }
 
-    $response = Invoke-SignedWebRequest $Order.CertificateUrl $State;
+    $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
     $certificate = $response.Content;
 
     if($PSVersionTable.PSVersion -ge "6.0") {

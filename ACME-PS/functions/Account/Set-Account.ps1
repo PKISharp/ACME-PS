@@ -44,7 +44,7 @@ function Set-Account {
     $payload = New-SignedMessage -Url $Url -SigningKey $NewAccountKey -Payload $innerPayload;
 
     if($PSCmdlet.ShouldProcess("Account", "Set new AccountKey and store it into state")) {
-        Invoke-SignedWebRequest $Url -$State $payload -ErrorAction 'Stop';
+        Invoke-SignedWebRequest -Url $Url -State $State -Payload $payload -ErrorAction 'Stop';
 
         $State.Set($NewAccountKey);
         $account = Get-Account -Url $TargetAccount.ResourceUrl -State $State -KeyId $Account.KeyId

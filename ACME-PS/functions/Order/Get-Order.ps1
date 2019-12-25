@@ -33,6 +33,6 @@ function Get-Order {
         $State
     )
 
-    $response = Invoke-SignedWebRequest $Url $State;
+    $response = Invoke-SignedWebRequest -Url $Url -State $State;
     return [AcmeOrder]::new($response);
 }

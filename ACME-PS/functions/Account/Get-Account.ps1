@@ -52,7 +52,7 @@ function Get-Account {
     if($PSCmdlet.ParameterSetName -eq "FindAccount") {
         $requestUrl = $State.GetServiceDirectory().NewAccount;
         $payload = @{"onlyReturnExisting" = $true};
-        $response = Invoke-SignedWebRequest $requestUrl $State $payload
+        $response = Invoke-SignedWebRequest -Url $requestUrl -State $State -Payload $payload
 
         if($response.StatusCode -eq 200) {
             $KeyId = $response.Headers["Location"][0];
@@ -64,7 +64,7 @@ function Get-Account {
         }
     }
 
-    $response = Invoke-SignedWebRequest $AccountUrl $State @{}
+    $response = Invoke-SignedWebRequest -Url $AccountUrl -State $State -Payload @{}
     $result = [AcmeAccount]::new($response, $KeyId);
 
     if($AutomaticAccountHandling) {
