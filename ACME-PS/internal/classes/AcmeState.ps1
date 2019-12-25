@@ -1,95 +1,3 @@
-class AcmeStateX {
-
-    hidden [string] GetOrderHash([AcmeOrder] $order) {
-        $orderIdentifiers = $order.Identifiers | Foreach-Object { $_.ToString() } | Sort-Object;
-        $identifier = [string]::Join('|', $orderIdentifiers);
-
-        $sha256 = [System.Security.Cryptography.SHA256]::Create();
-        try {
-            $identifierBytes = [System.Text.Encoding]::UTF8.GetBytes($identifier);
-            $identifierHash = $sha256.ComputeHash($identifierBytes);
-            $result = ConvertTo-UrlBase64 -InputBytes $identifierHash;
-
-            return $result;
-        } finally {
-            $sha256.Dispose();
-        }
-    }
-    
-
-    hidden [AcmeOrder] LoadOrder([string] $orderHash) {
-        $orderFile = $this.GetOrderFileName($orderHash);
-        if(Test-Path $orderFile) {
-            $order = Import-AcmeObject -Path $orderFile -TypeName "AcmeOrder";
-            return $order;
-        }
-
-        return $null;
-    }
-
-    [void] AddOrder([AcmeOrder] $order) {
-        $this.SetOrder($order);
-    }
-
-    [void] SetOrder([AcmeOrder] $order) {
-        if($this.AutoSave) {
-            $orderHash = $this.GetOrderHash($order);
-            $orderFileName = $this.GetOrderFileName($orderHash);
-
-            if(-not (Test-Path $order)) {
-                $orderListFile = $this.Filenames.OrderList;
-
-                foreach ($id in $order.Identifiers) {
-                    if(-not (Test-Path $orderListFile)) {
-                        New-Item $orderListFile -Force;
-                    }
-
-                    "$($id.ToString())=$orderHash" | Add-Content $orderListFile;
-                }
-            }
-
-            $order | Export-AcmeObject $orderFileName -Force;
-        } else {
-            Write-Warning "auto saving the state has been disabled, so set order is a no-op."
-        }
-    }
-
-    [void] RemoveOrder([AcmeOrder] $order) {
-        if($this.AutoSave) {
-            $orderHash = $this.GetOrderHash($order);
-            $orderFileName = $this.GetOrderFileName($orderHash);
-
-            if(Test-Path $orderFileName) {
-                Remove-Item $orderFileName;
-            }
-
-            $orderListFile = $this.Filenames.OrderList;
-            Set-Content -Path $orderListFile -Value (Get-Content -Path $orderListFile | Select-String -Pattern "=$orderHash" -NotMatch -SimpleMatch)
-        } else {
-            Write-Warning "auto saving the state has been disabled, so set order is a no-op."
-        }
-    }
-
-    [AcmeOrder] FindOrder([string[]] $dnsNames) {
-        $orderListFile = $this.Filenames.OrderList;
-
-        $first = $true;
-        $lastMatch = $null;
-        foreach($dnsName in $dnsNames) {
-            $match = Select-String -Path $orderListFile -Pattern "$dnsName=" -SimpleMatch | Select-Object -Last 1
-            if($first) { $lastMatch = $match; }
-            if($match -ne $lastMatch) { return $null; }
-
-            $lastMatch = $match;
-        }
-
-        $orderHash = ($lastMatch -split "=", 2)[1];
-        return $this.LoadOrder($orderHash);
-    }
-
-
-}
-
 <# abstract #> class AcmeState {
     static [AcmeState] FromPath([string] $path) {
         return [AcmeState]::FromPaths([AcmeStatePaths]::new($path));
@@ -117,11 +25,11 @@ class AcmeStateX {
     <# abstract #> [void] Set([IAccountKey] $value)            { throw [System.NotImplementedException]::new(); }
     <# abstract #> [void] Set([AcmeAccount] $value)            { throw [System.NotImplementedException]::new(); }
 
-    <# abstract #> [AcmeOrder] GetOrder([object] $params)      { throw [System.NotImplementedException]::new(); }
     <# abstract #> [AcmeOrder] FindOrder([string[]] $dnsNames) { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] AddOrder([object] $params)           { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] SetOrder([object] $params)           { throw [System.NotImplementedException]::new(); }
 
+    <# abstract #> [void] AddOrder([AcmeOrder] $order)           { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] SetOrder([AcmeOrder] $order)           { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] RemoveOrder([AcmeOrder] $order)      { throw [System.NotImplementedException]::new(); }
 
     [bool] DirectoryExists() {
         if ($null -eq $this.GetServiceDirectory()) {
@@ -307,20 +215,87 @@ class AcmeDiskPersistedState {
     }
 
     <# Orders #>
-    [AcmeOrder] GetOrder([object] $params) {
-        throw [System.NotImplementedException]::new();
+    hidden [string] GetOrderHash([AcmeOrder] $order) {
+        $orderIdentifiers = $order.Identifiers | Foreach-Object { $_.ToString() } | Sort-Object;
+        $identifier = [string]::Join('|', $orderIdentifiers);
+
+        $sha256 = [System.Security.Cryptography.SHA256]::Create();
+        try {
+            $identifierBytes = [System.Text.Encoding]::UTF8.GetBytes($identifier);
+            $identifierHash = $sha256.ComputeHash($identifierBytes);
+            $result = ConvertTo-UrlBase64 -InputBytes $identifierHash;
+
+            return $result;
+        } finally {
+            $sha256.Dispose();
+        }
+    }
+
+    hidden [string] GetOrderFileName([string] $orderHash) {
+        $fileName = $this.Filenames.Order.Replace("[hash]", $orderHash);
+        return $fileName;
+    }
+
+    hidden [AcmeOrder] LoadOrder([string] $orderHash) {
+        $orderFile = $this.GetOrderFileName($orderHash);
+        if(Test-Path $orderFile) {
+            $order = Import-AcmeObject -Path $orderFile -TypeName "AcmeOrder";
+            return $order;
+        }
+
+        return $null;
+    }
+
+    [AcmeOrder] FindOrder([string[]] $dnsNames) {
+        $orderListFile = $this.Filenames.OrderList;
+
+        $first = $true;
+        $lastMatch = $null;
+        foreach($dnsName in $dnsNames) {
+            $match = Select-String -Path $orderListFile -Pattern "$dnsName=" -SimpleMatch | Select-Object -Last 1
+            if($first) { $lastMatch = $match; }
+            if($match -ne $lastMatch) { return $null; }
+
+            $lastMatch = $match;
+        }
+
+        $orderHash = ($lastMatch -split "=", 2)[1];
+        return $this.LoadOrder($orderHash);
+    }
+
+    [void] AddOrder([AcmeOrder] $order) {
+        $this.SetOrder($order);
     }
     
-    [AcmeOrder] FindOrder([string[]] $dnsNames) {
-        throw [System.NotImplementedException]::new();
+    [void] SetOrder([AcmeOrder] $order) {
+        $orderHash = $this.GetOrderHash($order);
+        $orderFileName = $this.GetOrderFileName($orderHash);
+
+        if(-not (Test-Path $order)) {
+            $orderListFile = $this.Filenames.OrderList;
+
+            foreach ($id in $order.Identifiers) {
+                if(-not (Test-Path $orderListFile)) {
+                    New-Item $orderListFile -Force;
+                }
+
+                "$($id.ToString())=$orderHash" | Add-Content $orderListFile;
+            }
+        }
+
+        $order | Export-AcmeObject $orderFileName -Force;
     }
 
-    [void] AddOrder([object] $params) {
-        throw [System.NotImplementedException]::new();
-    }
+    [void] RemoveOrder([AcmeOrder] $order) {
+        $orderHash = $this.GetOrderHash($order);
+        $orderFileName = $this.GetOrderFileName($orderHash);
 
-    [void] SetOrder([object] $params) {
-        throw [System.NotImplementedException]::new();
+        if(Test-Path $orderFileName) {
+            Remove-Item $orderFileName;
+        }
+
+        $orderListFile = $this.Filenames.OrderList;
+        Set-Content -Path $orderListFile -Value (Get-Content -Path $orderListFile | Select-String -Pattern "=$orderHash" -NotMatch -SimpleMatch)
     }
 }
 
@@ -346,8 +321,22 @@ class AcmeEphemeralState {
     [void] Set([IAccountKey] $value)   { $this.AccountKey = $value; }
     [void] Set([AcmeAccount] $value)   { $this.Account = $value; }
 
-    [AcmeOrder] GetOrder([object] $params) { throw [System.NotImplementedException]::new(); }
-    [AcmeOrder] FindOrder([string[]] $dnsNames) { throw [System.NotImplementedException]::new(); }
-    [void] AddOrder([object] $params) { throw [System.NotImplementedException]::new(); }
-    [void] SetOrder([object] $params) { throw [System.NotImplementedException]::new(); }
+
+    [AcmeOrder] FindOrder([string[]] $dnsNames) {
+        throw [System.NotImplementedException]::new();
+    }
+
+    [void] AddOrder([AcmeOrder] $order) {
+        $this.Orders.Add($order);
+    }
+    
+    [void] SetOrder([AcmeOrder] $order) {
+         if(-not $this.Orders.Contains($order)) {
+            $this.Orders.Add($order);
+         }
+    }
+
+    [void] RemoveOrder([AcmeOrder] $order) {
+        $this.Orders.Remove($order);
+    }
 }
