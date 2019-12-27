@@ -1,7 +1,7 @@
 <# abstract #> class AcmeState {
     static [AcmeState] FromPath([string] $path) {
         $paths = [AcmeStatePaths]::new($path);
-        [AcmeDiskPersistedState]::new($paths, $false, $true);
+        return [AcmeDiskPersistedState]::new($paths, $false, $true);
     }
 
     static [AcmeState] FromPaths([AcmeStatePaths] $paths) {
