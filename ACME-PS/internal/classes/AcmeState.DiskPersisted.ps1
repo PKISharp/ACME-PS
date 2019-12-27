@@ -155,13 +155,8 @@ class AcmeDiskPersistedState {
         }
     }
 
-    hidden [string] GetOrderFileName([string] $orderHash) {
-        $fileName = $this.Filenames.Order.Replace("[hash]", $orderHash);
-        return $fileName;
-    }
-
     hidden [AcmeOrder] LoadOrder([string] $orderHash) {
-        $orderFile = $this.GetOrderFileName($orderHash);
+        $orderFile = $this.Filenames.GetOrderFileName($orderHash);
         if(Test-Path $orderFile) {
             $order = Import-AcmeObject -Path $orderFile -TypeName "AcmeOrder";
             return $order;
@@ -193,7 +188,7 @@ class AcmeDiskPersistedState {
 
     [void] SetOrder([AcmeOrder] $order) {
         $orderHash = $this.GetOrderHash($order);
-        $orderFileName = $this.GetOrderFileName($orderHash);
+        $orderFileName = $this.Filenames.GetOrderFileName($orderHash);
 
         if(-not (Test-Path $order)) {
             $orderListFile = $this.Filenames.OrderList;
@@ -212,7 +207,7 @@ class AcmeDiskPersistedState {
 
     [void] RemoveOrder([AcmeOrder] $order) {
         $orderHash = $this.GetOrderHash($order);
-        $orderFileName = $this.GetOrderFileName($orderHash);
+        $orderFileName = $this.Filenames.GetOrderFileName($orderHash);
 
         if(Test-Path $orderFileName) {
             Remove-Item $orderFileName;

@@ -1,6 +1,6 @@
 <# abstract #> class AcmeState {
     static [AcmeState] FromPath([string] $path) {
-        return [AcmeState]::FromPaths([AcmeStatePaths]::new($path));
+        return FromPaths([AcmeStatePaths]::new($path));
     }
 
     static [AcmeState] FromPaths([AcmeStatePaths] $paths) {
