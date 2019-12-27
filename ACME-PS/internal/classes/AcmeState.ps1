@@ -6,7 +6,7 @@
     }
 
     static Create([string] $fromPath) {
-        $paths = [AcmeStatePaths]::new($Path);
+        $paths = [AcmeStatePaths]::new($fromPath);
         return [AcmeDiskPersistedState]::new($paths, $false, $true);
     }
 
