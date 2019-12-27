@@ -24,7 +24,7 @@ function Set-Account {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State,
 

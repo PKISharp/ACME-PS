@@ -35,7 +35,7 @@ function New-Order {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State,
 

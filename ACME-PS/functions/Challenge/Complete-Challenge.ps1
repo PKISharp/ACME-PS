@@ -31,7 +31,7 @@ function Complete-Challenge {
 
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State
     )

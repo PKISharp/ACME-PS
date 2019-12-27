@@ -32,7 +32,7 @@ function Get-Account {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate("AccountKey")})]
+        [ValidateScript({$_.AccountKeyExists()})]
         [AcmeState]
         $State,
 

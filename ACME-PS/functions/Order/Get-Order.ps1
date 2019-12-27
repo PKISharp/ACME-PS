@@ -28,7 +28,7 @@ function Get-Order {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State
     )
