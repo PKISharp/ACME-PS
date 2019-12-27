@@ -97,7 +97,7 @@ class AcmeDiskPersistedState : AcmeState {
     }
 
     [AcmeAccount] GetAccount() {
-        $fileName = $this.Filenames.AccountKey;
+        $fileName = $this.Filenames.Account;
 
         if(Test-Path $fileName) {
             $result = Import-AcmeObject -Path $fileName -TypeName "AcmeAccount";
