@@ -5,6 +5,10 @@
         }
     }
 
+    static Create([string] $fromPath) {
+        $paths = [AcmeStatePaths]::new($Path);
+        return [AcmeDiskPersistedState]::new($paths, $false, $true);
+    }
 
     <# abstract #> [string]        GetNonce()                  { throw [System.NotImplementedException]::new(); }
     <# abstract #> [AcmeDirectory] GetServiceDirectory()       { throw [System.NotImplementedException]::new(); }
