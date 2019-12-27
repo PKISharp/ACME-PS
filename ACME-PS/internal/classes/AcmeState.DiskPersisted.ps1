@@ -10,7 +10,7 @@ class AcmeStatePaths {
     hidden [string] $Order;
 
     AcmeStatePaths([string] $basePath) {
-        $this.BasePath = Resolve-Path $basePath
+        $this.BasePath = [System.IO.Path]::GetFullPath($basePath);
 
         $this.ServiceDirectory = "$($this.BasePath)/ServiceDirectory.xml";
         $this.Nonce = "$($this.BasePath)/NextNonce.txt";
