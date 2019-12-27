@@ -34,7 +34,7 @@
     [bool] NonceExists() {
         $exists = $this.DirectoryExists();
 
-        if($null -eq $this.Nonce) {
+        if($null -eq $this.GetNonce()) {
             Write-Warning "State does not contain a nonce. Run New-ACMENonce to get one."
             return $false;
         }
@@ -45,7 +45,7 @@
     [bool] AccountKeyExists() {
         $exists = $this.NonceExists();
 
-        if($null -eq $this.AccountKey) {
+        if($null -eq $this.GetAccountKey()) {
             Write-Warning "State does not contain an account key. Run New-ACMEAccountKey to create one."
             return $false;
         }
@@ -56,7 +56,7 @@
     [bool] AccountExists() {
         $exists = $this.AccountKeyExists();
 
-        if($null -eq $this.Account) {
+        if($null -eq $this.GetAccount()) {
             Write-Warning "State does not contain an account. Register one by running New-ACMEAccount."
             return $false;
         }
