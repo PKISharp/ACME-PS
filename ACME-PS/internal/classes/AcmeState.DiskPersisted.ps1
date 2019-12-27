@@ -26,7 +26,7 @@ class AcmeStatePaths {
     }
 }
 
-class AcmeDiskPersistedState {
+class AcmeDiskPersistedState : AcmeState {
     hidden [AcmeStatePaths] $Filenames;
 
     AcmeDiskPersistedState([AcmeStatePaths] $paths, [bool] $createState, [bool] $allowLateInit) {

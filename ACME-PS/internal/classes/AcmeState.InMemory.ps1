@@ -1,4 +1,4 @@
-class AcmeInMemoryState {
+class AcmeInMemoryState : AcmeState {
     [ValidateNotNull()] hidden [AcmeDirectory] $ServiceDirectory;
     [ValidateNotNull()] hidden [string] $Nonce;
     [ValidateNotNull()] hidden [IAccountKey] $AccountKey;
