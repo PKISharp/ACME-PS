@@ -8,7 +8,7 @@
     }
 
 
-    AcmeStateBase() {
+    AcmeState() {
         if ($this.GetType() -eq [AcmeState]) {
             throw [System.InvalidOperationException]::new("This is intended to be abstract - inherit from it.");
         }
