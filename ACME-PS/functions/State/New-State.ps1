@@ -27,7 +27,8 @@ function New-State {
             return [AcmeInMemoryState]::new()
         } else {
             if($PSCmdlet.ShouldProcess("State", "Create new state and save it to $Path")) {
-                return [AcmeState]::FromPath($Path);
+                $paths = [AcmeStatePaths]::new($Path);
+                return [AcmeDiskPersistedState]::new($paths, $false, $true);
             }
         }
     }

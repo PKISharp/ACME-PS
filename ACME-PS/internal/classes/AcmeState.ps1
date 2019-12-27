@@ -1,14 +1,4 @@
 <# abstract #> class AcmeState {
-    static [AcmeState] FromPath([string] $path) {
-        $paths = [AcmeStatePaths]::new($path);
-        return [AcmeDiskPersistedState]::new($paths, $false, $true);
-    }
-
-    static [AcmeState] FromPaths([AcmeStatePaths] $paths) {
-        return [AcmeDiskPersistedState]::new($paths, $false, $true);
-    }
-
-
     AcmeState() {
         if ($this.GetType() -eq [AcmeState]) {
             throw [System.InvalidOperationException]::new("This is intended to be abstract - inherit from it.");
