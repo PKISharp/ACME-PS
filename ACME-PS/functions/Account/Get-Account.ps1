@@ -67,9 +67,5 @@ function Get-Account {
     $response = Invoke-SignedWebRequest -Url $AccountUrl -State $State -Payload @{}
     $result = [AcmeAccount]::new($response, $KeyId);
 
-    if($AutomaticAccountHandling) {
-        Enable-AccountHandling -Account $result;
-    }
-
     return $result;
 }
