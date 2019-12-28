@@ -1,13 +1,9 @@
+[System.ComponentModel.TypeConverter([StringToAcmeStateConverter])]
 <# abstract #> class AcmeState {
     AcmeState() {
         if ($this.GetType() -eq [AcmeState]) {
-            throw [System.InvalidOperationException]::new("This is intended to be abstract - inherit from it.");
+            throw [System.InvalidOperationException]::new("This is intended to be abstract - inherit To it.");
         }
-    }
-
-    static [AcmeState] Create([string] $fromPath) {
-        $paths = [AcmeStatePaths]::new($fromPath);
-        return [AcmeDiskPersistedState]::new($paths, $false, $true);
     }
 
     <# abstract #> [string]        GetNonce()                  { throw [System.NotImplementedException]::new(); }
@@ -66,5 +62,72 @@
         }
 
         return $exists;
+    }
+}
+
+class StringToAcmeStateConverter : System.Management.Automation.PSTypeConverter {
+    hidden [bool] CanConvert([object] $object, [System.Type] $destinationType) {
+        return $object -is [string] -and $destinationType -eq [AcmeState];
+    }
+
+    hidden [AcmeState] Convert([string] $inputString) {
+        $paths = [AcmeStatePaths]::new($inputString);
+        return [AcmeDiskPersistedState]::new($paths, $false, $true);
+    }
+    
+    [bool] CanConvertFrom([object] $object, [Type] $destinationType) {
+        return $this.CanConvert($object, $destinationType);
+    }
+
+    [bool] CanConvertFrom([PSObject] $object, [Type] $destinationType) {
+        return $this.CanConvert($object, $destinationType);
+    }
+
+    [bool] CanConvertTo([object] $object, [Type] $destinationType) {
+        return $this.CanConvert($object, $destinationType);
+    }
+
+    [bool] CanConvertTo([PSObject] $object, [Type] $destinationType) {
+        return $this.CanConvert($object, $destinationType);
+    }
+
+    [object] ConvertFrom([PSObject] $sourceValue, [Type] $destinationType,
+        [IFormatProvider] $formatProvider, [bool] $ignoreCase)
+    {
+        if(-not $this.CanConvert($sourceValue, $destinationType)) {
+            return $null;
+        }
+
+        return Convert([string]$sourceValue)
+    }
+
+    [object] ConvertFrom([object] $sourceValue, [Type] $destinationType,
+        [IFormatProvider] $formatProvider, [bool] $ignoreCase)
+    {
+        if(-not $this.CanConvert($sourceValue, $destinationType)) {
+            return $null;
+        }
+
+        return Convert([string]$sourceValue)
+    }
+
+    [object] ConvertTo([object] $sourceValue, [Type] $destinationType,
+        [IFormatProvider] $formatProvider, [bool] $ignoreCase)
+    {
+        if(-not $this.CanConvert($sourceValue, $destinationType)) {
+            return $null;
+        }
+
+        return Convert([string]$sourceValue)
+    }
+
+    [object] ConvertTo([PSObject] $sourceValue, [Type] $destinationType,
+        [IFormatProvider] $formatProvider, [bool] $ignoreCase)
+    {
+        if(-not $this.CanConvert($sourceValue, $destinationType)) {
+            return $null;
+        }
+
+        return Convert([string]$sourceValue)
     }
 }
