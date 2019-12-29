@@ -66,68 +66,34 @@
 }
 
 class StringToAcmeStateConverter : System.Management.Automation.PSTypeConverter {
-    hidden [bool] CanConvert([object] $object, [System.Type] $destinationType) {
-        return $object -is [string] -and $destinationType -eq [AcmeState];
-    }
-
-    hidden [AcmeState] Convert([string] $inputString) {
-        $paths = [AcmeStatePaths]::new($inputString);
-        return [AcmeDiskPersistedState]::new($paths, $false, $true);
-    }
-    
     [bool] CanConvertFrom([object] $object, [Type] $destinationType) {
-        return $this.CanConvert($object, $destinationType);
-    }
+        if($object -is [string]) {
+            return Test-Path ([string]$object);
+        }
 
-    [bool] CanConvertFrom([PSObject] $object, [Type] $destinationType) {
-        return $this.CanConvert($object, $destinationType);
+        return $false;
     }
 
     [bool] CanConvertTo([object] $object, [Type] $destinationType) {
-        return $this.CanConvert($object, $destinationType);
-    }
-
-    [bool] CanConvertTo([PSObject] $object, [Type] $destinationType) {
-        return $this.CanConvert($object, $destinationType);
-    }
-
-    [object] ConvertFrom([PSObject] $sourceValue, [Type] $destinationType,
-        [IFormatProvider] $formatProvider, [bool] $ignoreCase)
-    {
-        if(-not $this.CanConvert($sourceValue, $destinationType)) {
-            return $null;
-        }
-
-        return Convert([string]$sourceValue)
+        return $false
     }
 
     [object] ConvertFrom([object] $sourceValue, [Type] $destinationType,
         [IFormatProvider] $formatProvider, [bool] $ignoreCase)
     {
-        if(-not $this.CanConvert($sourceValue, $destinationType)) {
-            return $null;
+        if($null -eq $sourceValue) { return $null; }
+
+        if(-not $this.CanConvertFrom($sourceValue, $destinationType)) {
+            throw [System.InvalidCastException]::new();
         }
 
-        return Convert([string]$sourceValue)
+        $paths = [AcmeStatePaths]::new($sourceValue);
+        return [AcmeDiskPersistedState]::new($paths, $false, $true);
     }
 
     [object] ConvertTo([object] $sourceValue, [Type] $destinationType,
         [IFormatProvider] $formatProvider, [bool] $ignoreCase)
     {
-        if(-not $this.CanConvert($sourceValue, $destinationType)) {
-            return $null;
-        }
-
-        return Convert([string]$sourceValue)
-    }
-
-    [object] ConvertTo([PSObject] $sourceValue, [Type] $destinationType,
-        [IFormatProvider] $formatProvider, [bool] $ignoreCase)
-    {
-        if(-not $this.CanConvert($sourceValue, $destinationType)) {
-            return $null;
-        }
-
-        return Convert([string]$sourceValue)
+        throw [System.NotImplementedException]::new();
     }
 }
