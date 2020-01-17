@@ -33,13 +33,16 @@ Copy-Item -Path "$ModuleSourcePath/TypeDefinitions.ps1" -Destination "$ModuleOut
 Write-Information "Copying $ModuleSourcePath/Prerequisites.ps1"
 Copy-Item -Path "$ModuleSourcePath/Prerequisites.ps1" -Destination "$ModuleOutPath/" -Force;
 
+Write-Information "Copying $ModuleSourcePath/Types.ps1xml"
+Copy-Item -Path "$ModuleSourcePath/Types.ps1xml" -Destination "$ModuleOutPath/" -Force;
 
 Import-Module "$PSScriptRoot/ACME-PS" -Force -ErrorAction 'Stop' -Verbose:$false # This will create the All* files.
 
 $ModuleFiles = @(
     "internal/AllClasses.ps1",
     "internal/AllFunctions.ps1",
-    "AllFunctions.ps1"
+    "AllFunctions.ps1",
+    "ModuleSetup.ps1"
 )
 
 Write-Information "Merging Module content files $([string]::Join(", ", $ModuleFiles))"
