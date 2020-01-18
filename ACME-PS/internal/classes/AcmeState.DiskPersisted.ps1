@@ -88,7 +88,7 @@ class AcmeDiskPersistedState : AcmeState {
         $fileName = $this.Filenames.AccountKey;
 
         if(Test-Path $fileName) {
-            $result = Import-AccountKEy -Path $fileName;
+            $result = Import-AccountKey -Path $fileName;
             return $result;
         }
 
@@ -198,7 +198,10 @@ class AcmeDiskPersistedState : AcmeState {
                     New-Item $orderListFile -Force;
                 }
 
-                "$($id.ToString())=$orderHash" | Add-Content $orderListFile;
+                $match = Select-String -Path $orderListFile -Pattern "$($id.ToString())=" -SimpleMatch | Select-Object -Last 1
+                if($null -eq $match) {
+                    "$($id.ToString())=$orderHash" | Add-Content $orderListFile;
+                }
             }
         }
 
