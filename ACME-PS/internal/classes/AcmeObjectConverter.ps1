@@ -1,14 +1,10 @@
-class StringToAcmeStateConverter : System.Management.Automation.PSTypeConverter {
+class AcmeObjectConverter : System.Management.Automation.PSTypeConverter {
     [bool] CanConvertFrom([object] $object, [Type] $destinationType) {
         if($object -is [string]) {
-            return Test-Path ([string]$object);
+            return $destinationType -in @([AcmeState],[AcmeIdentifier]);
         }
 
         return $false;
-    }
-
-    [bool] CanConvertTo([object] $object, [Type] $destinationType) {
-        return $false
     }
 
     [object] ConvertFrom([object] $sourceValue, [Type] $destinationType,
@@ -20,8 +16,22 @@ class StringToAcmeStateConverter : System.Management.Automation.PSTypeConverter 
             throw [System.InvalidCastException]::new();
         }
 
-        $paths = [AcmeStatePaths]::new($sourceValue);
-        return [AcmeDiskPersistedState]::new($paths, $false, $true);
+        if($destinationType -eq [AcmeState]) {
+            $paths = [AcmeStatePaths]::new($sourceValue);
+            return [AcmeDiskPersistedState]::new($paths, $false, $true);
+        }
+
+        if($destinationType -eq [AcmeIdentifier]) {
+            return [AcmeIdentifier]::Parse($sourceValue);
+        }
+
+        # This will only be called, if CanConvertFrom was ignored.
+        throw [System.InvalidCastException]::new();
+    }
+
+
+    [bool] CanConvertTo([object] $object, [Type] $destinationType) {
+        return $false
     }
 
     [object] ConvertTo([object] $sourceValue, [Type] $destinationType,
