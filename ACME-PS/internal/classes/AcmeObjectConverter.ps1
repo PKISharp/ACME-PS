@@ -24,6 +24,9 @@ class AcmeObjectConverter : System.Management.Automation.PSTypeConverter {
         if($destinationType -eq [AcmeIdentifier]) {
             return [AcmeIdentifier]::Parse($sourceValue);
         }
+
+        # This will only be called, if CanConvertFrom was ignored.
+        throw [System.InvalidCastException]::new();
     }
 
 
