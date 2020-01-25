@@ -1,8 +1,14 @@
 <Types>
   <Type>
+    <Name>AcmeIdentifier</Name>
+      <TypeConverter>
+        <TypeName>AcmeObjectConverter</TypeName>
+      </TypeConverter>
+  </Type>
+  <Type>
     <Name>AcmeState</Name>
       <TypeConverter>
-        <TypeName>StringToAcmeStateConverter</TypeName>
+        <TypeName>AcmeObjectConverter</TypeName>
       </TypeConverter>
   </Type>
 </Types>
