@@ -36,7 +36,7 @@ function New-Account {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate("AccountKey")})]
+        [ValidateScript({$_.AccountKeyExists()})]
         [AcmeState]
         $State,
 
@@ -66,7 +66,7 @@ function New-Account {
     $url = $State.GetServiceDirectory().NewAccount;
 
     if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
-        $response = Invoke-SignedWebRequest $url $State $payload -SupressKeyId -ErrorAction 'Stop'
+        $response = Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SupressKeyId -ErrorAction 'Stop'
 
         if($response.StatusCode -eq 200) {
             if(-not $ExistingAccountIsError) {

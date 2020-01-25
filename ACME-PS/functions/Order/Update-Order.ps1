@@ -27,7 +27,7 @@ function Update-Order {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State,
 
@@ -42,7 +42,7 @@ function Update-Order {
     )
 
     if($PSCmdlet.ShouldProcess("Order", "Get updated order form ACME service and store it to state")) {
-        $response = Invoke-SignedWebRequest $Order.ResourceUrl $State;
+        $response = Invoke-SignedWebRequest -Url $Order.ResourceUrl -State $State;
         $Order.UpdateOrder($response);
         $State.SetOrder($Order);
 

@@ -28,11 +28,11 @@ function Get-Order {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State
     )
 
-    $response = Invoke-SignedWebRequest $Url $State;
+    $response = Invoke-SignedWebRequest -Url $Url -State $State;
     return [AcmeOrder]::new($response);
 }

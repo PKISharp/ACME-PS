@@ -33,7 +33,7 @@ function Export-Certificate {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State,
 
@@ -71,7 +71,7 @@ function Export-Certificate {
         }
     }
 
-    $response = Invoke-SignedWebRequest $Order.CertificateUrl $State;
+    $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
     $certificate = $response.Content;
 
     if($PSVersionTable.PSVersion -ge "6.0") {

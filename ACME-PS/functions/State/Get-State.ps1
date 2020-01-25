@@ -25,6 +25,6 @@ function Get-State {
     $ErrorActionPreference = 'Stop';
 
     Write-Verbose "Loading ACME-PS state from $Path";
-    $state = [AcmeState]::FromPath($Path);
-    return $state;
+    $paths = [AcmeStatePaths]::new($Path);
+    return [AcmeDiskPersistedState]::new($paths, $false, $true);
 }

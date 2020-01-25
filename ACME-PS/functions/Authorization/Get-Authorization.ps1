@@ -38,7 +38,7 @@ function Get-Authorization {
 
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State
     )
@@ -49,7 +49,7 @@ function Get-Authorization {
                 $Order.AuthorizationUrls | ForEach-Object { Get-Authorization -Url $_ $State }
             }
             Default {
-                $response = Invoke-SignedWebRequest $Url $State
+                $response = Invoke-SignedWebRequest -Url $Url -State $State
                 return [AcmeAuthorization]::new($response);
             }
         }

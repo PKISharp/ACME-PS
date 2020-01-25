@@ -28,7 +28,7 @@ function Complete-Order {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State,
 
@@ -63,7 +63,7 @@ function Complete-Order {
         $requestUrl = $Order.FinalizeUrl;
 
         if($PSCmdlet.ShouldProcess("Order", "Finalizing order at ACME service by submitting CSR")) {
-            $response = Invoke-SignedWebRequest $requestUrl $State $payload;
+            $response = Invoke-SignedWebRequest -Url $requestUrl -State $State -Payload $payload;
 
             $Order.UpdateOrder($response);
         }

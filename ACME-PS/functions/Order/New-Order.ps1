@@ -35,7 +35,7 @@ function New-Order {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State,
 
@@ -78,7 +78,7 @@ function New-Order {
     }
 
     if($PSCmdlet.ShouldProcess("Order", "Create new order with ACME Service")) {
-        $response = Invoke-SignedWebRequest $requestUrl $State $payload;
+        $response = Invoke-SignedWebRequest -Url $requestUrl -State $State -Payload $payload;
 
         $order = [AcmeOrder]::new($response, $csrOptions);
         $state.AddOrder($order);

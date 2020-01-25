@@ -1,0 +1,8 @@
+<Types>
+  <Type>
+    <Name>AcmeState</Name>
+      <TypeConverter>
+        <TypeName>StringToAcmeStateConverter</TypeName>
+      </TypeConverter>
+  </Type>
+</Types>

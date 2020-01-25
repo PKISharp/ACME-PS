@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.1.2'
+	ModuleVersion = '1.1.3'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -48,6 +48,7 @@
 		"New-Nonce",
 
 		"Complete-Order",
+		"Find-Order",
 		"Get-Order",
 		"New-Identifier",
 		"New-Order",

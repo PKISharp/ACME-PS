@@ -31,7 +31,7 @@ function Complete-Challenge {
 
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate()})]
+        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State
     )
@@ -40,7 +40,7 @@ function Complete-Challenge {
         $payload = @{};
 
         if($PSCmdlet.ShouldProcess("Challenge", "Complete challenge by submitting completion to ACME service")) {
-            $response = Invoke-SignedWebRequest $Challenge.Url $State $payload;
+            $response = Invoke-SignedWebRequest -Url $Challenge.Url -State $State -Payload $payload;
 
             return [AcmeChallenge]::new($response, $Challenge.Identifier);
         }

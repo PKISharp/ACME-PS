@@ -24,10 +24,11 @@ function New-State {
     process {
         if(-not $Path) {
             Write-Warning "You did not provide a persistency path. State will not be saved automatically."
-            return [AcmeState]::new()
+            return [AcmeInMemoryState]::new()
         } else {
             if($PSCmdlet.ShouldProcess("State", "Create new state and save it to $Path")) {
-                return [AcmeState]::new($Path, $true);
+                $paths = [AcmeStatePaths]::new($Path);
+                return [AcmeDiskPersistedState]::new($paths, $true, $true);
             }
         }
     }

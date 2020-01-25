@@ -23,7 +23,7 @@ function New-Nonce {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [ValidateScript({$_.Validate("ServiceDirectory")})]
+        [ValidateScript({$_.DirectoryExists()})]
         [AcmeState]
         $State,
 
