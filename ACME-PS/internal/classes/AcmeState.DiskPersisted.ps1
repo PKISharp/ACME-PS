@@ -182,6 +182,10 @@ class AcmeDiskPersistedState : AcmeState {
         return $this.LoadOrder($orderHash);
     }
 
+    [AcmeOrder] FindOrder([AcmeIdentifier[]] $identifiers) {
+        return $this.FindOrder($identifiers | %{ $_.ToString() });
+    }
+
     [void] AddOrder([AcmeOrder] $order) {
         $this.SetOrder($order);
     }

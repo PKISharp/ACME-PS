@@ -5,21 +5,22 @@
         }
     }
 
-    <# abstract #> [string]        GetNonce()                  { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [AcmeDirectory] GetServiceDirectory()       { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [IAccountKey]   GetAccountKey()             { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [AcmeAccount]   GetAccount()                { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [string]        GetNonce()            { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmeDirectory] GetServiceDirectory() { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [IAccountKey]   GetAccountKey()       { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmeAccount]   GetAccount()          { throw [System.NotImplementedException]::new(); }
 
-    <# abstract #> [void] SetNonce([string] $value)            { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] Set([AcmeDirectory] $value)          { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] Set([IAccountKey] $value)            { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] Set([AcmeAccount] $value)            { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] SetNonce([string] $value)   { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([AcmeDirectory] $value) { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([IAccountKey] $value)   { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([AcmeAccount] $value)   { throw [System.NotImplementedException]::new(); }
 
-    <# abstract #> [AcmeOrder] FindOrder([string[]] $dnsNames) { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmeOrder] FindOrder([string[]] $dnsNames)          { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmeOrder] FindOrder([AcmeIdentifier] $identifiers) { throw [System.NotImplementedException]::new(); }
 
-    <# abstract #> [void] AddOrder([AcmeOrder] $order)           { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] SetOrder([AcmeOrder] $order)           { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] RemoveOrder([AcmeOrder] $order)      { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] AddOrder([AcmeOrder] $order)    { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] SetOrder([AcmeOrder] $order)    { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] RemoveOrder([AcmeOrder] $order) { throw [System.NotImplementedException]::new(); }
 
     [bool] DirectoryExists() {
         if ($null -eq $this.GetServiceDirectory()) {
