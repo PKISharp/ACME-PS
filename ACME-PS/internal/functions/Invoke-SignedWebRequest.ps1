@@ -14,7 +14,10 @@ function Invoke-SignedWebRequest {
         [object] $Payload = "",
 
         [Parameter()]
-        [switch] $SupressKeyId
+        [switch] $SupressKeyId,
+
+        [Parameter()]
+        [switch] $SkipRetryOnNonceError
     )
 
     process {
@@ -26,12 +29,18 @@ function Invoke-SignedWebRequest {
         $requestBody = New-SignedMessage -Url $Url -SigningKey $accountKey -KeyId $keyId -Nonce $nonce -Payload $Payload
         $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST -ErrorAction 'Continue'
 
-        if($null -ne $response -and $response.NextNonce) {
+        if($response.NextNonce) {
             $State.SetNonce($response.NextNonce);
+
+            if($response.IsError -and -not $SkipRetryOnNonceError) {
+                if($response.Content.Type -eq "urn:ietf:params:acme:error:badNonce") {
+                    return Invoke-SignedWebRequest -Url $Url -State $State -Payload $Payload -SuppressKeyId:$SupressKeyId.IsPresent -SkipRetryOnNonceError;
+                }
+            }
         }
 
         if($response.IsError) {
-            throw "$($response.ErrorMessage)`n$($response.Content)";
+            throw [AcmeException]::new($respone.ErrorMessage, $response)
         }
 
         return $response;

@@ -61,6 +61,7 @@ $classes = @(
     "crypto/KeyAuthorization",
     "crypto/AlgorithmFactory",
     "AcmeHttpResponse",
+    "AcmeException",
     "AcmeDirectory",
     "AcmeAccount",
     "AcmeIdentifier",
