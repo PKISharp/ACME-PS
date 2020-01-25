@@ -1,10 +1,11 @@
 function Find-Order {
     <#
         .SYNOPSIS
-            Fetches an order from acme service
+            Finds a saved order in the state object and returns it.
 
         .DESCRIPTION
-            Uses the given url to fetch an existing order object from the acme service.
+            Uses the given strings (hostname or type:hostname) or identifiers to find the latest matching
+            order in the given state object. If the order cannot be found, it'll return $null.
 
 
         .PARAMETER State
