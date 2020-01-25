@@ -165,13 +165,13 @@ class AcmeDiskPersistedState : AcmeState {
         return $null;
     }
 
-    [AcmeOrder] FindOrder([string[]] $dnsNames) {
+    [AcmeOrder] FindOrder([string[]] $names) {
         $orderListFile = $this.Filenames.OrderList;
 
         $first = $true;
         $lastMatch = $null;
-        foreach($dnsName in $dnsNames) {
-            $match = Select-String -Path $orderListFile -Pattern "$dnsName=" -SimpleMatch | Select-Object -Last 1
+        foreach($name in $names) {
+            $match = Select-String -Path $orderListFile -Pattern "$name=" -SimpleMatch | Select-Object -Last 1
             if($first) { $lastMatch = $match; }
             if($match -ne $lastMatch) { return $null; }
 
@@ -183,7 +183,8 @@ class AcmeDiskPersistedState : AcmeState {
     }
 
     [AcmeOrder] FindOrder([AcmeIdentifier[]] $identifiers) {
-        return $this.FindOrder($identifiers | %{ $_.ToString() });
+        $names = $identifiers | ForEach-Object { $_.ToString() };
+        return $this.FindOrder($names);
     }
 
     [void] AddOrder([AcmeOrder] $order) {
