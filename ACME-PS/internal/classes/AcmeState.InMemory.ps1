@@ -21,10 +21,6 @@ class AcmeInMemoryState : AcmeState {
     [void] Set([AcmeAccount] $value)   { $this.Account = $value; }
 
 
-    [AcmeOrder] FindOrder([string[]] $dnsNames) {
-        throw [System.NotImplementedException]::new();
-    }
-
     [void] AddOrder([AcmeOrder] $order) {
         $this.Orders.Add($order);
     }
