@@ -5,6 +5,11 @@
         }
     }
 
+    static [AcmeState] Parse([string] $stringValue) {
+        $paths = [AcmeStatePaths]::new($stringValue);
+        return [AcmeDiskPersistedState]::new($paths, $false, $true);
+    }
+
     <# abstract #> [string]        GetNonce()            { throw [System.NotImplementedException]::new(); }
     <# abstract #> [AcmeDirectory] GetServiceDirectory() { throw [System.NotImplementedException]::new(); }
     <# abstract #> [IAccountKey]   GetAccountKey()       { throw [System.NotImplementedException]::new(); }
