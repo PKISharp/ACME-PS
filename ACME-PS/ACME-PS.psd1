@@ -48,6 +48,7 @@
 		"New-Nonce",
 
 		"Complete-Order",
+		"Find-Order",
 		"Get-Order",
 		"New-Identifier",
 		"New-Order",
