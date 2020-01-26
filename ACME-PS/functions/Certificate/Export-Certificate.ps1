@@ -58,7 +58,11 @@ function Export-Certificate {
 
         [Parameter()]
         [switch]
-        $Force
+        $Force,
+
+        [Parameter()]
+        [switch]
+        $IgnoreSavedCertificate
     )
 
     $ErrorActionPreference = 'Stop'
@@ -79,8 +83,18 @@ function Export-Certificate {
         }
     }
 
-    $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
-    $certificate = $response.Content;
+    if(-not $IgnoreSavedCertificate) {
+        $certificate = $State.GetOrderCertificate($Order);
+    }
+
+    if($null -ne $certificate) {
+        $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
+        $certificate = $response.Content;
+
+        if(-not $IgnoreSavedCertificate) {
+            $State.SetOrderCertificate($Order);
+        }
+    }
 
     if($PSVersionTable.PSVersion -ge "6.0") {
         $CertificateKey.ExportPfx($certificate, $Password) | Set-Content $Path -AsByteStream

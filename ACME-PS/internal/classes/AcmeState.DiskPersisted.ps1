@@ -29,6 +29,11 @@ class AcmeStatePaths {
         $orderFilename = $this.GetOrderFilename($orderHash);
         return [System.IO.Path]::ChangeExtension($orderFilename, "key.xml");
     }
+
+    [string] GetOrderCertificateFilename([string] $orderHash) {
+        $orderFilename = $this.GetOrderFilename($orderHash);
+        return [System.IO.Path]::ChangeExtension($orderFilename, "pem");
+    }
 }
 
 class AcmeDiskPersistedState : AcmeState {
@@ -230,6 +235,7 @@ class AcmeDiskPersistedState : AcmeState {
         Set-Content -Path $orderListFile -Value (Get-Content -Path $orderListFile | Select-String -Pattern "=$orderHash" -NotMatch -SimpleMatch)
     }
 
+
     [ICertificateKey] GetOrderCertificateKey([AcmeOrder] $order) {
         $orderHash = $this.GetOrderHash($order);
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
@@ -247,4 +253,36 @@ class AcmeDiskPersistedState : AcmeState {
         
         $certificateKey | Export-CertificateKey -Path $certKeyFilename
     }
+
+
+    [byte[]] GetOrderCertificate([AcmeOrder] $order) {
+        $orderHash = $this.GetOrderHash($order);
+        $certFilename = $this.Filenames.GetOrderCertificateFilename($orderHash);
+        
+        if(Test-Path $certFilename) {
+            if($PSVersionTable.PSVersion -ge "6.0") {
+                return Get-Content -Path $certFilename -AsByteStream;
+            } else {
+                return Get-Content -Path $certFilename -Encoding Byte;
+            }
+        }
+
+        return $null;
+    }
+
+    [void] SetOrderCertificate([AcmeOrder] $order, [byte[]] $certificate) {
+        $orderHash = $this.GetOrderHash($order);
+        $certFilename = $this.Filenames.GetOrderCertificateFilename($orderHash);
+
+        if(Test-Path $certFilename) {
+            Clear-Content $certFilename;
+        }
+
+        if($PSVersionTable.PSVersion -ge "6.0") {
+            $certificate | Set-Content $certFilename -AsByteStream;
+        } else {
+            $certificate | Set-Content $certFilename -Encoding Byte;
+        }
+    }
+
 }
