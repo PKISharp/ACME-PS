@@ -42,7 +42,7 @@ function Export-Certificate {
         [AcmeOrder]
         $Order,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateNotNull()]
         [ICertificateKey]
         $CertificateKey,
@@ -62,6 +62,14 @@ function Export-Certificate {
     )
 
     $ErrorActionPreference = 'Stop'
+
+    if($null -eq $CertificateKey) {
+        $CertificateKey = $State.GetOrderCertificateKey($Order);
+
+        if($null -eq $CertificateKey) {
+            throw 'Need $CertificateKey to be provided or present in $Order and $State respectively'
+        }
+    }
 
     if(Test-Path $Path) {
         if($Force) {
