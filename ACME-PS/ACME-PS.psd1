@@ -23,6 +23,7 @@
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
+		"Disable-Account",
 		"Find-Account",
 		"Get-Account",
 		"New-Account",
@@ -35,6 +36,7 @@
 		"Get-Authorization",
 
 		"Export-Certificate",
+		"Revoke-Certificate",
 
 		"Export-CertificateKey",
 		"Import-CertificateKey",
@@ -80,7 +82,7 @@
 			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACMESharpCore-PowerShell/releases'
 
 			# Prerelase
-			# Prerelease = 'beta'
+			Prerelease = 'beta4'
 		} # End of PSData hashtable
 
 	} # End of PrivateData hashtable
