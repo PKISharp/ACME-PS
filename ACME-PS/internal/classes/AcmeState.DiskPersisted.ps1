@@ -10,15 +10,15 @@ class AcmeStatePaths {
     hidden [string] $Order;
 
     AcmeStatePaths([string] $basePath) {
-        $this.BasePath = [System.IO.Path]::GetFullPath($basePath);
+        $this.BasePath = [System.IO.Path]::GetFullPath($basePath).TrimEnd('/', '\');
 
-        $this.ServiceDirectory = "$($this.BasePath)/ServiceDirectory.xml";
-        $this.Nonce = "$($this.BasePath)/NextNonce.txt";
-        $this.AccountKey = "$($this.BasePath)AccountKey.xml";
-        $this.Account = "$($this.BasePath)Account.xml";
+        $this.ServiceDirectory = [System.IO.Path]::Combine($this.BasePath, "ServiceDirectory.xml");
+        $this.Nonce = [System.IO.Path]::Combine($this.BasePath, "NextNonce.txt");
+        $this.AccountKey = [System.IO.Path]::Combine($this.BasePath, "AccountKey.xml");
+        $this.Account = [System.IO.Path]::Combine($this.BasePath, "Account.xml");
 
-        $this.OrderList = "$($this.BasePath)Orders/OrderList.txt"
-        $this.Order = "$($this.BasePath)Orders/Order-[hash].xml";
+        $this.OrderList = [System.IO.Path]::Combine($this.BasePath, "Orders", "OrderList.txt");
+        $this.Order = [System.IO.Path]::Combine($this.BasePath, "Orders", "Order-[hash].xml");
     }
 
     [string] GetOrderFilename([string] $orderHash) {
