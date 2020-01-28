@@ -17,7 +17,7 @@ function Revoke-Certificate {
         .EXAMPLE
             PS> Revoke-Certificate -State $myState -Order $myOrder
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='High')]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
@@ -37,7 +37,7 @@ function Revoke-Certificate {
     $url = $State.GetServiceDirectory().RevokeCert;
     $payload = @{ "certificate" = $base64Certificate };
 
-    if($PSCmdlet.ShouldContinue("Certificate", "Revoking certificate.")) {
+    if($PSCmdlet.ShouldProcess("Certificate", "Revoking certificate.")) {
         Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;
     }
 }
