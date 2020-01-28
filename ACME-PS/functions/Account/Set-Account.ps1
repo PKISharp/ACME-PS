@@ -16,11 +16,13 @@ function Set-Account {
         .PARAMETER NewAccountKey
             New account key to be associated with the account.
 
+        .PARAMETER DisableAccount
+            If set, the account will be disabled and thus not be usable with the acme-service anymore.
 
         .EXAMPLE
             PS> Set-Account -State $myState -NewAccountKey $myNewAccountKey
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='High')]
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
@@ -33,22 +35,42 @@ function Set-Account {
         $PassThru,
 
         [Parameter(Mandatory = $true, ParameterSetName="NewAccountKey")]
-        [IAccountKey] $NewAccountKey
+        [IAccountKey]
+        $NewAccountKey,
+
+        [Parameter(Mandatory = $true, ParameterSetName="DisableAccount")]
+        [switch]
+        $DisableAccount
     )
 
-    $innerPayload = @{
-        "account" = $State.GetAccount().KeyId;
-        "oldKey" = $State.GetAccountKey().ExportPuplicKey()
-    };
+    switch ($PSCmdlet.ParameterSetName) {
+        "NewAccountKey" {
+            $innerPayload = @{
+                "account" = $State.GetAccount().KeyId;
+                "oldKey" = $State.GetAccountKey().ExportPuplicKey()
+            };
 
-    $payload = New-SignedMessage -Url $Url -SigningKey $NewAccountKey -Payload $innerPayload;
+            $payload = New-SignedMessage -Url $Url -SigningKey $NewAccountKey -Payload $innerPayload;
+            $message = "Set new account key and store it into state?";
+        }
 
-    if($PSCmdlet.ShouldProcess("Account", "Set new AccountKey and store it into state")) {
-        Invoke-SignedWebRequest -Url $Url -State $State -Payload $payload -ErrorAction 'Stop';
+        "DisableAccount" {
+            $payload = @{"status"= "deactivated"};
+            $message = "Disable account? - This is irrevocable!"
+        }
 
-        $State.Set($NewAccountKey);
-        $account = Get-Account -Url $TargetAccount.ResourceUrl -State $State -KeyId $Account.KeyId
+        Default {
+            return;
+        }
+    }
 
+    if($PSCmdlet.ShouldProcess("Account", $message)) {
+        $response = Invoke-SignedWebRequest -Url $Url -State $State -Payload $payload -ErrorAction 'Stop';
+        $keyId = $State.GetAccount().KeyId;
+
+        $account = [AcmeAccount]::new($response, $keyId);
+
+        if($null -ne $NewAccountKey) { $State.Set($NewAccountKey); }
         $State.Set($account);
 
         if($PassThru) {

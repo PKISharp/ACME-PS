@@ -10,19 +10,29 @@ class AcmeStatePaths {
     hidden [string] $Order;
 
     AcmeStatePaths([string] $basePath) {
-        $this.BasePath = [System.IO.Path]::GetFullPath($basePath);
+        $this.BasePath = [System.IO.Path]::GetFullPath($basePath).TrimEnd('/', '\');
 
-        $this.ServiceDirectory = "$($this.BasePath)/ServiceDirectory.xml";
-        $this.Nonce = "$($this.BasePath)/NextNonce.txt";
-        $this.AccountKey = "$($this.BasePath)AccountKey.xml";
-        $this.Account = "$($this.BasePath)Account.xml";
+        $this.ServiceDirectory = [System.IO.Path]::Combine($this.BasePath, "ServiceDirectory.xml");
+        $this.Nonce = [System.IO.Path]::Combine($this.BasePath, "NextNonce.txt");
+        $this.AccountKey = [System.IO.Path]::Combine($this.BasePath, "AccountKey.xml");
+        $this.Account = [System.IO.Path]::Combine($this.BasePath, "Account.xml");
 
-        $this.OrderList = "$($this.BasePath)Orders/OrderList.txt"
-        $this.Order = "$($this.BasePath)Orders/Order-[hash].xml";
+        $this.OrderList = [System.IO.Path]::Combine($this.BasePath, "Orders", "OrderList.txt");
+        $this.Order = [System.IO.Path]::Combine($this.BasePath, "Orders", "Order-[hash].xml");
     }
 
-    [string] GetOrderFileName([string] $orderHash) {
+    [string] GetOrderFilename([string] $orderHash) {
         return $this.Order.Replace("[hash]", $orderHash);
+    }
+
+    [string] GetOrderCertificateKeyFilename([string] $orderHash) {
+        $orderFilename = $this.GetOrderFilename($orderHash);
+        return [System.IO.Path]::ChangeExtension($orderFilename, "key.xml");
+    }
+
+    [string] GetOrderCertificateFilename([string] $orderHash) {
+        $orderFilename = $this.GetOrderFilename($orderHash);
+        return [System.IO.Path]::ChangeExtension($orderFilename, "pem");
     }
 }
 
@@ -156,7 +166,7 @@ class AcmeDiskPersistedState : AcmeState {
     }
 
     hidden [AcmeOrder] LoadOrder([string] $orderHash) {
-        $orderFile = $this.Filenames.GetOrderFileName($orderHash);
+        $orderFile = $this.Filenames.GetOrderFilename($orderHash);
         if(Test-Path $orderFile) {
             $order = Import-AcmeObject -Path $orderFile -TypeName "AcmeOrder";
             return $order;
@@ -193,7 +203,7 @@ class AcmeDiskPersistedState : AcmeState {
 
     [void] SetOrder([AcmeOrder] $order) {
         $orderHash = $this.GetOrderHash($order);
-        $orderFileName = $this.Filenames.GetOrderFileName($orderHash);
+        $orderFileName = $this.Filenames.GetOrderFilename($orderHash);
 
         if(-not (Test-Path $order)) {
             $orderListFile = $this.Filenames.OrderList;
@@ -215,7 +225,7 @@ class AcmeDiskPersistedState : AcmeState {
 
     [void] RemoveOrder([AcmeOrder] $order) {
         $orderHash = $this.GetOrderHash($order);
-        $orderFileName = $this.Filenames.GetOrderFileName($orderHash);
+        $orderFileName = $this.Filenames.GetOrderFilename($orderHash);
 
         if(Test-Path $orderFileName) {
             Remove-Item $orderFileName;
@@ -224,4 +234,55 @@ class AcmeDiskPersistedState : AcmeState {
         $orderListFile = $this.Filenames.OrderList;
         Set-Content -Path $orderListFile -Value (Get-Content -Path $orderListFile | Select-String -Pattern "=$orderHash" -NotMatch -SimpleMatch)
     }
+
+
+    [ICertificateKey] GetOrderCertificateKey([AcmeOrder] $order) {
+        $orderHash = $this.GetOrderHash($order);
+        $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
+        
+        if(Test-Path $certKeyFilename) {
+            return (Import-CertificateKey -Path $certKeyFilename);
+        }
+
+        return $null;
+    }
+
+    [void] SetOrderCertificateKey([AcmeOrder] $order, [ICertificateKey] $certificateKey) {
+        $orderHash = $this.GetOrderHash($order);
+        $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
+        
+        $certificateKey | Export-CertificateKey -Path $certKeyFilename
+    }
+
+
+    [byte[]] GetOrderCertificate([AcmeOrder] $order) {
+        $orderHash = $this.GetOrderHash($order);
+        $certFilename = $this.Filenames.GetOrderCertificateFilename($orderHash);
+        
+        if(Test-Path $certFilename) {
+            if($PSVersionTable.PSVersion -ge "6.0") {
+                return Get-Content -Path $certFilename -AsByteStream;
+            } else {
+                return Get-Content -Path $certFilename -Encoding Byte;
+            }
+        }
+
+        return $null;
+    }
+
+    [void] SetOrderCertificate([AcmeOrder] $order, [byte[]] $certificate) {
+        $orderHash = $this.GetOrderHash($order);
+        $certFilename = $this.Filenames.GetOrderCertificateFilename($orderHash);
+
+        if(Test-Path $certFilename) {
+            Clear-Content $certFilename;
+        }
+
+        if($PSVersionTable.PSVersion -ge "6.0") {
+            $certificate | Set-Content $certFilename -AsByteStream;
+        } else {
+            $certificate | Set-Content $certFilename -Encoding Byte;
+        }
+    }
+
 }
