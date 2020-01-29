@@ -149,22 +149,6 @@ class AcmeDiskPersistedState : AcmeState {
     }
 
     <# Orders #>
-    hidden [string] GetOrderHash([AcmeOrder] $order) {
-        $orderIdentifiers = $order.Identifiers | Foreach-Object { $_.ToString() } | Sort-Object;
-        $identifier = [string]::Join('|', $orderIdentifiers);
-
-        $sha256 = [System.Security.Cryptography.SHA256]::Create();
-        try {
-            $identifierBytes = [System.Text.Encoding]::UTF8.GetBytes($identifier);
-            $identifierHash = $sha256.ComputeHash($identifierBytes);
-            $result = ConvertTo-UrlBase64 -InputBytes $identifierHash;
-
-            return $result;
-        } finally {
-            $sha256.Dispose();
-        }
-    }
-
     hidden [AcmeOrder] LoadOrder([string] $orderHash) {
         $orderFile = $this.Filenames.GetOrderFilename($orderHash);
         if(Test-Path $orderFile) {
@@ -202,7 +186,7 @@ class AcmeDiskPersistedState : AcmeState {
     }
 
     [void] SetOrder([AcmeOrder] $order) {
-        $orderHash = $this.GetOrderHash($order);
+        $orderHash = $order.GetHashString();
         $orderFileName = $this.Filenames.GetOrderFilename($orderHash);
 
         if(-not (Test-Path $order)) {
@@ -224,7 +208,7 @@ class AcmeDiskPersistedState : AcmeState {
     }
 
     [void] RemoveOrder([AcmeOrder] $order) {
-        $orderHash = $this.GetOrderHash($order);
+        $orderHash = $order.GetHashString();
         $orderFileName = $this.Filenames.GetOrderFilename($orderHash);
 
         if(Test-Path $orderFileName) {
@@ -237,7 +221,7 @@ class AcmeDiskPersistedState : AcmeState {
 
 
     [ICertificateKey] GetOrderCertificateKey([AcmeOrder] $order) {
-        $orderHash = $this.GetOrderHash($order);
+        $orderHash = $order.GetHashString();
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
         
         if(Test-Path $certKeyFilename) {
@@ -248,7 +232,7 @@ class AcmeDiskPersistedState : AcmeState {
     }
 
     [void] SetOrderCertificateKey([AcmeOrder] $order, [ICertificateKey] $certificateKey) {
-        $orderHash = $this.GetOrderHash($order);
+        $orderHash = $order.GetHashString();
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
         
         $certificateKey | Export-CertificateKey -Path $certKeyFilename
@@ -256,14 +240,14 @@ class AcmeDiskPersistedState : AcmeState {
 
 
     [byte[]] GetOrderCertificate([AcmeOrder] $order) {
-        $orderHash = $this.GetOrderHash($order);
+        $orderHash = $order.GetHashString();
         $certFilename = $this.Filenames.GetOrderCertificateFilename($orderHash);
 
         return Get-ByteContent -Path $certFilename;
     }
 
     [void] SetOrderCertificate([AcmeOrder] $order, [byte[]] $certificate) {
-        $orderHash = $this.GetOrderHash($order);
+        $orderHash = $order.GetHashString();
         $certFilename = $this.Filenames.GetOrderCertificateFilename($orderHash);
 
         Set-ByteContent -Path $certFilename -Content $certificate;

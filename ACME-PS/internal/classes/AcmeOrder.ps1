@@ -37,6 +37,25 @@ class AcmeOrder {
         }
     }
 
+
+    [string] $ResourceUrl;
+
+    [string] $Status;
+    [string] $Expires;
+
+    [Nullable[System.DateTimeOffset]] $NotBefore;
+    [Nullable[System.DateTimeOffset]] $NotAfter;
+
+    [AcmeIdentifier[]] $Identifiers;
+
+    [string[]] $AuthorizationUrls;
+    [string] $FinalizeUrl;
+
+    [string] $CertificateUrl;
+
+    [AcmeCsrOptions] $CSROptions;
+
+
     [void] UpdateOrder([AcmeHttpResponse] $httpResponse) {
         $this.Status = $httpResponse.Content.Status;
         $this.Expires  = $httpResponse.Content.Expires;
@@ -58,20 +77,19 @@ class AcmeOrder {
         }
     }
 
-    [string] $ResourceUrl;
+    [string] GetHashString() {
+        $orderIdentifiers = $this.Identifiers | ForEach-Object { $_.ToString() } | Sort-Object;
+        $plainValues = "$($this.ResourceUrl)|$([string]::Join('|', $orderIdentifiers))";
 
-    [string] $Status;
-    [string] $Expires;
+        $sha256 = [System.Security.Cryptography.SHA256]::Create();
+        try {
+            $plainBytes = [System.Text.Encoding]::UTF8.GetBytes($plainValues);
+            $hashBytes = $sha256.ComputeHash($plainBytes);
+            $hashString = ConvertTo-UrlBase64 -InputBytes $hashBytes;
 
-    [Nullable[System.DateTimeOffset]] $NotBefore;
-    [Nullable[System.DateTimeOffset]] $NotAfter;
-
-    [AcmeIdentifier[]] $Identifiers;
-
-    [string[]] $AuthorizationUrls;
-    [string] $FinalizeUrl;
-
-    [string] $CertificateUrl;
-
-    [AcmeCsrOptions] $CSROptions;
+            return $hashString;
+        } finally {
+            $sha256.Dispose();
+        }
+    }
 }
