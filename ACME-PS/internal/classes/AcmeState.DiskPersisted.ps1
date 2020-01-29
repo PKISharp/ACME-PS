@@ -258,31 +258,15 @@ class AcmeDiskPersistedState : AcmeState {
     [byte[]] GetOrderCertificate([AcmeOrder] $order) {
         $orderHash = $this.GetOrderHash($order);
         $certFilename = $this.Filenames.GetOrderCertificateFilename($orderHash);
-        
-        if(Test-Path $certFilename) {
-            if($PSVersionTable.PSVersion -ge "6.0") {
-                return Get-Content -Path $certFilename -AsByteStream;
-            } else {
-                return Get-Content -Path $certFilename -Encoding Byte;
-            }
-        }
 
-        return $null;
+        return Get-ByteContent -Path $certFilename;
     }
 
     [void] SetOrderCertificate([AcmeOrder] $order, [byte[]] $certificate) {
         $orderHash = $this.GetOrderHash($order);
         $certFilename = $this.Filenames.GetOrderCertificateFilename($orderHash);
 
-        if(Test-Path $certFilename) {
-            Clear-Content $certFilename;
-        }
-
-        if($PSVersionTable.PSVersion -ge "6.0") {
-            $certificate | Set-Content $certFilename -AsByteStream;
-        } else {
-            $certificate | Set-Content $certFilename -Encoding Byte;
-        }
+        Set-ByteContent -Path $certFilename -Content $certificate;
     }
 
 }

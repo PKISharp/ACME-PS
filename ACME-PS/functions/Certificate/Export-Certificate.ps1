@@ -76,9 +76,7 @@ function Export-Certificate {
     }
 
     if(Test-Path $Path) {
-        if($Force) {
-            Clear-Content $Path;
-        } else {
+        if(!$Force) {
             throw "$Path does already exist."
         }
     }
@@ -96,9 +94,5 @@ function Export-Certificate {
         }
     }
 
-    if($PSVersionTable.PSVersion -ge "6.0") {
-        $CertificateKey.ExportPfx($certificate, $Password) | Set-Content $Path -AsByteStream
-    } else {
-        $CertificateKey.ExportPfx($certificate, $Password) | Set-Content $Path -Encoding Byte
-    }
+    Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
 }
