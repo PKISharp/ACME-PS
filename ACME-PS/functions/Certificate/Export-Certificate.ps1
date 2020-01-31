@@ -26,6 +26,8 @@ function Export-Certificate {
         .PARAMETER Force
             Allows the operation to override existing a certificate.
 
+        .PARAMETER SkipExistingCertificate
+            Forces the operation to reload the certificate from the acme service.
 
         .EXAMPLE
             PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
@@ -62,7 +64,7 @@ function Export-Certificate {
 
         [Parameter()]
         [switch]
-        $IgnoreSavedCertificate
+        $SkipExistingCertificate
     )
 
     $ErrorActionPreference = 'Stop'
@@ -81,17 +83,15 @@ function Export-Certificate {
         }
     }
 
-    if(-not $IgnoreSavedCertificate) {
+    if(-not $SkipExistingCertificate) {
         $certificate = $State.GetOrderCertificate($Order);
     }
 
-    if($null -ne $certificate) {
+    if($null -eq $certificate) {
         $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
         $certificate = $response.Content;
 
-        if(-not $IgnoreSavedCertificate) {
-            $State.SetOrderCertificate($Order);
-        }
+        $State.SetOrderCertificate($Order);
     }
 
     Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
