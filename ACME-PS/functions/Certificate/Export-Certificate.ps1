@@ -91,7 +91,7 @@ function Export-Certificate {
         $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
         $certificate = $response.Content;
 
-        $State.SetOrderCertificate($Order);
+        $State.SetOrderCertificate($Order, $certificate);
     }
 
     Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
