@@ -61,8 +61,8 @@ versions of ACME-Servers.
 
 ## Samples
 
-This repoository contains a collection of [samples](samples/).  
-You'll find a description of all samples in the [README.md](/samples/README.md).
+This repoository contains a collection of [samples](./samples/).  
+You'll find a description of all samples in the [README.md](./samples/README.md).
 
 These samples can be used to create an ACME account, create an order, fullfill a http-01 challenge and issue a certificate for using it.
 
