@@ -8,3 +8,7 @@ If you want to know more about the used commands, refer to `Get-Help`
 ## Create an new account [./CreateAccount.ps1]
 
 The sample will create a state object, an account key and register an account with the acme service.
+
+## Create a new order [./CreateOrder.ps1]
+
+The sample will create orders with single and multiple dns names. 

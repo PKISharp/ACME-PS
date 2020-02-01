@@ -1,4 +1,4 @@
-# -- Variables --
+<# -- Variables -- #>
 
 # ServiceName (valid names are LetsEncrypt and LetsEncrypt-Stagign, use the latter one for testing your scripts).
 $acmeServiceName = "LetsEncrypt-Staging";
@@ -6,10 +6,12 @@ $acmeServiceName = "LetsEncrypt-Staging";
 # Your email addresses, where acme services will send informations.
 $contactMailAddresses = @("mail@example.com", "mail2@example.com");
 
-# This directory is used to store your account key, orders, certificate keys, etc.
+# This directory is used to store your account key and service directory urls as well as orders and related data
 $acmeStateDir = "C:\Temp\AcmeState";
 
-# -- Script --
+
+<# -- Script -- #>
+
 Import-Module 'ACME-PS';
 
 # Create the state object - will be saved to disk
