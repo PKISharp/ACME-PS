@@ -13,55 +13,58 @@ versions of ACME-Servers.
 
 ## Synopsis
 
- - ACME service
+- ACME service
 
    The ACME service or ACME directory is the server, which will issue certificates to you.
 
- - Account Key
+- Account Key
 
    The account key is used to authenticate yourself to the ACME service. After registering it with   the server make sure you do not lose the key.
    The module supports RSA and ECDSA keys with different sizes.
 
- - Account
+- Account
 
    The account is associated with your account key. It stores informations like contact addresses on the ACME service. As long as you have the account key, you can identify yourself as the owner of the account.
 
- - Identifier
+- Identifier
 
    An Identifier is used to describe what the certificate will be used for. It has the form `dns:www.example.com`.
 
- - Order
+- Order
 
    The order is the main object during certificate issuance. It has a collection of identifiers, defining all subject alternate names of the certificate.
    Also it contains an authroization object for each identifier as well as some links allowing you to send the actual certificate signing request and acquiring the certificate.
 
- - Authroization
+- Authroization
 
    An authorization is associated with an identifier. It contains a collection of challenges, of which you have to satisfy one. An authorization will be valid if one challenge is successful.
 
- - Challenge
+- Challenge
 
    A challenge provides data about what you have to do, to prove that you own the dns names you provided as identifiers via the order. The challenge needs to be completed, so the authorization is also valid and thus the order will be ready to be used for certificate issuance.
 
- - Certificate Key
+- Certificate Key
 
    To complete the order you need to create a key for the certificate itself. This is the public and private key for your certificate. You should keep it save until the certificate is exported.
 
- - Service directory
+- Service directory
 
    The service directory is a collection of URLs describing the endpoints of an ACME service.
 
- - Nonce
+- Nonce
 
    The nonce is used as an anti-replay token. A nonce will be send whenever you communicate with the ACME service and the service will send back a nonce which can be used with the next request.
 
- - State
+- State
 
    The state is a local storage of information neccessary to make handling of request easier.
 
 ## Samples
 
-These samples can be used to create an ACME account, create an order, fullfill a http-01 challenge and issue a certificate for using it. Modify the variables to suit your needs.
+This repoository contains a collection of [samples](samples/).  
+You'll find a description of all samples in the [README.md](/samples/README.md).
+
+These samples can be used to create an ACME account, create an order, fullfill a http-01 challenge and issue a certificate for using it.
 
 ```powershell
 $stateDir = "C:\Temp\AcmeState";

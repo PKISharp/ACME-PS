@@ -13,8 +13,8 @@ InModuleScope ACME-PS {
         $state.AutoSave = $false;
 
         $identifiers = @(
-            New-ACMEIdentifier "www.example2.com";
-            New-ACMEIdentifier "www.example1.com";
+            New-Identifier "www.example2.com";
+            New-Identifier "www.example1.com";
         )
 
         Context 'Mandatory parameters only' {
