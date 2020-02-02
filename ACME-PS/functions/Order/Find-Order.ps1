@@ -42,7 +42,7 @@ function Find-Order {
     )
 
     if($PSCmdlet.ParameterSetName -eq "FromString") {
-        return $State.FindOrder($IdentifierTexts)
+        return $State.FindOrder($DNSNames)
     }
 
     return $State.FindOrder($Identifiers);
