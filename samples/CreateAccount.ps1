@@ -11,7 +11,6 @@ $acmeStateDir = "C:\Temp\AcmeState";
 
 
 <# -- Script -- #>
-
 Import-Module 'ACME-PS';
 
 # Create the state object - will be saved to disk

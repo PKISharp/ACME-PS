@@ -5,10 +5,20 @@ All used variables will be defined on top of the scripts.
 
 If you want to know more about the used commands, refer to `Get-Help`
 
-## Create an new account [./CreateAccount.ps1]
+## Create an new account
 
-The sample will create a state object, an account key and register an account with the acme service.
+The [sample](./CreateAccount.ps1) will create a state object, an account key and register an account with the acme service.
 
-## Create a new order [./CreateOrder.ps1]
+## Create a new order
 
-The sample will create orders with single and multiple dns names. 
+The sample will create orders with [single](./CreateOrderS.ps1) and [multiple](./CreateOrderM.ps1) dns names.
+
+## Fullfill challenges
+
+The [sample](./FullfillChallenge.ps1) will fullfill http-01 challenges for existing orders.  
+For the sample to work properly, you need to ensure, your web-server is able to serve extensionless files.
+For IIS this can be enabled with [this script](./IISExtensionless.ps1).
+
+## Issue certificate
+
+-text
