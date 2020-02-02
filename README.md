@@ -66,38 +66,6 @@ You'll find a description of all samples in the [README.md](./samples/README.md)
 
 These samples can be used to create an ACME account, create an order, fullfill a http-01 challenge and issue a certificate for using it.
 
-```powershell
-$stateDir = "C:\Temp\AcmeState";
-
-$serviceName = "LetsEncrypt-Staging" # This will issue Fake Certificates - use this for testing!
-$contactMail = "mail@example.com";
-
-$dnsName = "www.example.com";
-$wwwRoot = "C:\inetpub\wwwroot"
-```
-
-### Create an ACME account
-
-This snippet will create an account key and register it with the ACME service.
-
-```powershell
-Import-Module ACME-PS;
-
-# Create a state object and save it to the harddrive
-$state = New-ACMEState -Path $stateDir
-
-# Fetch the service directory and save it in the state
-Get-ACMEServiceDirectory $state -ServiceName $serviceName -PassThru;
-
-# Get the first anti-replay nonce
-New-ACMENonce $state;
-
-# Create an account key. The state will make sure it's stored.
-New-ACMEAccountKey $state -PassThru;
-
-# Register the account key with the acme service. The account key will automatically be read from the state
-New-ACMEAccount $state -EmailAddresses $contactMail -AcceptTOS;
-```
 
 ### Issue a certificate
 
