@@ -17,7 +17,7 @@ The sample will create orders with [single](./CreateOrderS.ps1) and [multiple](.
 
 The [sample](./FullfillChallenge.ps1) will fullfill http-01 challenges for existing orders.  
 For the sample to work properly, you need to ensure, your web-server is able to serve extensionless files.
-For IIS this can be enabled with [this script](./IISExtensionless.ps1).
+For IIS this can be enabled with [this script](./IISExtensionless.md).
 
 ## Issue certificate
 
