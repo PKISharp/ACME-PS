@@ -21,4 +21,4 @@ For IIS this can be enabled with [this script](./IISExtensionless.ps1).
 
 ## Issue certificate
 
--text
+The samples will show how to issue a certificate. Use [this sample](./IssueCertificateA.ps1) for automatically generated certificate keys or [this sample](./IssueCertificateC.ps1) for custom key material.
