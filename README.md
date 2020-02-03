@@ -11,6 +11,18 @@ Due to changes in RFC 8555 requiring POST-as-GET requests on multiple occasions,
 Most commands will now need the `State` parameter to work correctly. Be aware, that this might not be compatible with non-updated
 versions of ACME-Servers.
 
+## Samples
+
+You'll find a collection of [samples and descriptions here](./samples/README.md). If you find them to be
+not extensive enough, feel free to provide better samples or request enhancements of them via issues.
+
+## Certificate Chain
+
+The certificate chain is not part of the issued certifcate. To get a correct certificate chain,
+you'll need to import the intermediate certificates from your acme service.
+For Lets Encrypt you can obtain them via <https://letsencrypt.org/certificates/.>
+
+
 ## Synopsis
 
 - ACME service
@@ -58,12 +70,6 @@ versions of ACME-Servers.
 - State
 
    The state is a local storage of information neccessary to make handling of request easier.
-
-## Certificate Chain
-
-The certificate chain is not part of the issued certifcate. To get a correct certificate chain,
-you'll need to import the intermediate certificates from your acme service.
-For Lets Encrypt you can obtain them via <https://letsencrypt.org/certificates/.>
 
 ## How to
 
