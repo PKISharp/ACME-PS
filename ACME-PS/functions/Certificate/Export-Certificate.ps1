@@ -26,6 +26,8 @@ function Export-Certificate {
         .PARAMETER Force
             Allows the operation to override existing a certificate.
 
+        .PARAMETER SkipExistingCertificate
+            Forces the operation to reload the certificate from the acme service.
 
         .EXAMPLE
             PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
@@ -42,7 +44,7 @@ function Export-Certificate {
         [AcmeOrder]
         $Order,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateNotNull()]
         [ICertificateKey]
         $CertificateKey,
@@ -58,25 +60,39 @@ function Export-Certificate {
 
         [Parameter()]
         [switch]
-        $Force
+        $Force,
+
+        [Parameter()]
+        [switch]
+        $SkipExistingCertificate
     )
 
     $ErrorActionPreference = 'Stop'
 
+    if($null -eq $CertificateKey) {
+        $CertificateKey = $State.GetOrderCertificateKey($Order);
+
+        if($null -eq $CertificateKey) {
+            throw 'Need $CertificateKey to be provided or present in $Order and $State respectively'
+        }
+    }
+
     if(Test-Path $Path) {
-        if($Force) {
-            Clear-Content $Path;
-        } else {
+        if(!$Force) {
             throw "$Path does already exist."
         }
     }
 
-    $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
-    $certificate = $response.Content;
-
-    if($PSVersionTable.PSVersion -ge "6.0") {
-        $CertificateKey.ExportPfx($certificate, $Password) | Set-Content $Path -AsByteStream
-    } else {
-        $CertificateKey.ExportPfx($certificate, $Password) | Set-Content $Path -Encoding Byte
+    if(-not $SkipExistingCertificate) {
+        $certificate = $State.GetOrderCertificate($Order);
     }
+
+    if($null -eq $certificate) {
+        $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
+        $certificate = $response.Content;
+
+        $State.SetOrderCertificate($Order, $certificate);
+    }
+
+    Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
 }

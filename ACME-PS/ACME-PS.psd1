@@ -23,6 +23,7 @@
 
 	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
+		"Disable-Account",
 		"Find-Account",
 		"Get-Account",
 		"New-Account",
@@ -35,6 +36,7 @@
 		"Get-Authorization",
 
 		"Export-Certificate",
+		"Revoke-Certificate",
 
 		"Export-CertificateKey",
 		"Import-CertificateKey",

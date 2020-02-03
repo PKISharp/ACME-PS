@@ -26,10 +26,13 @@ function New-Order {
             Make sure to provide a valid X500DistinguishedName.
 
         .EXAMPLE
-            PS> New-Order -Directory $myDirectory -AccountKey $myAccountKey -KeyId $myKid -Nonce $myNonce -Identifiers $myIdentifiers
+            PS> New-Order -State $myState -Identifiers $myIdentifiers
 
         .EXAMPLE
             PS> New-Order -Identifiers (New-Identifier "dns" "www.test.com")
+
+        .EXAMPLE
+            PS> New-Order -State "C:\Acme-State\" -Identifiers "www.example.com"
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

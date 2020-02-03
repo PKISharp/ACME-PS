@@ -1,6 +1,7 @@
 class AcmeHttpException : System.Exception {
-    AcmeHttpException([string]$_message, [AcmeHttpResponse]$_response) {
-        $this.Message = $_message;
+    AcmeHttpException([string]$_message, [AcmeHttpResponse]$_response)
+        :base($_message) 
+    {
         $this.Response = $_response;
     }
 
