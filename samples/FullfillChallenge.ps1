@@ -22,7 +22,7 @@ $authorizations = @(Get-ACMEAuthorization -State $acmeStateDir -Order $order);
 
 foreach($authz in $authorizations) {
     # Select a challenge to fullfill
-    $challenge = Get-ACMEChallenge -State $acmeStatePath -Authorization $authZ -Type "http-01";
+    $challenge = Get-ACMEChallenge -State $acmeStateDir -Authorization $authZ -Type "http-01";
 
     # Inspect the challenge data (uncomment, if you want to see the object)
     # Depending on the challenge-type this will include different properties
@@ -45,11 +45,11 @@ foreach($authz in $authorizations) {
     } while(-not $promptResult);
 
     # Signal the ACME server that the challenge is ready
-    $challenge | Complete-ACMEChallenge -State $acmeStatePath;
+    $challenge | Complete-ACMEChallenge -State $acmeStateDir;
 }
 
 # Wait a little bit and update the order, until we see the status 'ready' or 'invalid'
 while($order.Status -notin ("ready","invalid")) {
     Start-Sleep -Seconds 10;
-    $order | Update-ACMEOrder -State $acmeStatePath -PassThru;
+    $order | Update-ACMEOrder -State $acmeStateDir -PassThru;
 }
