@@ -29,7 +29,11 @@ class AcmeHttpResponse {
 
             if($contentType -eq "application/problem+json") {
                 $this.IsError = $true;
-                $this.ErrorMessage = "Server returned problem (Status: $($this.StatusCode))."
+
+                $this.ErrorMessage = "Server returned Problem (Status: $($this.StatusCode))."
+                if($this.Content.detail) {
+                    $this.ErrorMessage += "´n$($this.Content.detail)";
+                }
             }
         }
         elseif ($contentType -ieq "application/pem-certificate-chain") {
@@ -43,6 +47,7 @@ class AcmeHttpResponse {
             }
 
             if ($this.StatusCode -ge 400) {
+                $this.IsError = $true;
                 $this.ErrorMessage = "Unexpected server response (Status: $($this.StatusCode), ContentType: $contentType)."
             }
         }

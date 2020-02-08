@@ -40,7 +40,7 @@ function Invoke-SignedWebRequest {
         }
 
         if($response.IsError) {
-            throw [AcmeHttpException]::new($respone.ErrorMessage, $response)
+            throw [AcmeHttpException]::new($response.ErrorMessage, $response)
         }
 
         return $response;
