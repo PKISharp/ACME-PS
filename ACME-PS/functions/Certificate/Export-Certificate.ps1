@@ -5,6 +5,7 @@ function Export-Certificate {
 
         .DESCRIPTION
             Exports an issued certificate by downloading it from the acme service and combining it with the private key.
+            The downloaded certificate will be saved with the order, to enable revocation.
 
 
         .PARAMETER State
@@ -28,6 +29,10 @@ function Export-Certificate {
 
         .PARAMETER SkipExistingCertificate
             Forces the operation to reload the certificate from the acme service.
+
+        .PARAMETER DisablePEMStorage
+            The downloaded public certificate will not be stored with the order.
+            This will make revocation impossible.
 
         .EXAMPLE
             PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
@@ -62,9 +67,13 @@ function Export-Certificate {
         [switch]
         $Force,
 
+        [Parameter(Alias = "SkipExistingCertificate")]
+        [switch]
+        $ForceCertificateReload,
+
         [Parameter()]
         [switch]
-        $SkipExistingCertificate
+        $DisablePEMStorage
     )
 
     $ErrorActionPreference = 'Stop'
@@ -83,7 +92,7 @@ function Export-Certificate {
         }
     }
 
-    if(-not $SkipExistingCertificate) {
+    if(-not $ForceCertificateReload) {
         $certificate = $State.GetOrderCertificate($Order);
     }
 
@@ -91,7 +100,9 @@ function Export-Certificate {
         $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
         $certificate = $response.Content;
 
-        $State.SetOrderCertificate($Order, $certificate);
+        if(-not $DisablePEMStorage) {
+            $State.SetOrderCertificate($Order, $certificate);
+        }
     }
 
     Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)

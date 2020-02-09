@@ -32,6 +32,10 @@ function Revoke-Certificate {
     )
 
     $certificate = $State.GetOrderCertificate($Order);
+    if($null -eq $certificate) {
+        throw "Cannot get certificate associated with order, revocation failed."
+    }
+
     $base64Certificate = [System.Convert]::ToBase64String($certificate);
 
     $url = $State.GetServiceDirectory().RevokeCert;
