@@ -67,7 +67,8 @@ function Export-Certificate {
         [switch]
         $Force,
 
-        [Parameter(Alias = "SkipExistingCertificate")]
+        [Parameter()]
+        [Alias("SkipExistingCertificate")]
         [switch]
         $ForceCertificateReload,
 

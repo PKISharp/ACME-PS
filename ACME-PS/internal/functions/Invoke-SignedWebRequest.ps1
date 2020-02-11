@@ -14,7 +14,8 @@ function Invoke-SignedWebRequest {
         [object] $Payload = "",
 
         [Parameter()]
-        [switch] $SupressKeyId,
+        [Alias("SupressKeyId")]
+        [switch] $SuppressKeyId,
 
         [Parameter()]
         [switch] $SkipRetryOnNonceError
@@ -23,7 +24,7 @@ function Invoke-SignedWebRequest {
     process {
         $accountKey = $State.GetAccountKey();
         $account = $State.GetAccount();
-        $keyId = $(if($account -and -not $SupressKeyId) { $account.KeyId });
+        $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
         $nonce = $State.GetNonce();
 
         $requestBody = New-SignedMessage -Url $Url -SigningKey $accountKey -KeyId $keyId -Nonce $nonce -Payload $Payload
@@ -34,7 +35,7 @@ function Invoke-SignedWebRequest {
 
             if($response.IsError -and -not $SkipRetryOnNonceError) {
                 if($response.Content.Type -eq "urn:ietf:params:acme:error:badNonce") {
-                    return Invoke-SignedWebRequest -Url $Url -State $State -Payload $Payload -SuppressKeyId:$SupressKeyId.IsPresent -SkipRetryOnNonceError;
+                    return Invoke-SignedWebRequest -Url $Url -State $State -Payload $Payload -SuppressKeyId:$SuppressKeyId.IsPresent -SkipRetryOnNonceError;
                 }
             }
         }

@@ -66,7 +66,7 @@ function New-Account {
     $url = $State.GetServiceDirectory().NewAccount;
 
     if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
-        $response = Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SupressKeyId -ErrorAction 'Stop'
+        $response = Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SuppressKeyId -ErrorAction 'Stop'
 
         if($response.StatusCode -eq 200) {
             if(-not $ExistingAccountIsError) {
