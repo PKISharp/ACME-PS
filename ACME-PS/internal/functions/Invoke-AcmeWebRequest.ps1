@@ -29,7 +29,6 @@ function Invoke-ACMEWebRequest {
         Write-Debug "The content of the request is $JsonBody";
     }
 
-    #TODO: This should possibly swapped out to be something singleton-ish.
     try {
         $httpClient = [System.Net.Http.HttpClient]::new();
         $httpResponse = $httpClient.SendAsync($httpRequest).GetAwaiter().GetResult();
