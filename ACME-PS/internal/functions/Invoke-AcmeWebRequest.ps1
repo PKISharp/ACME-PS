@@ -30,10 +30,16 @@ function Invoke-ACMEWebRequest {
     }
 
     #TODO: This should possibly swapped out to be something singleton-ish.
-    $httpClient = [System.Net.Http.HttpClient]::new();
+    try {
+        $httpClient = [System.Net.Http.HttpClient]::new();
+        $httpResponse = $httpClient.SendAsync($httpRequest).GetAwaiter().GetResult();
+        $result = [AcmeHttpResponse]::new($httpResponse);
+    } catch {
+        $result = [AcmeHttpResponse]::new();
+        $result.IsError = $true;
+        $result.Message = $_.Message;
+        $result.Content = $_;
+    }
 
-    $httpResponse = $httpClient.SendAsync($httpRequest).GetAwaiter().GetResult();
-
-    $result = [AcmeHttpResponse]::new($httpResponse);
     return $result;
 }
