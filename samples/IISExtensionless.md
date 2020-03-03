@@ -7,7 +7,7 @@ To serve static files put a web.config in your .well-known directory (or acme-ch
  <configuration>
     <system.webServer>
         <staticContent>
-            <mimeMap fileExtension=".*" mimeType="text/plain" />
+            <mimeMap fileExtension="." mimeType="text/plain" />
         </staticContent>
         <handlers>
             <clear />
