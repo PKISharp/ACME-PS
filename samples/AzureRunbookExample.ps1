@@ -269,7 +269,7 @@ try
     # Now we wait until the ACME service provides the certificate url
     while(-not $order.CertificateUrl) {
         Start-Sleep -Seconds 15
-        $order | Update-Order -State $acmeStateDir -PassThru
+        $order | Update-ACMEOrder -State $acmeStateDir -PassThru
     }
 
     $securePassword = ConvertTo-SecureString "XXX" –asplaintext –force
