@@ -1,6 +1,6 @@
 <# -- Variables -- #>
 
-# ServiceName (valid names are LetsEncrypt and LetsEncrypt-Stagign, use the latter one for testing your scripts).
+# ServiceName (valid names are LetsEncrypt and LetsEncrypt-Staging, use the latter one for testing your scripts).
 $acmeServiceName = "LetsEncrypt-Staging";
 
 # Your email addresses, where acme services will send informations.
