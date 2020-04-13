@@ -41,8 +41,7 @@ Import-Module "$PSScriptRoot/ACME-PS" -Force -ErrorAction 'Stop' -Verbose:$false
 $ModuleFiles = @(
     "internal/AllClasses.ps1",
     "internal/AllFunctions.ps1",
-    "AllFunctions.ps1",
-    "ModuleSetup.ps1"
+    "AllFunctions.ps1"
 )
 
 Write-Information "Merging Module content files $([string]::Join(", ", $ModuleFiles))"
