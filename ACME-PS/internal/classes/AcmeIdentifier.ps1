@@ -1,5 +1,5 @@
 class AcmeIdentifier {
-    static [AcmeIdentifier] Parse([string] $textValue) {
+    static [AcmeIdentifier] Create([string] $textValue) {
         if($textValue -contains ":") {
             $_type, $_value = $textValue -split ":",2;
             return [AcmeIdentifier]::new($_type, $_value);

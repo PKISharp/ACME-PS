@@ -5,7 +5,7 @@
         }
     }
 
-    static [AcmeState] Parse([string] $stringValue) {
+    static [AcmeState] Create([string] $stringValue) {
         $paths = [AcmeStatePaths]::new($stringValue);
         return [AcmeDiskPersistedState]::new($paths, $false, $true);
     }

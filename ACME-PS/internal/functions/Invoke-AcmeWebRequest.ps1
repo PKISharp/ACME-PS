@@ -36,8 +36,8 @@ function Invoke-ACMEWebRequest {
     } catch {
         $result = [AcmeHttpResponse]::new();
         $result.IsError = $true;
-        $result.Message = $_.Message;
-        $result.Content = $_;
+        $result.ErrorMessage = $_.Exception.Message;
+        $result.Content = $_.Exception;
     }
 
     return $result;
