@@ -28,7 +28,7 @@ $acmeStateDir = "C:\Temp\AcmeState";
 # This path will be used to export your certificate file.
 $certExportPath = "C:\Temp\certificates\certificate.pfx";
 
-# ServiceName (valid names are LetsEncrypt and LetsEncrypt-Stagign, use the latter one for testing your scripts).
+# ServiceName (valid names are LetsEncrypt and LetsEncrypt-Staging, use the latter one for testing your scripts).
 #$acmeServiceName = "LetsEncrypt-Staging";
 $acmeServiceName = "LetsEncrypt";
 
