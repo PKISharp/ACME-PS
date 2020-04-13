@@ -2,6 +2,17 @@
 
 # requires -Modules ACME-PS, Azure, AzureRM.Websites
 
+<# 
+  Azure Runbooks seem to have problems with ACME-PS, if Az.Storage is used as well.
+  To work-around the problems, it seems neccessary to explicitly import the azure cmdlets used
+  before ACME-PS is imported
+  
+  Import-Module 'Azure';
+  Import-Module 'Az.Storage';
+  Import-Module 'AzureRM.Websites';
+  Import-Module 'ACME-PS';
+#>
+
 param(
     [Parameter()]
     [String] $AutomationConnectionName = "AzureRunAsConnection",
