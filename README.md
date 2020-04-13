@@ -11,6 +11,8 @@ Due to changes in RFC 8555 requiring POST-as-GET requests on multiple occasions,
 Most commands will now need the `State` parameter to work correctly. Be aware, that this might not be compatible with non-updated
 versions of ACME-Servers.
 
+This change also means, you cannot simply call resource urls. To look into the contents of such an URL use `Invoke-ACMESignedWebRequest -Url $myResourceUrl -State $myState`.
+
 ## Samples
 
 You'll find a collection of [samples and descriptions here](./samples/README.md). If you find them to be
@@ -21,7 +23,6 @@ not extensive enough, feel free to provide better samples or request enhancement
 The certificate chain is not part of the issued certifcate. To get a correct certificate chain,
 you'll need to import the intermediate certificates from your acme service.
 For Lets Encrypt you can obtain them via <https://letsencrypt.org/certificates/.>
-
 
 ## Synopsis
 
