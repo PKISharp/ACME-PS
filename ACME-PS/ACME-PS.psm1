@@ -71,8 +71,7 @@ $classes = @(
     "AcmeAuthorization",
     "AcmeState",
     "AcmeState.InMemory",
-    "AcmeState.DiskPersisted",
-    "AcmeObjectConverter"
+    "AcmeState.DiskPersisted"
 )
 
 $classMergeFile = "$classPath\..\AllClasses.ps1";

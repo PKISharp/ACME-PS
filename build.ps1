@@ -33,9 +33,6 @@ Copy-Item -Path "$ModuleSourcePath/TypeDefinitions.ps1" -Destination "$ModuleOut
 Write-Information "Copying $ModuleSourcePath/Prerequisites.ps1"
 Copy-Item -Path "$ModuleSourcePath/Prerequisites.ps1" -Destination "$ModuleOutPath/" -Force;
 
-Write-Information "Copying $ModuleSourcePath/Types.ps1xml"
-Copy-Item -Path "$ModuleSourcePath/Types.ps1xml" -Destination "$ModuleOutPath/" -Force;
-
 Import-Module "$PSScriptRoot/ACME-PS" -Force -ErrorAction 'Stop' -Verbose:$false # This will create the All* files.
 
 $ModuleFiles = @(
