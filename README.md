@@ -48,7 +48,7 @@ For Lets Encrypt you can obtain them via <https://letsencrypt.org/certificates/.
    The order is the main object during certificate issuance. It has a collection of identifiers, defining all subject alternate names of the certificate.
    Also it contains an authroization object for each identifier as well as some links allowing you to send the actual certificate signing request and acquiring the certificate.
 
-- Authroization
+- Authorization
 
    An authorization is associated with an identifier. It contains a collection of challenges, of which you have to satisfy one. An authorization will be valid if one challenge is successful.
 
