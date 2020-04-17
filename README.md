@@ -89,3 +89,9 @@ To run the Pester-Tests call:
 ```powershell
 PS> & .\ACME-PS\tests\A-Manual-Test-Run.ps1
 ```
+
+### Support my work
+
+[![Donate with PayPal button](https://www.paypalobjects.com/en_US/DK/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4VVHGMBA5P3HN)
+
+[![Donate with BitCoin](https://de.wikipedia.org/wiki/Bitcoin#/media/Datei:Bitcoin_logo.svg)](bitcoin:bc1qr9cnq29ey3uvkutcdfsfrtf8p4lhp027krpv2u)
