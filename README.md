@@ -92,6 +92,8 @@ PS> & .\ACME-PS\tests\A-Manual-Test-Run.ps1
 
 ### Support my work
 
-[![Donate with PayPal button](https://www.paypalobjects.com/en_US/DK/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4VVHGMBA5P3HN)
+Want to support my work?  
+Buy me a coffee, a bag of coffee beans or two?  
 
-Bitcoin Wallet: bc1qr9cnq29ey3uvkutcdfsfrtf8p4lhp027krpv2u
+PayPal: <https://www.paypal.me/TGlatzer>
+BitCoin Wallet: bc1qr9cnq29ey3uvkutcdfsfrtf8p4lhp027krpv2u
