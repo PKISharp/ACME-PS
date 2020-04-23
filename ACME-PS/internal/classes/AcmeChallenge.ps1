@@ -5,11 +5,17 @@ class AcmeChallenge {
         $this.Token = $obj.token;
 
         $this.Identifier = $identifier;
+
+        $this.Status = $obj.status;
+        $this.Error = $obj.error;
     }
 
     [string] $Type;
     [string] $Url;
     [string] $Token;
+
+    [string] $Status;
+    [string] $Error;
 
     [AcmeIdentifier] $Identifier;
 

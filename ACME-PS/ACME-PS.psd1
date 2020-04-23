@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.1.6'
+	ModuleVersion = '1.1.8'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -34,6 +34,7 @@
 		"New-AccountKey",
 
 		"Get-Authorization",
+		"Get-AuthorizationError",
 
 		"Export-Certificate",
 		"Revoke-Certificate",
