@@ -53,3 +53,10 @@ while($order.Status -notin ("ready","invalid")) {
     Start-Sleep -Seconds 10;
     $order | Update-ACMEOrder -State $acmeStateDir -PassThru;
 }
+
+
+# Should the order get invalid, use Get-ACMEAuthorizationError to list error details.
+if($order.Status -ieq ("invalid")) {
+    $order | Get-ACMEAuthorizationError -State $acmeStateDir;
+    throw "Order was invalid";
+}
