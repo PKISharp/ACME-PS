@@ -1,16 +1,16 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.1.9'
+	ModuleVersion = '1.1.10'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
 	PowershellVersion = "5.1"
 
-	Author = 'https://github.com/PKISharp/ACMESharpCore-PowerShell/graphs/contributors'
-	CompanyName = 'https://github.com/PKISharp'
-	Copyright = '(c) 2018 Thomas Glatzer, Eugene Bekker. All rights reserved.'
+	Author = 'https://github.com/PKISharp/ACME-PS/graphs/contributors'
+	CompanyName = 'Thomas Glatzer via PKISharp (https://github.com/PKISharp)'
+	Copyright = '(c) 2018-2020 Thomas Glatzer. All rights reserved. - Based on the originial work of Eugene Bekker (https://www.powershellgallery.com/packages/ACMESharp/0.9.1.326)'
 
-	Description = "PowerShell client module for the ACME protocol Version 2"
+	Description = "PowerShell client module for the ACME protocol Version 2, which can be used to interoperate with the Let's Encrypt™ projects certificate servers and any other RFC 8555 compliant server."
 
 	NestedModules = @(
 		"./Prerequisites.ps1",
@@ -73,16 +73,16 @@
 			Tags = @('pki','ssl','tls','security','certificates','letsencrypt','acme','powershell','acmesharp')
 
 			# A URL to the license for this module.
-			LicenseUri = 'https://raw.githubusercontent.com/PKISharp/ACMESharpCore-PowerShell/master/LICENSE'
+			LicenseUri = 'https://raw.githubusercontent.com/PKISharp/ACME-PS/master/LICENSE'
 
 			# A URL to the main website for this project.
-			ProjectUri = 'https://github.com/PKISharp/ACMESharpCore-PowerShell'
+			ProjectUri = 'https://github.com/PKISharp/ACME-PS'
 
 			# A URL to an icon representing this module.
-			IconUri = 'https://raw.githubusercontent.com/PKISharp/ACMESharpCore/master/docs/acmesharp-logo-color.png'
+			IconUri = 'https://raw.githubusercontent.com/PKISharp/ACME-PS/master/ACME-PS/ACME-PS.png'
 
 			# ReleaseNotes of this module
-			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACMESharpCore-PowerShell/releases'
+			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACME-PS/releases'
 
 			# Prerelase
 			# Prerelease = 'beta'
