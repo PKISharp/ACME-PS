@@ -27,12 +27,18 @@ class AcmeHttpResponse {
             $stringContent = $responseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             $this.Content = $stringContent | ConvertFrom-Json;
 
-            if($contentType -eq "application/problem+json") {
+            if ($this.StatusCode -ge 400) {
                 $this.IsError = $true;
 
                 $this.ErrorMessage = "Server returned Problem (Status: $($this.StatusCode))."
-                if($this.Content.detail) {
-                    $this.ErrorMessage += "´n$($this.Content.detail)";
+
+                if($this.Content) {
+                    if($this.Content.type) {
+                        $this.ErrorMessage += "`nType: $($this.Content.type)";
+                    }
+                    if($this.Content.detail) {
+                        $this.ErrorMessage += "`n$($this.Content.detail)";
+                    }
                 }
             }
         }
