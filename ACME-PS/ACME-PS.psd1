@@ -10,7 +10,7 @@
 	CompanyName = 'Thomas Glatzer via PKISharp (https://github.com/PKISharp)'
 	Copyright = '(c) 2018-2020 Thomas Glatzer. All rights reserved. - Based on the originial work of Eugene Bekker (https://www.powershellgallery.com/packages/ACMESharp/0.9.1.326)'
 
-	Description = "PowerShell client module for the ACME protocol Version 2, which can be used to interoperate with the Let's Encrypt™ projects certificate servers and any other RFC 8555 compliant server."
+	Description = "PowerShell client module for the ACME protocol Version 2, which can be used to interoperate with the Let's Encrypt(TM) projects certificate servers and any other RFC 8555 compliant server."
 
 	NestedModules = @(
 		"./Prerequisites.ps1",
