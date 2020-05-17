@@ -1,21 +1,43 @@
 class Certificate {
-    static [byte[]] ExportPfx([byte[]] $acmeCertificate, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
+    static [System.Security.Cryptography.X509Certificates.X509Certificate2] CreateX509WithKey([byte[]] $acmeCertificate, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
         $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificate);
 
         if($algorithm -is [System.Security.Cryptography.RSA]) {
-            $certifiate = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
+            $certificate = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
         }
         elseif($algorithm -is [System.Security.Cryptography.ECDsa]) {
-            $certifiate = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
+            $certificate = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
         }
         else {
             throw [System.InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to export pfx.");
         }
 
+        return $certificate
+    }
+
+    static [byte[]] ExportPfx([byte[]] $acmeCertificate, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
+        $certificate = [Certificate]::CreateX509WithKey($acmeCertificate, $algorithm);
+
         if($password) {
-            return $certifiate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $password);
+            return $certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $password);
         } else {
-            return $certifiate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx);
+            return $certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx);
+        }
+    }
+
+    static [byte[]] ExportPfxChain([byte[][]] $acmeCertificates, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
+        $leafCertificate = [Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm);
+        $certificateCollection = [System.Security.Cryptography.X509Certificates.X509Certificate2Collection]::new($leafCertificate);
+
+        for($i = 1; $i -lt $acmeCertificates.Length; $i++) {
+            $chainCert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i]);
+            $certificateCollection.Add($chainCert);
+        }
+
+        if($password) {
+            return $certificateCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $password);
+        } else {
+            return $certificateCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx);
         }
     }
 
