@@ -108,8 +108,8 @@ class ECDsaCertificateKey : ECDsaAccountKey, ICertificateKey {
         return [Certificate]::ExportPfx($acmeCertificate, $this.ECDsa, $password);
     }
     
-    [byte[]] ExportPfxChain([byte[]] $acmeCertificate, [SecureString] $password) {
-        return [Certificate]::ExportPfxChain($acmeCertificate, $this.ECDsa, $password);
+    [byte[]] ExportPfxChain([byte[][]] $acmeCertificates, [SecureString] $password) {
+        return [Certificate]::ExportPfxChain($acmeCertificates, $this.ECDsa, $password);
     }
 
     [byte[]] GenerateCsr([string[]] $dnsNames, [string] $distinguishedName) {

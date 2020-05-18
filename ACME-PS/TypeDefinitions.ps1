@@ -18,7 +18,7 @@ public interface IAccountKey : ISigningKey { }
 public interface ICertificateKey : ISigningKey
 {
     byte[] ExportPfx(byte[] acmeCertificate, System.Security.SecureString password);
-    byte[] ExportPfxChain(byte[] acmeCertificate, System.Security.SecureString password);
+    byte[] ExportPfxChain(byte[][] acmeCertificate, System.Security.SecureString password);
     byte[] GenerateCsr(string[] dnsNames, string distinguishedName);
 }
 "@
