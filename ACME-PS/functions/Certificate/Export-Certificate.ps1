@@ -119,12 +119,14 @@ function Export-Certificate {
         $certBoundary = "-----END CERTIFICATE-----";
 
         $pemString = [System.Text.Encoding]::UTF8.GetString($certificate);
-        $certificates = $pemString.Split($certBoundary, "RemoveEmptyEntries") | Where-Object {
-            ($_.Trim()) | ForEach-Object {
-                [System.Text.Encoding]::UTF8.GetBytes($_.Trim() + "`n$certBoundary")
-            }
+        $certificates = [System.Collections.ArrayList]::new();
+        foreach($pem in $pemString.Split(@($certBoundary), "RemoveEmptyEntries")) {
+            if(-not $pem -or -not $pem.Trim()) { continue; }
+
+            $certBytes = [System.Text.Encoding]::UTF8.GetBytes($pem.Trim() + "`n$certBoundary");
+            $certificates.Add($certBytes) | Out-Null;
         }
 
-        Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfxChain($certificates, $Password)
+        Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfxChain($certificates, $Password);
     }
 }
