@@ -5,7 +5,16 @@ to enable you to write a script or module which uses an ACME v2 service to creat
 
 Download the Module via Powershell-Gallery <https://www.powershellgallery.com/packages/ACME-PS/>
 
-## Breaking Change in Version 1.1
+## Breaking Changes
+
+This is a list of breaking changes, that occured during ongoing development of the module
+
+### Version 1.2
+
+Version 1.2 now automatically includes chain certificates, if they are issued by the CA.  
+While this will not break most users, it is a change in behaviour and thus a breaking change for some.
+
+### Version 1.1
 
 Due to changes in RFC 8555 requiring POST-as-GET requests on multiple occasions, we decided to introduce a breaking change.
 Most commands will now need the `State` parameter to work correctly. Be aware, that this might not be compatible with non-updated
@@ -20,9 +29,8 @@ not extensive enough, feel free to provide better samples or request enhancement
 
 ## Certificate Chain
 
-The certificate chain is not part of the issued certifcate. To get a correct certificate chain,
-you'll need to import the intermediate certificates from your acme service.
-For Lets Encrypt you can obtain them via <https://letsencrypt.org/certificates/.>
+For Lets Encrypt you can obtain the chain files via <https://letsencrypt.org/certificates/.>
+The issued certificate will _most likely_ contain all chain files, if not excluded via `ExcludeChain`.
 
 ## Synopsis
 

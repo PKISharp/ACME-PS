@@ -56,7 +56,7 @@ function Complete-Order {
         [switch]
         $SaveCertificateKey,
 
-        [Parameter(ParameterSetName="AutoKey")]
+        [Parameter(Mandatory = $true, ParameterSetName="AutoKey")]
         [switch]
         $GenerateCertificateKey,
 
@@ -71,6 +71,10 @@ function Complete-Order {
         if($GenerateCertificateKey) {
             $SaveCertificateKey = $true;
             $CertificateKey = New-CertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue'
+        }
+
+        if(-not $CertifikateKey) {
+            throw "You need to provide a certificate key or enable automatic generation."
         }
 
         if($SaveCertificateKey) {

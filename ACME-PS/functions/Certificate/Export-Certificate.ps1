@@ -24,6 +24,9 @@ function Export-Certificate {
         .PARAMETER Password
             The password used to secure the certificate.
 
+        .PARAMETER ExcludeChain
+            The downloaded certificate might include the full chain, this switch will exclude the chain from exported certificate.
+
         .PARAMETER Force
             Allows the operation to override existing a certificate.
 
@@ -62,6 +65,10 @@ function Export-Certificate {
         [Parameter()]
         [SecureString]
         $Password,
+
+        [Parameter()]
+        [switch]
+        $ExcludeChain,
 
         [Parameter()]
         [switch]
@@ -106,5 +113,20 @@ function Export-Certificate {
         }
     }
 
-    Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
+    if($ExcludeChain) {
+        Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
+    } else {
+        $certBoundary = "-----END CERTIFICATE-----";
+
+        $pemString = [System.Text.Encoding]::UTF8.GetString($certificate);
+        $certificates = [System.Collections.ArrayList]::new();
+        foreach($pem in $pemString.Split(@($certBoundary), "RemoveEmptyEntries")) {
+            if(-not $pem -or -not $pem.Trim()) { continue; }
+
+            $certBytes = [System.Text.Encoding]::UTF8.GetBytes($pem.Trim() + "`n$certBoundary");
+            $certificates.Add($certBytes) | Out-Null;
+        }
+
+        Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfxChain($certificates, $Password);
+    }
 }
