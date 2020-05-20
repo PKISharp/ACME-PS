@@ -53,7 +53,6 @@ function Export-Certificate {
         $Order,
 
         [Parameter()]
-        [ValidateNotNull()]
         [ICertificateKey]
         $CertificateKey,
 
