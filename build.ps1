@@ -2,7 +2,7 @@
 param(
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string] $ModuleOutPath = "./build/ACME-PS",
+    [string] $ModuleOutPath = "./dist/ACME-PS",
 
     [Parameter()]
     [Switch] $SignModule
@@ -21,7 +21,8 @@ begin {
         )
 
         process {
-            Get-Content $_ | Add-Content $OutFile
+            Get-Content $_ | Add-Content $OutFile;
+            Add-Content $OutFile -Value "";
         }
     }
 }
@@ -101,15 +102,11 @@ process {
     }
 
     Write-Information "Finished building - running tests";
+    & Invoke-ScriptAnalyzer -Path $ModuleOutFile;
 
     <# Run tests #>
-    try {
-        Remove-Module ACME-PS -ErrorAction Ignore
+    & Invoke-Command -ScriptBlock {
         Import-Module "$ModuleOutPath\ACME-PS.psd1" -ErrorAction 'Stop'
-
         Invoke-Pester -Path "$ModuleSourcePath\tests"
-    }
-    catch {
-        Write-Error $error[0];
     }
 }
