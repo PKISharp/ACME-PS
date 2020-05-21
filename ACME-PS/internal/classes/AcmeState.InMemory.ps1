@@ -21,7 +21,7 @@ class AcmeInMemoryState : AcmeState {
 
 
     [void] AddOrder([AcmeOrder] $order) {
-        SetOrder($order);
+        $this.SetOrder($order);
     }
 
     [void] SetOrder([AcmeOrder] $order) {
