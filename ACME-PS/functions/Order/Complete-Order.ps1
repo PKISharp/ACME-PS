@@ -81,14 +81,7 @@ function Complete-Order {
             $State.SetOrderCertificateKey($Order, $CertificateKey);
         }
 
-        $dnsNames = $Order.Identifiers | ForEach-Object { $_.Value }
-        if($Order.CSROptions -and -not [string]::IsNullOrWhiteSpace($Order.CSROptions.DistinguishedName)) {
-            $certDN = $Order.CSROptions.DistinguishedName;
-        } else {
-            $certDN = "CN=$($Order.Identifiers[0].Value)"
-        }
-
-        $csr = $CertificateKey.GenerateCsr($dnsNames, $certDN);
+        $csr = $CertificateKey.GenerateCsr($dnsNames, $Order.CSROptions.DistinguishedName);
         $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) }
 
         $requestUrl = $Order.FinalizeUrl;
