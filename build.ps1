@@ -102,7 +102,7 @@ process {
 
     Write-Information "Finished building - running tests";
 
-    <# Run tests
+    <# Run tests #>
     try {
         Remove-Module ACME-PS -ErrorAction Ignore
         Import-Module "$ModuleOutPath\ACME-PS.psd1" -ErrorAction 'Stop'
@@ -111,5 +111,5 @@ process {
     }
     catch {
         Write-Error $error[0];
-    }#>
+    }
 }
