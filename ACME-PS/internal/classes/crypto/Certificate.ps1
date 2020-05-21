@@ -35,7 +35,9 @@ class Certificate {
         }
 
         if($password) {
-            return $certificateCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $password);
+            $unprotectedPassword = [PSCredential]::new("ACME-PS", $password).GetNetworkCredential().Password;
+
+            return $certificateCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $unprotectedPassword);
         } else {
             return $certificateCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx);
         }

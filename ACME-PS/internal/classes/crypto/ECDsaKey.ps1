@@ -107,7 +107,7 @@ class ECDsaCertificateKey : ECDsaAccountKey, ICertificateKey {
     [byte[]] ExportPfx([byte[]] $acmeCertificate, [SecureString] $password) {
         return [Certificate]::ExportPfx($acmeCertificate, $this.ECDsa, $password);
     }
-    
+
     [byte[]] ExportPfxChain([byte[][]] $acmeCertificates, [SecureString] $password) {
         return [Certificate]::ExportPfxChain($acmeCertificates, $this.ECDsa, $password);
     }

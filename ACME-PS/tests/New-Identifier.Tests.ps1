@@ -1,25 +1,25 @@
-$CommandName = $MyInvocation.MyCommand.Name.Replace(".Tests.ps1", "")
+InModuleScope ACME-PS {
+    Describe "UnitTesting New-Identifier" -Tag "UnitTest" {
+        It "Creates an Identifier (Parameter by Name)" {
+            $identifier = New-Identifier -Type "Type" -Value "Value";
 
-Describe "UnitTesting $CommandName" -Tag "UnitTest" {
-    It "Creates an Identifier (Parameter by Name)" {
-        $identifier = New-AcmeIdentifier -Type "Type" -Value "Value";
+            $identifier.Type | Should -Be "Type";
+            $identifier.Value | Should -Be "Value";
+        }
 
-        $identifier.Type | Should -Be "Type";
-        $identifier.Value | Should -Be "Value";
-    }
+        It "Creates an Identifier (Parameter by Position)" {
+            $identifier = New-Identifier "Value" "Type";
 
-    It "Creates an Identifier (Parameter by Position)" {
-        $identifier = New-AcmeIdentifier "Value" "Type";
+            $identifier.Type | Should -Be "Type";
+            $identifier.Value | Should -Be "Value";
+        }
 
-        $identifier.Type | Should -Be "Type";
-        $identifier.Value | Should -Be "Value";
-    }
+        It "Creates an Identifier (Parameter From Pipeline)" {
+            $tmp = New-Identifier "Value" "Type";
+            $identifier = $tmp | New-Identifier;
 
-    It "Creates an Identifier (Parameter From Pipeline)" {
-        $tmp = New-AcmeIdentifier "Value" "Type";
-        $identifier = $tmp | New-AcmeIdentifier;
-
-        $identifier.Type | Should -Be "Type";
-        $identifier.Value | Should -Be "Value";
+            $identifier.Type | Should -Be "Type";
+            $identifier.Value | Should -Be "Value";
+        }
     }
 }

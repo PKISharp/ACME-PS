@@ -1,4 +1,5 @@
 function Set-ByteContent {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]

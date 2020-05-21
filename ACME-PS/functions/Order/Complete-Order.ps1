@@ -30,7 +30,7 @@ function Complete-Order {
 
         .EXAMPLE
             PS> Complete-Order -State $myState -Order $myOrder -CertificateKey $myCertKey
-        
+
         .EXAMPLE
             PS> Complete-Order -State $myState -Order $myOrder -GenerateCertificateKey
     #>
@@ -73,7 +73,7 @@ function Complete-Order {
             $CertificateKey = New-CertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue'
         }
 
-        if(-not $CertifikateKey) {
+        if($null -eq $CertificateKey) {
             throw "You need to provide a certificate key or enable automatic generation."
         }
 

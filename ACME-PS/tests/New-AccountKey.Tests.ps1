@@ -23,8 +23,7 @@ InModuleScope ACME-PS {
         }
 
         Context "Key-Creation with state" {
-            $state = Get-State -Path $PSScriptRoot\states\simple
-            $state.AutoSave = $false;
+            $state = New-State -WarningAction 'SilentlyContinue';
 
             It "Creates and stores Key the key to state" {
                 $key = New-ACMEAccountKey -State $state -PassThru -WarningAction 'SilentlyContinue' -Force
