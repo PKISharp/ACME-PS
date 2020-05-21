@@ -12,9 +12,6 @@ function Get-Account {
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
 
-        .PARAMETER PassThru
-            Forces the retreieved account to be returned to the pipeline.
-
         .PARAMETER AccountUrl
             The rescource url of the account to load.
 
@@ -35,10 +32,6 @@ function Get-Account {
         [ValidateScript({$_.AccountKeyExists()})]
         [AcmeState]
         $State,
-
-        [Parameter()]
-        [switch]
-        $PassThru,
 
         [Parameter(Mandatory = $true, Position = 1, ParameterSetName="GetAccount")]
         [ValidateNotNull()]
