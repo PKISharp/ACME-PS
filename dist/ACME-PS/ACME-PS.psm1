@@ -1175,7 +1175,7 @@ class AcmeDiskPersistedState : AcmeState {
     [ICertificateKey] GetOrderCertificateKey([AcmeOrder] $order) {
         $orderHash = $order.GetHashString();
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
-        
+
         if(Test-Path $certKeyFilename) {
             return (Import-CertificateKey -Path $certKeyFilename);
         }
@@ -1238,17 +1238,19 @@ function ConvertTo-UrlBase64 {
         [byte[]] $InputBytes
     )
 
-    if($PSCmdlet.ParameterSetName -eq "FromString") {
-        $InputBytes = [System.Text.Encoding]::UTF8.GetBytes($InputText);
+    process {
+        if($PSCmdlet.ParameterSetName -eq "FromString") {
+            $InputBytes = [System.Text.Encoding]::UTF8.GetBytes($InputText);
+        }
+
+        $encoded = [System.Convert]::ToBase64String($InputBytes);
+
+        $encoded = $encoded.TrimEnd('=');
+        $encoded = $encoded.Replace('+', '-');
+        $encoded = $encoded.Replace('/', '_');
+
+        return $encoded;
     }
-
-    $encoded = [System.Convert]::ToBase64String($InputBytes);
-
-    $encoded = $encoded.TrimEnd('=');
-    $encoded = $encoded.Replace('+', '-');
-    $encoded = $encoded.Replace('/', '_');
-
-    return $encoded;
 }
 
 function Export-AcmeObject {
@@ -1494,9 +1496,6 @@ function Get-Account {
             The state object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
 
-        .PARAMETER PassThru
-            Forces the retreieved account to be returned to the pipeline.
-
         .PARAMETER AccountUrl
             The rescource url of the account to load.
 
@@ -1517,10 +1516,6 @@ function Get-Account {
         [ValidateScript({$_.AccountKeyExists()})]
         [AcmeState]
         $State,
-
-        [Parameter()]
-        [switch]
-        $PassThru,
 
         [Parameter(Mandatory = $true, Position = 1, ParameterSetName="GetAccount")]
         [ValidateNotNull()]
@@ -1921,10 +1916,10 @@ function New-AccountKey {
         $Force
     )
 
-    if($PSCmdlet.ParameterSetName -eq "ECDsa") {
+    if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
         $accountKey = [IAccountKey]([ECDsaAccountKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa account key with hash size $ECDsaHashSize";
-    } else {
+    } elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
         $accountKey = [IAccountKey]([RSAAccountKey]::new($RSAHashSize, $RSAKeySize));
         Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
     }
@@ -2037,6 +2032,8 @@ function Get-AuthorizationError {
     )
 
     process {
+        $Order = Update-Order -State $state -Order $Order -PassThru
+
         if ($Order.Status -ine "invalid") {
             return;
         }
@@ -2397,10 +2394,10 @@ function New-CertificateKey {
         }
     }
 
-    if($PSCmdlet.ParameterSetName -eq "ECDsa") {
+    if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
         $certificateKey = [ICertificateKey]([ECDsaCertificateKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa certificate key with hash size $ECDsaHashSize";
-    } else {
+    } elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
         if($RSAKeySize -lt 2048 -or $RSAKeySize -gt 4096 -or ($RSAKeySize%8) -ne 0) {
             throw "The RSAKeySize must be between 2048 and 4096 and must be divisible by 8";
         }
@@ -3046,15 +3043,17 @@ function Update-Order {
         $PassThru
     )
 
-    if($PSCmdlet.ShouldProcess("Order", "Get updated order form ACME service and store it to state")) {
-        $response = Invoke-SignedWebRequest -Url $Order.ResourceUrl -State $State;
-        $Order.UpdateOrder($response);
-        $State.SetOrder($Order);
+    process {
+        if($PSCmdlet.ShouldProcess("Order", "Get updated order form ACME service and store it to state")) {
+            $response = Invoke-SignedWebRequest -Url $Order.ResourceUrl -State $State;
+            $Order.UpdateOrder($response);
+            $State.SetOrder($Order);
 
-        if($PassThru) {
-            return $Order;
+            if($PassThru) {
+                return $Order;
+            }
         }
-    }
+}
 }
 
 function Get-ServiceDirectory {
