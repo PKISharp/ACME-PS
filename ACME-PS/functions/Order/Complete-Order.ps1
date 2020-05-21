@@ -73,7 +73,7 @@ function Complete-Order {
             $CertificateKey = New-CertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue'
         }
 
-        if($null -eq $CertifikateKey) {
+        if($null -eq $CertificateKey) {
             throw "You need to provide a certificate key or enable automatic generation."
         }
 
