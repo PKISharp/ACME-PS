@@ -102,7 +102,10 @@ process {
     }
 
     Write-Information "Finished building - running tests";
-    & Invoke-ScriptAnalyzer -Path $ModuleOutFile;
+    
+    if ($null -ne (Get-Module PSScriptAnalyzer -ListAvailable)) {
+        & Invoke-ScriptAnalyzer -Path $ModuleOutFile;
+    }
 
     <# Run tests #>
     & Invoke-Command -ScriptBlock {
