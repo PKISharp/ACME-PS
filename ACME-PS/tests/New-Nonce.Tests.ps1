@@ -1,5 +1,10 @@
 InModuleScope ACME-PS {
     Describe "UnitTesting New-Nonce" -Tag "UnitTest" {
+        $simpleState = Get-State -Path "$PSScriptRoot\states\simple";
+        $state = New-State -WarningAction 'SilentlyContinue';
+
+        $state.Set($simpleState.GetServiceDirectory())
+
         Mock Invoke-AcmeWebRequest {
             $mockResult = [AcmeHttpResponse]::new();
             $mockResult.NextNonce = "MyNewNonce";
@@ -9,10 +14,7 @@ InModuleScope ACME-PS {
             $Method -eq "HEAD"
         }
 
-        $state = Get-State -Path $PSScriptRoot\states\simple
-        $state.AutoSave = $false;
-
-        $nonce = New-Nonce $state -PassThru;
+        $nonce = New-Nonce -State $state -PassThru;
 
         It 'called the ACME service' {
             Assert-VerifiableMock

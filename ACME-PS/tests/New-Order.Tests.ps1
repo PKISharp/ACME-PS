@@ -9,8 +9,13 @@ InModuleScope ACME-PS {
             $Method -eq "POST"
         }
 
-        $state = Get-State -Path $PSScriptRoot\states\simple
-        $state.AutoSave = $false;
+        $simpleState = Get-State -Path "$PSScriptRoot\states\simple";
+        $state = New-State -WarningAction 'SilentlyContinue';
+
+        $state.Set($simpleState.GetServiceDirectory())
+        $state.SetNonce($simpleState.GetNonce());
+        $state.Set($simpleState.GetAccountKey());
+        $state.Set($simpleState.GetAccount());
 
         $identifiers = @(
             New-Identifier "www.example2.com";
@@ -18,7 +23,7 @@ InModuleScope ACME-PS {
         )
 
         Context 'Mandatory parameters only' {
-            $order = New-Order $state -Identifiers $identifiers
+            $order = New-Order $state -Identifiers $identifiers;
 
             It 'called the ACME service' {
                 Assert-VerifiableMock
