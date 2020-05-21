@@ -30,7 +30,7 @@ function Export-Certificate {
         .PARAMETER Force
             Allows the operation to override existing a certificate.
 
-        .PARAMETER SkipExistingCertificate
+        .PARAMETER ForceCertificateReload
             Forces the operation to reload the certificate from the acme service.
 
         .PARAMETER DisablePEMStorage
