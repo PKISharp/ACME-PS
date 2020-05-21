@@ -33,6 +33,8 @@ function Get-AuthorizationError {
     )
 
     process {
+        $Order = Update-Order -State $state -Order $Order -PassThru
+
         if ($Order.Status -ine "invalid") {
             return;
         }
