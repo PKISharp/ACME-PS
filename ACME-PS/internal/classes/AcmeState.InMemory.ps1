@@ -7,7 +7,6 @@ class AcmeInMemoryState : AcmeState {
     hidden [hashtable] $Orders = @{};
 
     AcmeInMemoryState() {
-        Write-Warning "Using an ephemeral state-object might lead to data loss."
     }
 
     [AcmeDirectory] GetServiceDirectory() { return $this.ServiceDirectory; }
@@ -22,16 +21,16 @@ class AcmeInMemoryState : AcmeState {
 
 
     [void] AddOrder([AcmeOrder] $order) {
-        $this.Orders.Add($order);
+        SetOrder($order);
     }
 
     [void] SetOrder([AcmeOrder] $order) {
-         if(-not $this.Orders.Contains($order)) {
-            $this.Orders.Add($order);
-         }
+        $orderHash = $order.GetHashString();
+        $this.Orders[$orderHash] = $order;
     }
 
     [void] RemoveOrder([AcmeOrder] $order) {
-        $this.Orders.Remove($order);
+        $orderHash = $order.GetHashString();
+        $this.Orders.Remove($orderHash);
     }
 }
