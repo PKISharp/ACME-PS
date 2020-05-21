@@ -223,7 +223,7 @@ class AcmeDiskPersistedState : AcmeState {
     [ICertificateKey] GetOrderCertificateKey([AcmeOrder] $order) {
         $orderHash = $order.GetHashString();
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
-        
+
         if(Test-Path $certKeyFilename) {
             return (Import-CertificateKey -Path $certKeyFilename);
         }
@@ -234,10 +234,9 @@ class AcmeDiskPersistedState : AcmeState {
     [void] SetOrderCertificateKey([AcmeOrder] $order, [ICertificateKey] $certificateKey) {
         $orderHash = $order.GetHashString();
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
-        
+
         $certificateKey | Export-CertificateKey -Path $certKeyFilename
     }
-
 
     [byte[]] GetOrderCertificate([AcmeOrder] $order) {
         $orderHash = $order.GetHashString();
@@ -252,5 +251,4 @@ class AcmeDiskPersistedState : AcmeState {
 
         Set-ByteContent -Path $certFilename -Content $certificate;
     }
-
 }

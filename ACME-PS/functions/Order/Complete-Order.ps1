@@ -30,7 +30,7 @@ function Complete-Order {
 
         .EXAMPLE
             PS> Complete-Order -State $myState -Order $myOrder -CertificateKey $myCertKey
-        
+
         .EXAMPLE
             PS> Complete-Order -State $myState -Order $myOrder -GenerateCertificateKey
     #>
