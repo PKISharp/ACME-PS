@@ -85,10 +85,10 @@ function New-CertificateKey {
         }
     }
 
-    if($PSCmdlet.ParameterSetName -eq "ECDsa") {
+    if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
         $certificateKey = [ICertificateKey]([ECDsaCertificateKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa certificate key with hash size $ECDsaHashSize";
-    } else {
+    } elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
         if($RSAKeySize -lt 2048 -or $RSAKeySize -gt 4096 -or ($RSAKeySize%8) -ne 0) {
             throw "The RSAKeySize must be between 2048 and 4096 and must be divisible by 8";
         }

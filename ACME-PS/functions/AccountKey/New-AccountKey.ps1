@@ -92,10 +92,10 @@ function New-AccountKey {
         $Force
     )
 
-    if($PSCmdlet.ParameterSetName -eq "ECDsa") {
+    if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
         $accountKey = [IAccountKey]([ECDsaAccountKey]::new($ECDsaHashSize));
         Write-Verbose "Created new ECDsa account key with hash size $ECDsaHashSize";
-    } else {
+    } elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
         $accountKey = [IAccountKey]([RSAAccountKey]::new($RSAHashSize, $RSAKeySize));
         Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
     }
