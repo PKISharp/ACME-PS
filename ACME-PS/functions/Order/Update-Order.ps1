@@ -41,13 +41,15 @@ function Update-Order {
         $PassThru
     )
 
-    if($PSCmdlet.ShouldProcess("Order", "Get updated order form ACME service and store it to state")) {
-        $response = Invoke-SignedWebRequest -Url $Order.ResourceUrl -State $State;
-        $Order.UpdateOrder($response);
-        $State.SetOrder($Order);
+    process {
+        if($PSCmdlet.ShouldProcess("Order", "Get updated order form ACME service and store it to state")) {
+            $response = Invoke-SignedWebRequest -Url $Order.ResourceUrl -State $State;
+            $Order.UpdateOrder($response);
+            $State.SetOrder($Order);
 
-        if($PassThru) {
-            return $Order;
+            if($PassThru) {
+                return $Order;
+            }
         }
-    }
+}
 }
