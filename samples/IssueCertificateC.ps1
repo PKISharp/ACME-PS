@@ -14,7 +14,7 @@ $dnsIdentifiers = New-ACMEIdentifier "www.example.com";
 <# -- Script -- #>
 Import-Module 'ACME-PS';
 
-if ($null -ne $order) { # Will fetch the order
+if ($null -eq $order) { # Will fetch the order
     $order = Find-ACMEOrder -State $acmeStateDir -Identifiers $dnsIdentifiers;
 }
 
