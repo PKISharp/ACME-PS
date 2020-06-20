@@ -23,6 +23,7 @@ function Complete-Order {
 
         .PARAMETER GenerateCertificateKey
             If present, the cmdlet will automatically create a certificate key and store it with the order object.
+            Should the order already have an associated key, it will be used.
 
         .PARAMETER PassThru
             Forces the order to be returned to the pipeline.
@@ -69,12 +70,16 @@ function Complete-Order {
         $ErrorActionPreference = 'Stop';
 
         if($GenerateCertificateKey) {
-            $SaveCertificateKey = $true;
-            $CertificateKey = New-CertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue'
+            $CertificateKey = $State.GetOrderCertificateKey($Order);
+
+            if($null -eq $CertificateKey) {
+                $SaveCertificateKey = $true;
+                $CertificateKey = New-CertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue';
+            }
         }
 
         if($null -eq $CertificateKey) {
-            throw "You need to provide a certificate key or enable automatic generation."
+            throw "You need to provide a certificate key or enable automatic generation.";
         }
 
         if($SaveCertificateKey) {
@@ -85,11 +90,11 @@ function Complete-Order {
         if($Order.CSROptions -and -not [string]::IsNullOrWhiteSpace($Order.CSROptions.DistinguishedName)) {
             $certDN = $Order.CSROptions.DistinguishedName;
         } else {
-            $certDN = "CN=$($Order.Identifiers[0].Value)"
+            $certDN = "CN=$($Order.Identifiers[0].Value)";
         }
 
         $csr = $CertificateKey.GenerateCsr($dnsNames, $certDN);
-        $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) }
+        $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) };
 
         $requestUrl = $Order.FinalizeUrl;
 
