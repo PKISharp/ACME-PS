@@ -1,4 +1,4 @@
-function New-Identifier {
+function New-ACMEIdentifier {
     <#
         .SYNOPSIS
             Creates a new identifier.
@@ -15,7 +15,7 @@ function New-Identifier {
 
 
         .EXAMPLE
-            PS> New-Identifier www.example.com
+            PS> New-ACMEIdentifier www.example.com
     #>
     [CmdletBinding(SupportsShouldProcess=$false)]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute(

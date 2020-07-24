@@ -1,4 +1,4 @@
-function Get-Challenge {
+function Get-ACMEChallenge {
     <#
         .SYNOPSIS
             Gets the challange from the ACME service.
@@ -40,7 +40,7 @@ function Get-Challenge {
     process {
         $challange = $Authorization.Challenges | Where-Object { $_.Type -eq $Type } | Select-Object -First 1
         if(-not $challange.Data) {
-            $challange | Initialize-Challenge $State
+            $challange | Initialize-ACMEChallenge $State
         }
 
         return $challange;

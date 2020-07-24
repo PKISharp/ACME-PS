@@ -1,4 +1,4 @@
-function Export-Certificate {
+function Export-ACMECertificate {
     <#
         .SYNOPSIS
             Exports an issued certificate as pfx with private and public key.
@@ -38,7 +38,7 @@ function Export-Certificate {
             This will make revocation impossible.
 
         .EXAMPLE
-            PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
+            PS> Export-ACMECertificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -104,7 +104,7 @@ function Export-Certificate {
     }
 
     if($null -eq $certificate) {
-        $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
+        $response = Invoke-ACMESignedWebRequest -Url $Order.CertificateUrl -State $State;
         $certificate = $response.Content;
 
         if(-not $DisablePEMStorage) {

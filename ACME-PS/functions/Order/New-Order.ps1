@@ -1,4 +1,4 @@
-function New-Order {
+function New-ACMEOrder {
     <#
         .SYNOPSIS
             Creates a new order object.
@@ -21,18 +21,18 @@ function New-Order {
             Latest date the certificate should be considered valid.
 
         .PARAMETER CertDN
-            If set, this will be used as Distinguished Name for the CSR that will be send to the ACME service by Complete-Order.
+            If set, this will be used as Distinguished Name for the CSR that will be send to the ACME service by Complete-ACMEOrder.
             If not set, the first identifier will be used as CommonName (CN=Identifier).
             Make sure to provide a valid X500DistinguishedName.
 
         .EXAMPLE
-            PS> New-Order -State $myState -Identifiers $myIdentifiers
+            PS> New-ACMEOrder -State $myState -Identifiers $myIdentifiers
 
         .EXAMPLE
-            PS> New-Order -Identifiers (New-Identifier "dns" "www.test.com")
+            PS> New-ACMEOrder -Identifiers (New-ACMEIdentifier "dns" "www.test.com")
 
         .EXAMPLE
-            PS> New-Order -State "C:\Acme-State\" -Identifiers "www.example.com"
+            PS> New-ACMEOrder -State "C:\Acme-State\" -Identifiers "www.example.com"
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -81,7 +81,7 @@ function New-Order {
     }
 
     if($PSCmdlet.ShouldProcess("Order", "Create new order with ACME Service")) {
-        $response = Invoke-SignedWebRequest -Url $requestUrl -State $State -Payload $payload;
+        $response = Invoke-ACMESignedWebRequest -Url $requestUrl -State $State -Payload $payload;
 
         $order = [AcmeOrder]::new($response, $csrOptions);
         $state.AddOrder($order);

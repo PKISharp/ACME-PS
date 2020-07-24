@@ -1,4 +1,4 @@
-function Update-Order {
+function Update-ACMEOrder {
     <#
         .SYNOPSIS
             Updates an order from acme service
@@ -20,7 +20,7 @@ function Update-Order {
 
 
         .EXAMPLE
-            PS> $myOrder | Update-Order -State $myState -PassThru
+            PS> $myOrder | Update-ACMEOrder -State $myState -PassThru
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType("AcmeOrder")]
@@ -43,7 +43,7 @@ function Update-Order {
 
     process {
         if($PSCmdlet.ShouldProcess("Order", "Get updated order form ACME service and store it to state")) {
-            $response = Invoke-SignedWebRequest -Url $Order.ResourceUrl -State $State;
+            $response = Invoke-ACMESignedWebRequest -Url $Order.ResourceUrl -State $State;
             $Order.UpdateOrder($response);
             $State.SetOrder($Order);
 

@@ -1,5 +1,5 @@
 InModuleScope ACME-PS {
-    Describe "UnitTesting New-Order" -Tag "UnitTest" {
+    Describe "UnitTesting New-ACMEOrder" -Tag "UnitTest" {
         Mock Invoke-AcmeWebRequest {
             $mockResult = [AcmeHttpResponse]::new();
             $mockResult.NextNonce = "NextNonce";
@@ -9,8 +9,8 @@ InModuleScope ACME-PS {
             $Method -eq "POST"
         }
 
-        $simpleState = Get-State -Path "$PSScriptRoot\states\simple";
-        $state = New-State -WarningAction 'SilentlyContinue';
+        $simpleState = Get-ACMEState -Path "$PSScriptRoot\states\simple";
+        $state = New-ACMEState -WarningAction 'SilentlyContinue';
 
         $state.Set($simpleState.GetServiceDirectory())
         $state.SetNonce($simpleState.GetNonce());
@@ -18,12 +18,12 @@ InModuleScope ACME-PS {
         $state.Set($simpleState.GetAccount());
 
         $identifiers = @(
-            New-Identifier "www.example2.com";
-            New-Identifier "www.example1.com";
+            New-ACMEIdentifier "www.example2.com";
+            New-ACMEIdentifier "www.example1.com";
         )
 
         Context 'Mandatory parameters only' {
-            $order = New-Order $state -Identifiers $identifiers;
+            $order = New-ACMEOrder $state -Identifiers $identifiers;
 
             It 'called the ACME service' {
                 Assert-VerifiableMock
@@ -38,7 +38,7 @@ InModuleScope ACME-PS {
         }
 
         Context 'Mandatory parameters and CertDN' {
-            $order = New-Order $state -Identifiers $identifiers -CertDN "CN=MyTestDN"
+            $order = New-ACMEOrder $state -Identifiers $identifiers -CertDN "CN=MyTestDN"
 
             It 'used the certCN for the options' {
                 $order.CSROptions.DistinguishedName | Should -Be "CN=MyTestDN";
@@ -47,7 +47,7 @@ InModuleScope ACME-PS {
 
         Context 'Exceptions' {
             It 'does not accept wrong CertDNs' {
-               { New-Order $state -Identifiers $identifiers -CertDN "invalid" } | Should -Throw;
+               { New-ACMEOrder $state -Identifiers $identifiers -CertDN "invalid" } | Should -Throw;
             }
         }
     }

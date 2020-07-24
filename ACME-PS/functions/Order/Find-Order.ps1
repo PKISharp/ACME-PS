@@ -1,4 +1,4 @@
-function Find-Order {
+function Find-ACMEOrder {
     <#
         .SYNOPSIS
             Finds a saved order in the state object and returns it.
@@ -21,7 +21,7 @@ function Find-Order {
             be returned. Returns null, if none is found.
 
         .EXAMPLE
-            PS> Get-Order -Url "https://service.example.com/kid/213/order/123"
+            PS> Get-ACMEOrder -Url "https://service.example.com/kid/213/order/123"
     #>
     [CmdletBinding()]
     [OutputType("AcmeOrder")]

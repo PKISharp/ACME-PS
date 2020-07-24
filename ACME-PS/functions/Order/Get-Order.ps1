@@ -1,4 +1,4 @@
-function Get-Order {
+function Get-ACMEOrder {
     <#
         .SYNOPSIS
             Fetches an order from acme service
@@ -16,7 +16,7 @@ function Get-Order {
 
 
         .EXAMPLE
-            PS> Get-Order -Url "https://service.example.com/kid/213/order/123"
+            PS> Get-ACMEOrder -Url "https://service.example.com/kid/213/order/123"
     #>
     [CmdletBinding()]
     [OutputType("AcmeOrder")]
@@ -33,6 +33,6 @@ function Get-Order {
         $State
     )
 
-    $response = Invoke-SignedWebRequest -Url $Url -State $State;
+    $response = Invoke-ACMESignedWebRequest -Url $Url -State $State;
     return [AcmeOrder]::new($response);
 }

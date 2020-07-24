@@ -1,4 +1,4 @@
-function Complete-Order {
+function Complete-ACMEOrder {
     <#
         .SYNOPSIS
             Completes an order process at the ACME service, so the certificate will be issued.
@@ -30,10 +30,10 @@ function Complete-Order {
 
 
         .EXAMPLE
-            PS> Complete-Order -State $myState -Order $myOrder -CertificateKey $myCertKey
+            PS> Complete-ACMEOrder -State $myState -Order $myOrder -CertificateKey $myCertKey
 
         .EXAMPLE
-            PS> Complete-Order -State $myState -Order $myOrder -GenerateCertificateKey
+            PS> Complete-ACMEOrder -State $myState -Order $myOrder -GenerateCertificateKey
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -74,7 +74,7 @@ function Complete-Order {
 
             if($null -eq $CertificateKey) {
                 $SaveCertificateKey = $true;
-                $CertificateKey = New-CertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue';
+                $CertificateKey = New-ACMECertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue';
             }
         }
 
@@ -99,7 +99,7 @@ function Complete-Order {
         $requestUrl = $Order.FinalizeUrl;
 
         if($PSCmdlet.ShouldProcess("Order", "Finalizing order at ACME service by submitting CSR")) {
-            $response = Invoke-SignedWebRequest -Url $requestUrl -State $State -Payload $payload;
+            $response = Invoke-ACMESignedWebRequest -Url $requestUrl -State $State -Payload $payload;
 
             $Order.UpdateOrder($response);
         }

@@ -1,4 +1,4 @@
-function New-Nonce {
+function New-ACMENonce {
     <#
         .SYNOPSIS
             Gets a new nonce.
@@ -16,7 +16,7 @@ function New-Nonce {
 
 
         .EXAMPLE
-            PS> New-Nonce -State $state
+            PS> New-ACMENonce -State $state
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType("string")]
