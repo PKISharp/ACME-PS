@@ -21,7 +21,6 @@
 		'System.Net.Http'
 	)
 
-	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
 		"Disable-ACMEAccount",
 		"Find-ACMEAccount",
@@ -50,12 +49,13 @@
 		"Get-ACMENonce",
 		"New-ACMENonce",
 
-		"Complete-ACMEOrder",
+		"New-ACMEIdentifier",
+
 		"Find-ACMEOrder",
 		"Get-ACMEOrder",
-		"New-ACMEIdentifier",
 		"New-ACMEOrder",
 		"Update-ACMEOrder"
+		"Complete-ACMEOrder",
 
 		"Get-ACMEServiceDirectory",
 		"Get-ACMETermsOfService",
