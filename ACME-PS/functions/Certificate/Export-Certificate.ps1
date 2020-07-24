@@ -119,7 +119,7 @@ function Export-Certificate {
 
         $pemString = [System.Text.Encoding]::UTF8.GetString($certificate);
         $certificates = [System.Collections.ArrayList]::new();
-        foreach($pem in $pemString.Split(@($certBoundary), "RemoveEmptyEntries")) {
+        foreach($pem in $pemString.Split(@($certBoundary), [System.StringSplitOptions]::RemoveEmptyEntries)) {
             if(-not $pem -or -not $pem.Trim()) { continue; }
 
             $certBytes = [System.Text.Encoding]::UTF8.GetBytes($pem.Trim() + "`n$certBoundary");

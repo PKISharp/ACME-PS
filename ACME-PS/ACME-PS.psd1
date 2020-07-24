@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.2.3'
+	ModuleVersion = '1.2.4'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -79,7 +79,7 @@
 			ProjectUri = 'https://github.com/PKISharp/ACME-PS'
 
 			# An icon representing this module.
-			Icon = './ACME-PS.png'
+			IconUri = 'https://github.com/PKISharp/ACME-PS/raw/master/ACME-PS/ACME-PS.png'
 
 			# ReleaseNotes of this module
 			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACME-PS/releases'
