@@ -2083,6 +2083,10 @@ function Export-ACMECertificate {
             The downloaded public certificate will not be stored with the order.
             This will make revocation impossible.
 
+        .PARAMETER AdditionalChainCertificates
+            Certificates in this Paramter will be appended to the certificate chain during export.
+            Provide in PEM form (-----BEGIN CERTIFICATE----- [CertContent] -----END CERTIFICATE-----).
+
         .EXAMPLE
             PS> Export-ACMECertificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>
@@ -2126,7 +2130,11 @@ function Export-ACMECertificate {
 
         [Parameter()]
         [switch]
-        $DisablePEMStorage
+        $DisablePEMStorage,
+
+        [Parameter()]
+        [string[]]
+        $AdditionalChainCertificates
     )
 
     $ErrorActionPreference = 'Stop'
@@ -2161,9 +2169,15 @@ function Export-ACMECertificate {
     if($ExcludeChain) {
         Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
     } else {
-        $certBoundary = "-----END CERTIFICATE-----";
-
         $pemString = [System.Text.Encoding]::UTF8.GetString($certificate);
+
+        if($null -ne $AdditionalChainCertificates) {
+            foreach($chainCert in $AdditionalChainCertificates) {
+                $pemString = $pemString + "`n$chainCert";
+            }
+        }
+
+        $certBoundary = "-----END CERTIFICATE-----";
         $certificates = [System.Collections.ArrayList]::new();
         foreach($pem in $pemString.Split(@($certBoundary), [System.StringSplitOptions]::RemoveEmptyEntries)) {
             if(-not $pem -or -not $pem.Trim()) { continue; }
