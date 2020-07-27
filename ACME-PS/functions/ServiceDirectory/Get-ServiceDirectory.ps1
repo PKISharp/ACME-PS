@@ -1,4 +1,4 @@
-function Get-ServiceDirectory {
+function Get-ACMEServiceDirectory {
     <#
         .SYNOPSIS
             Fetches the ServiceDirectory from an ACME Servers.
@@ -26,13 +26,13 @@ function Get-ServiceDirectory {
 
 
         .EXAMPLE
-            PS> Get-ServiceDirectory $myState
+            PS> Get-ACMEServiceDirectory $myState
 
         .EXAMPLE
-            PS> Get-ServiceDirectory "LetsEncrypt" $myState -PassThru
+            PS> Get-ACMEServiceDirectory "LetsEncrypt" $myState -PassThru
 
         .EXAMPLE
-            PS> Get-ServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org" $myState
+            PS> Get-ACMEServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org" $myState
     #>
     [CmdletBinding(DefaultParameterSetName="FromName")]
     [OutputType("ACMEDirectory")]

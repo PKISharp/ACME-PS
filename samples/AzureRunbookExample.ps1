@@ -40,8 +40,8 @@ $acmeStateDir = "C:\Temp\AcmeState";
 $certExportPath = "C:\Temp\certificates\certificate.pfx";
 
 # ServiceName (valid names are LetsEncrypt and LetsEncrypt-Staging, use the latter one for testing your scripts).
-#$acmeServiceName = "LetsEncrypt-Staging";
-$acmeServiceName = "LetsEncrypt";
+$acmeServiceName = "LetsEncrypt-Staging";
+#$acmeServiceName = "LetsEncrypt";
 
 
 function PublishWebsiteFile

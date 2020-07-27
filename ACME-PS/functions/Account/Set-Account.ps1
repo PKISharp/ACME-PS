@@ -1,4 +1,4 @@
-function Set-Account {
+function Set-ACMEAccount {
     <#
         .SYNOPSIS
             Updates an ACME account
@@ -20,7 +20,7 @@ function Set-Account {
             If set, the account will be disabled and thus not be usable with the acme-service anymore.
 
         .EXAMPLE
-            PS> Set-Account -State $myState -NewAccountKey $myNewAccountKey
+            PS> Set-ACMEAccount -State $myState -NewAccountKey $myNewAccountKey
     #>
     [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='High')]
     param(
@@ -65,7 +65,7 @@ function Set-Account {
     }
 
     if($PSCmdlet.ShouldProcess("Account", $message)) {
-        $response = Invoke-SignedWebRequest -Url $Url -State $State -Payload $payload -ErrorAction 'Stop';
+        $response = Invoke-ACMESignedWebRequest -Url $Url -State $State -Payload $payload -ErrorAction 'Stop';
         $keyId = $State.GetAccount().KeyId;
 
         $account = [AcmeAccount]::new($response, $keyId);

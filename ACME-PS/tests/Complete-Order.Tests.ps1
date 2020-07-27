@@ -1,5 +1,5 @@
 InModuleScope ACME-PS {
-    Describe "UnitTesting Complete-Order" -Tag "UnitTest" {
+    Describe "UnitTesting Complete-ACMEOrder" -Tag "UnitTest" {
         $Urls = @{
             ResourceUrl = "https://service.acme/Order1";
             AuthorizationUrl = "https://service.acme/Order1/AuthZ";
@@ -15,8 +15,8 @@ InModuleScope ACME-PS {
             $Method -eq "POST"
         }
 
-        $simpleState = Get-State -Path "$PSScriptRoot\states\simple";
-        $state = New-State -WarningAction 'SilentlyContinue';
+        $simpleState = Get-ACMEState -Path "$PSScriptRoot\states\simple";
+        $state = New-ACMEState -WarningAction 'SilentlyContinue';
 
         $state.Set($simpleState.GetServiceDirectory())
         $state.SetNonce($simpleState.GetNonce());
@@ -28,8 +28,8 @@ InModuleScope ACME-PS {
             Expires  = [DateTime]::Now.AddDays(1);
 
             Identifiers = @(
-                New-Identifier "www.example2.com";
-                New-Identifier "www.example1.com";
+                New-ACMEIdentifier "www.example2.com";
+                New-ACMEIdentifier "www.example1.com";
             )
 
             AuthorizationUrls = $Urls.AuthorizationUrl;
@@ -41,10 +41,10 @@ InModuleScope ACME-PS {
             });
         });
         
-        $certificateKey = New-CertificateKey -RSA -SkipKeyExport -WarningAction 'SilentlyContinue';
+        $certificateKey = New-ACMECertificateKey -RSA -SkipKeyExport -WarningAction 'SilentlyContinue';
 
         Context 'CustomKey parameter set' {
-            Complete-Order -State $state -Order $order -CertificateKey $certificateKey;
+            Complete-ACMEOrder -State $state -Order $order -CertificateKey $certificateKey;
 
             It 'called ACME service to finalize the order' {
                 Assert-VerifiableMock

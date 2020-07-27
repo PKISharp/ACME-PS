@@ -1050,7 +1050,7 @@ class AcmeDiskPersistedState : AcmeState {
         $fileName = $this.Filenames.AccountKey;
 
         if(Test-Path $fileName) {
-            $result = Import-AccountKey -Path $fileName;
+            $result = Import-ACMEAccountKey -Path $fileName;
             return $result;
         }
 
@@ -1090,7 +1090,7 @@ class AcmeDiskPersistedState : AcmeState {
         $fileName = $this.Filenames.AccountKey;
 
         Write-Debug "Storing the account key to $fileName";
-        $value | Export-AccountKey $fileName -Force;
+        $value | Export-ACMEAccountKey $fileName -Force;
     }
 
     [void] Set([AcmeAccount] $value) {
@@ -1177,7 +1177,7 @@ class AcmeDiskPersistedState : AcmeState {
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
 
         if(Test-Path $certKeyFilename) {
-            return (Import-CertificateKey -Path $certKeyFilename);
+            return (Import-ACMECertificateKey -Path $certKeyFilename);
         }
 
         return $null;
@@ -1187,7 +1187,7 @@ class AcmeDiskPersistedState : AcmeState {
         $orderHash = $order.GetHashString();
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
 
-        $certificateKey | Export-CertificateKey -Path $certKeyFilename
+        $certificateKey | Export-ACMECertificateKey -Path $certKeyFilename
     }
 
     [byte[]] GetOrderCertificate([AcmeOrder] $order) {
@@ -1482,7 +1482,7 @@ function Set-ByteContent {
     }
 }
 
-function Get-Account {
+function Get-ACMEAccount {
     <#
         .SYNOPSIS
             Loads account data from the ACME service.
@@ -1504,10 +1504,10 @@ function Get-Account {
 
 
         .EXAMPLE
-            PS> Get-Account -State $myState -PassThru
+            PS> Get-ACMEAccount -State $myState -PassThru
 
         .EXAMPLE
-            PS> Get-Account -State $myState -KeyId 12345
+            PS> Get-ACMEAccount -State $myState -KeyId 12345
     #>
     [CmdletBinding(DefaultParameterSetName = "FindAccount")]
     param(
@@ -1529,7 +1529,7 @@ function Get-Account {
     if($PSCmdlet.ParameterSetName -eq "FindAccount") {
         $requestUrl = $State.GetServiceDirectory().NewAccount;
         $payload = @{"onlyReturnExisting" = $true};
-        $response = Invoke-SignedWebRequest -Url $requestUrl -State $State -Payload $payload
+        $response = Invoke-ACMESignedWebRequest -Url $requestUrl -State $State -Payload $payload
 
         if($response.StatusCode -eq 200) {
             $KeyId = $response.Headers["Location"][0];
@@ -1541,13 +1541,13 @@ function Get-Account {
         }
     }
 
-    $response = Invoke-SignedWebRequest -Url $AccountUrl -State $State -Payload @{}
+    $response = Invoke-ACMESignedWebRequest -Url $AccountUrl -State $State -Payload @{}
     $result = [AcmeAccount]::new($response, $KeyId);
 
     return $result;
 }
 
-function New-Account {
+function New-ACMEAccount {
     <#
         .SYNOPSIS
             Registers your account key with a new ACME-Account.
@@ -1576,10 +1576,10 @@ function New-Account {
 
 
         .EXAMPLE
-            PS> New-Account -AcceptTOS -EmailAddresses "mail@example.com" -AutomaticAccountHandling
+            PS> New-ACMEAccount -AcceptTOS -EmailAddresses "mail@example.com" -AutomaticAccountHandling
 
         .EXAMPLE
-            PS> New-Account $myServiceDirectory $myAccountKey $myNonce -AcceptTos -EmailAddresses @(...) -ExistingAccountIsError
+            PS> New-ACMEAccount $myServiceDirectory $myAccountKey $myNonce -AcceptTos -EmailAddresses @(...) -ExistingAccountIsError
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -1614,8 +1614,8 @@ function New-Account {
 
     $url = $State.GetServiceDirectory().NewAccount;
 
-    if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
-        $response = Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SuppressKeyId -ErrorAction 'Stop'
+    if($PSCmdlet.ShouldProcess("New-ACMEAccount", "Sending account registration to ACME Server $Url")) {
+        $response = Invoke-ACMESignedWebRequest -Url $url -State $State -Payload $payload -SuppressKeyId -ErrorAction 'Stop'
 
         if($response.StatusCode -eq 200) {
             if(-not $ExistingAccountIsError) {
@@ -1623,7 +1623,7 @@ function New-Account {
 
                 $keyId = $response.Headers["Location"][0];
 
-                return Get-Account -AccountUrl $keyId -KeyId $keyId -State $State -PassThru:$PassThru
+                return Get-ACMEAccount -AccountUrl $keyId -KeyId $keyId -State $State -PassThru:$PassThru
             } else {
                 Write-Error "JWK had already been registiered for an account."
                 return;
@@ -1639,7 +1639,7 @@ function New-Account {
     }
 }
 
-function Set-Account {
+function Set-ACMEAccount {
     <#
         .SYNOPSIS
             Updates an ACME account
@@ -1661,7 +1661,7 @@ function Set-Account {
             If set, the account will be disabled and thus not be usable with the acme-service anymore.
 
         .EXAMPLE
-            PS> Set-Account -State $myState -NewAccountKey $myNewAccountKey
+            PS> Set-ACMEAccount -State $myState -NewAccountKey $myNewAccountKey
     #>
     [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='High')]
     param(
@@ -1706,7 +1706,7 @@ function Set-Account {
     }
 
     if($PSCmdlet.ShouldProcess("Account", $message)) {
-        $response = Invoke-SignedWebRequest -Url $Url -State $State -Payload $payload -ErrorAction 'Stop';
+        $response = Invoke-ACMESignedWebRequest -Url $Url -State $State -Payload $payload -ErrorAction 'Stop';
         $keyId = $State.GetAccount().KeyId;
 
         $account = [AcmeAccount]::new($response, $keyId);
@@ -1720,7 +1720,7 @@ function Set-Account {
     }
 }
 
-function Export-AccountKey {
+function Export-ACMEAccountKey {
     <#
         .SYNOPSIS
             Stores an account key to the given path.
@@ -1740,7 +1740,7 @@ function Export-AccountKey {
 
 
         .EXAMPLE
-            PS> Export-AccountKey -Path "C:\myExportPath.xml" -AccountKey $myAccountKey
+            PS> Export-ACMEAccountKey -Path "C:\myExportPath.xml" -AccountKey $myAccountKey
     #>
     [CmdletBinding()]
     param(
@@ -1766,13 +1766,13 @@ function Export-AccountKey {
     }
 }
 
-function Import-AccountKey {
+function Import-ACMEAccountKey {
     <#
         .SYNOPSIS
             Imports an exported account key.
 
         .DESCRIPTION
-            Imports an account key that has been exported with Export-AccountKey. If requested, the key is registered for automatic key handling.
+            Imports an account key that has been exported with Export-ACMEAccountKey. If requested, the key is registered for automatic key handling.
 
 
         .PARAMETER Path
@@ -1787,7 +1787,7 @@ function Import-AccountKey {
 
 
         .EXAMPLE
-            PS> Import-AccountKey -State $myState -Path C:\AcmeTemp\AccountKey.xml
+            PS> Import-ACMEAccountKey -State $myState -Path C:\AcmeTemp\AccountKey.xml
     #>
     param(
         # Specifies a path to one or more locations.
@@ -1822,7 +1822,7 @@ function Import-AccountKey {
     }
 }
 
-function New-AccountKey {
+function New-ACMEAccountKey {
     <#
         .SYNOPSIS
             Creates a new account key, that will be used to sign ACME operations.
@@ -1867,13 +1867,13 @@ function New-AccountKey {
             existing account key.
 
         .EXAMPLE
-            PS> New-AccountKey -State $myState
+            PS> New-ACMEAccountKey -State $myState
 
         .EXAMPLE
-            PS> New-AccountKey -State $myState -RSA -HashSize 512
+            PS> New-ACMEAccountKey -State $myState -RSA -HashSize 512
 
         .EXAMPLE
-            PS> New-AccountKey -ECDsa -HashSize 384
+            PS> New-ACMEAccountKey -ECDsa -HashSize 384
     #>
     [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
     [OutputType("IAccountKey")]
@@ -1939,7 +1939,7 @@ function New-AccountKey {
     }
 }
 
-function Get-Authorization {
+function Get-ACMEAuthorization {
     <#
         .SYNOPSIS
             Fetches authorizations from acme service.
@@ -1960,10 +1960,10 @@ function Get-Authorization {
 
 
         .EXAMPLE
-            PS> Get-Authorization $myOrder $myState
+            PS> Get-ACMEAuthorization $myOrder $myState
 
         .EXAMPLE
-            PS> Get-Authorization https://acme.server/authz/1243 $myState
+            PS> Get-ACMEAuthorization https://acme.server/authz/1243 $myState
     #>
     [CmdletBinding()]
     param(
@@ -1987,17 +1987,17 @@ function Get-Authorization {
     process {
         switch ($PSCmdlet.ParameterSetName) {
             "FromOrder" {
-                $Order.AuthorizationUrls | ForEach-Object { Get-Authorization -Url $_ $State }
+                $Order.AuthorizationUrls | ForEach-Object { Get-ACMEAuthorization -Url $_ $State }
             }
             Default {
-                $response = Invoke-SignedWebRequest -Url $Url -State $State
+                $response = Invoke-ACMESignedWebRequest -Url $Url -State $State
                 return [AcmeAuthorization]::new($response);
             }
         }
     }
 }
 
-function Get-AuthorizationError {
+function Get-ACMEAuthorizationError {
     <#
         .SYNOPSIS
             Fetches authorizations erros from acme service.
@@ -2015,7 +2015,7 @@ function Get-AuthorizationError {
 
 
         .EXAMPLE
-            PS> Get-AuthorizationError $myOrder $myState
+            PS> Get-ACMEAuthorizationError $myOrder $myState
     #>
     [CmdletBinding()]
     param(
@@ -2032,19 +2032,19 @@ function Get-AuthorizationError {
     )
 
     process {
-        $Order = Update-Order -State $state -Order $Order -PassThru
+        $Order = Update-ACMEOrder -State $state -Order $Order -PassThru
 
         if ($Order.Status -ine "invalid") {
             return;
         }
 
-        $authorizations = $Order.AuthorizationUrls | ForEach-Object { Get-Authorization -Url $_ $State }
+        $authorizations = $Order.AuthorizationUrls | ForEach-Object { Get-ACMEAuthorization -Url $_ $State }
         $invalidAuthorizations = $authorizations | Where-Object { $_.Status -ieq "invalid" };
         $invalidAuthorizations | ForEach-Object { $_.Challenges | Where-Object { $_.Status -ieq "invalid" } }
     }
 }
 
-function Export-Certificate {
+function Export-ACMECertificate {
     <#
         .SYNOPSIS
             Exports an issued certificate as pfx with private and public key.
@@ -2083,8 +2083,12 @@ function Export-Certificate {
             The downloaded public certificate will not be stored with the order.
             This will make revocation impossible.
 
+        .PARAMETER AdditionalChainCertificates
+            Certificates in this Paramter will be appended to the certificate chain during export.
+            Provide in PEM form (-----BEGIN CERTIFICATE----- [CertContent] -----END CERTIFICATE-----).
+
         .EXAMPLE
-            PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
+            PS> Export-ACMECertificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -2126,7 +2130,11 @@ function Export-Certificate {
 
         [Parameter()]
         [switch]
-        $DisablePEMStorage
+        $DisablePEMStorage,
+
+        [Parameter()]
+        [string[]]
+        $AdditionalChainCertificates
     )
 
     $ErrorActionPreference = 'Stop'
@@ -2150,7 +2158,7 @@ function Export-Certificate {
     }
 
     if($null -eq $certificate) {
-        $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
+        $response = Invoke-ACMESignedWebRequest -Url $Order.CertificateUrl -State $State;
         $certificate = $response.Content;
 
         if(-not $DisablePEMStorage) {
@@ -2161,9 +2169,15 @@ function Export-Certificate {
     if($ExcludeChain) {
         Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
     } else {
-        $certBoundary = "-----END CERTIFICATE-----";
-
         $pemString = [System.Text.Encoding]::UTF8.GetString($certificate);
+
+        if($null -ne $AdditionalChainCertificates) {
+            foreach($chainCert in $AdditionalChainCertificates) {
+                $pemString = $pemString + "`n$chainCert";
+            }
+        }
+
+        $certBoundary = "-----END CERTIFICATE-----";
         $certificates = [System.Collections.ArrayList]::new();
         foreach($pem in $pemString.Split(@($certBoundary), [System.StringSplitOptions]::RemoveEmptyEntries)) {
             if(-not $pem -or -not $pem.Trim()) { continue; }
@@ -2176,7 +2190,7 @@ function Export-Certificate {
     }
 }
 
-function Revoke-Certificate {
+function Revoke-ACMECertificate {
     <#
         .SYNOPSIS
             Revokes the certificate associated with the order.
@@ -2193,7 +2207,7 @@ function Revoke-Certificate {
             The order which contains the issued certificate.
 
         .EXAMPLE
-            PS> Revoke-Certificate -State $myState -Order $myOrder
+            PS> Revoke-ACMECertificate -State $myState -Order $myOrder
     #>
     [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='High')]
     param(
@@ -2220,11 +2234,11 @@ function Revoke-Certificate {
     $payload = @{ "certificate" = $base64Certificate };
 
     if($PSCmdlet.ShouldProcess("Certificate", "Revoking certificate.")) {
-        Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;
+        Invoke-ACMESignedWebRequest -Url $url -State $State -Payload $payload;
     }
 }
 
-function Export-CertificateKey {
+function Export-ACMECertificateKey {
     <#
         .SYNOPSIS
             Stores an certificate key to the given path.
@@ -2241,7 +2255,7 @@ function Export-CertificateKey {
 
 
         .EXAMPLE
-            PS> Export-CertificateKey -Path "C:\myExportPath.xml" -CertificateKey $myCertificateKey
+            PS> Export-ACMECertificateKey -Path "C:\myExportPath.xml" -CertificateKey $myCertificateKey
     #>
     [CmdletBinding()]
     param(
@@ -2271,13 +2285,13 @@ function Export-CertificateKey {
     }
 }
 
-function Import-CertificateKey {
+function Import-ACMECertificateKey {
     <#
         .SYNOPSIS
             Imports an exported certificate key.
 
         .DESCRIPTION
-            Imports an certificate key that has been exported with Export-CertificateKey. If requested, the key is registered for automatic key handling.
+            Imports an certificate key that has been exported with Export-ACMECertificateKey. If requested, the key is registered for automatic key handling.
 
 
         .PARAMETER Path
@@ -2285,7 +2299,7 @@ function Import-CertificateKey {
 
 
         .EXAMPLE
-            PS> Import-CertificateKey -Path C:\AcmeCertKeys\example.key.xml;
+            PS> Import-ACMECertificateKey -Path C:\AcmeCertKeys\example.key.xml;
     #>
     param(
         # Specifies a path to one or more locations.
@@ -2307,7 +2321,7 @@ function Import-CertificateKey {
     return $certificateKey;
 }
 
-function New-CertificateKey {
+function New-ACMECertificateKey {
     <#
         .SYNOPSIS
             Creates a new certificate key, that can will used to sign ACME operations.
@@ -2344,13 +2358,13 @@ function New-CertificateKey {
 
 
         .EXAMPLE
-            PS> New-CertificateKey -Path C:\myKeyExport.xml -AutomaticCertificateKeyHandling
+            PS> New-ACMECertificateKey -Path C:\myKeyExport.xml -AutomaticCertificateKeyHandling
 
         .EXAMPLE
-            PS> New-CertificateKey -Path C:\myKeyExport.json -RSA -HashSize 512
+            PS> New-ACMECertificateKey -Path C:\myKeyExport.json -RSA -HashSize 512
 
         .EXAMPLE
-            PS> New-CertificateKey -ECDsa -HashSize 384 -SkipKeyExport
+            PS> New-ACMECertificateKey -ECDsa -HashSize 384 -SkipKeyExport
     #>
     [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
     [OutputType("ICertificateKey")]
@@ -2412,12 +2426,12 @@ function New-CertificateKey {
     }
 
     if($PSCmdlet.ShouldProcess("CertificateKey", "Store created key to $Path and reload it from there")) {
-        Export-CertificateKey -CertificateKey $certificateKey -Path $Path -ErrorAction 'Stop' | Out-Null
-        return Import-CertificateKey -Path $Path -ErrorAction 'Stop'
+        Export-ACMECertificateKey -CertificateKey $certificateKey -Path $Path -ErrorAction 'Stop' | Out-Null
+        return Import-ACMECertificateKey -Path $Path -ErrorAction 'Stop'
     }
 }
 
-function Complete-Challenge {
+function Complete-ACMEChallenge {
     <#
         .SYNOPSIS
             Signals a challenge to be checked by the ACME service.
@@ -2439,7 +2453,7 @@ function Complete-Challenge {
             PS> Complete-Challange $myState $myChallange
 
         .EXAMPLE
-            PS> $myChallenge | Complete-Challenge $myState
+            PS> $myChallenge | Complete-ACMEChallenge $myState
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -2459,14 +2473,14 @@ function Complete-Challenge {
         $payload = @{};
 
         if($PSCmdlet.ShouldProcess("Challenge", "Complete challenge by submitting completion to ACME service")) {
-            $response = Invoke-SignedWebRequest -Url $Challenge.Url -State $State -Payload $payload;
+            $response = Invoke-ACMESignedWebRequest -Url $Challenge.Url -State $State -Payload $payload;
 
             return [AcmeChallenge]::new($response, $Challenge.Identifier);
         }
     }
 }
 
-function Get-Challenge {
+function Get-ACMEChallenge {
     <#
         .SYNOPSIS
             Gets the challange from the ACME service.
@@ -2508,14 +2522,14 @@ function Get-Challenge {
     process {
         $challange = $Authorization.Challenges | Where-Object { $_.Type -eq $Type } | Select-Object -First 1
         if(-not $challange.Data) {
-            $challange | Initialize-Challenge $State
+            $challange | Initialize-ACMEChallenge $State
         }
 
         return $challange;
     }
 }
 
-function Initialize-Challenge {
+function Initialize-ACMEChallenge {
     <#
         .SYNOPSIS
             Prepares a challange with the data explaining how to complete it.
@@ -2563,7 +2577,7 @@ function Initialize-Challenge {
 
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
-            return ($Authorization.challenges | Initialize-Challenge $State -PassThru:$PassThru);
+            return ($Authorization.challenges | Initialize-ACMEChallenge $State -PassThru:$PassThru);
         }
 
         $accountKey = $State.GetAccountKey();
@@ -2619,7 +2633,7 @@ function Initialize-Challenge {
     }
 }
 
-function New-Nonce {
+function New-ACMENonce {
     <#
         .SYNOPSIS
             Gets a new nonce.
@@ -2637,7 +2651,7 @@ function New-Nonce {
 
 
         .EXAMPLE
-            PS> New-Nonce -State $state
+            PS> New-ACMENonce -State $state
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType("string")]
@@ -2674,7 +2688,7 @@ function New-Nonce {
     }
 }
 
-function Complete-Order {
+function Complete-ACMEOrder {
     <#
         .SYNOPSIS
             Completes an order process at the ACME service, so the certificate will be issued.
@@ -2706,10 +2720,10 @@ function Complete-Order {
 
 
         .EXAMPLE
-            PS> Complete-Order -State $myState -Order $myOrder -CertificateKey $myCertKey
+            PS> Complete-ACMEOrder -State $myState -Order $myOrder -CertificateKey $myCertKey
 
         .EXAMPLE
-            PS> Complete-Order -State $myState -Order $myOrder -GenerateCertificateKey
+            PS> Complete-ACMEOrder -State $myState -Order $myOrder -GenerateCertificateKey
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -2750,7 +2764,7 @@ function Complete-Order {
 
             if($null -eq $CertificateKey) {
                 $SaveCertificateKey = $true;
-                $CertificateKey = New-CertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue';
+                $CertificateKey = New-ACMECertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue';
             }
         }
 
@@ -2775,7 +2789,7 @@ function Complete-Order {
         $requestUrl = $Order.FinalizeUrl;
 
         if($PSCmdlet.ShouldProcess("Order", "Finalizing order at ACME service by submitting CSR")) {
-            $response = Invoke-SignedWebRequest -Url $requestUrl -State $State -Payload $payload;
+            $response = Invoke-ACMESignedWebRequest -Url $requestUrl -State $State -Payload $payload;
 
             $Order.UpdateOrder($response);
         }
@@ -2786,7 +2800,7 @@ function Complete-Order {
     }
 }
 
-function Find-Order {
+function Find-ACMEOrder {
     <#
         .SYNOPSIS
             Finds a saved order in the state object and returns it.
@@ -2809,7 +2823,7 @@ function Find-Order {
             be returned. Returns null, if none is found.
 
         .EXAMPLE
-            PS> Get-Order -Url "https://service.example.com/kid/213/order/123"
+            PS> Get-ACMEOrder -Url "https://service.example.com/kid/213/order/123"
     #>
     [CmdletBinding()]
     [OutputType("AcmeOrder")]
@@ -2837,7 +2851,7 @@ function Find-Order {
     return $State.FindOrder($Identifiers);
 }
 
-function Get-Order {
+function Get-ACMEOrder {
     <#
         .SYNOPSIS
             Fetches an order from acme service
@@ -2855,7 +2869,7 @@ function Get-Order {
 
 
         .EXAMPLE
-            PS> Get-Order -Url "https://service.example.com/kid/213/order/123"
+            PS> Get-ACMEOrder -Url "https://service.example.com/kid/213/order/123"
     #>
     [CmdletBinding()]
     [OutputType("AcmeOrder")]
@@ -2872,11 +2886,11 @@ function Get-Order {
         $State
     )
 
-    $response = Invoke-SignedWebRequest -Url $Url -State $State;
+    $response = Invoke-ACMESignedWebRequest -Url $Url -State $State;
     return [AcmeOrder]::new($response);
 }
 
-function New-Identifier {
+function New-ACMEIdentifier {
     <#
         .SYNOPSIS
             Creates a new identifier.
@@ -2893,7 +2907,7 @@ function New-Identifier {
 
 
         .EXAMPLE
-            PS> New-Identifier www.example.com
+            PS> New-ACMEIdentifier www.example.com
     #>
     [CmdletBinding(SupportsShouldProcess=$false)]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
@@ -2913,7 +2927,7 @@ function New-Identifier {
     }
 }
 
-function New-Order {
+function New-ACMEOrder {
     <#
         .SYNOPSIS
             Creates a new order object.
@@ -2936,18 +2950,18 @@ function New-Order {
             Latest date the certificate should be considered valid.
 
         .PARAMETER CertDN
-            If set, this will be used as Distinguished Name for the CSR that will be send to the ACME service by Complete-Order.
+            If set, this will be used as Distinguished Name for the CSR that will be send to the ACME service by Complete-ACMEOrder.
             If not set, the first identifier will be used as CommonName (CN=Identifier).
             Make sure to provide a valid X500DistinguishedName.
 
         .EXAMPLE
-            PS> New-Order -State $myState -Identifiers $myIdentifiers
+            PS> New-ACMEOrder -State $myState -Identifiers $myIdentifiers
 
         .EXAMPLE
-            PS> New-Order -Identifiers (New-Identifier "dns" "www.test.com")
+            PS> New-ACMEOrder -Identifiers (New-ACMEIdentifier "dns" "www.test.com")
 
         .EXAMPLE
-            PS> New-Order -State "C:\Acme-State\" -Identifiers "www.example.com"
+            PS> New-ACMEOrder -State "C:\Acme-State\" -Identifiers "www.example.com"
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -2996,7 +3010,7 @@ function New-Order {
     }
 
     if($PSCmdlet.ShouldProcess("Order", "Create new order with ACME Service")) {
-        $response = Invoke-SignedWebRequest -Url $requestUrl -State $State -Payload $payload;
+        $response = Invoke-ACMESignedWebRequest -Url $requestUrl -State $State -Payload $payload;
 
         $order = [AcmeOrder]::new($response, $csrOptions);
         $state.AddOrder($order);
@@ -3005,7 +3019,7 @@ function New-Order {
     }
 }
 
-function Update-Order {
+function Update-ACMEOrder {
     <#
         .SYNOPSIS
             Updates an order from acme service
@@ -3027,7 +3041,7 @@ function Update-Order {
 
 
         .EXAMPLE
-            PS> $myOrder | Update-Order -State $myState -PassThru
+            PS> $myOrder | Update-ACMEOrder -State $myState -PassThru
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType("AcmeOrder")]
@@ -3050,7 +3064,7 @@ function Update-Order {
 
     process {
         if($PSCmdlet.ShouldProcess("Order", "Get updated order form ACME service and store it to state")) {
-            $response = Invoke-SignedWebRequest -Url $Order.ResourceUrl -State $State;
+            $response = Invoke-ACMESignedWebRequest -Url $Order.ResourceUrl -State $State;
             $Order.UpdateOrder($response);
             $State.SetOrder($Order);
 
@@ -3061,7 +3075,7 @@ function Update-Order {
 }
 }
 
-function Get-ServiceDirectory {
+function Get-ACMEServiceDirectory {
     <#
         .SYNOPSIS
             Fetches the ServiceDirectory from an ACME Servers.
@@ -3089,13 +3103,13 @@ function Get-ServiceDirectory {
 
 
         .EXAMPLE
-            PS> Get-ServiceDirectory $myState
+            PS> Get-ACMEServiceDirectory $myState
 
         .EXAMPLE
-            PS> Get-ServiceDirectory "LetsEncrypt" $myState -PassThru
+            PS> Get-ACMEServiceDirectory "LetsEncrypt" $myState -PassThru
 
         .EXAMPLE
-            PS> Get-ServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org" $myState
+            PS> Get-ACMEServiceDirectory -DirectoryUrl "https://acme-staging-v02.api.letsencrypt.org" $myState
     #>
     [CmdletBinding(DefaultParameterSetName="FromName")]
     [OutputType("ACMEDirectory")]
@@ -3169,7 +3183,7 @@ function Get-ServiceDirectory {
     }
 }
 
-function Get-TermsOfService {
+function Get-ACMETermsOfService {
     <#
         .SYNOPSIS
             Show the ACME service TOS
@@ -3184,7 +3198,7 @@ function Get-TermsOfService {
 
 
         .EXAMPLE
-            PS> Get-TermsOfService -State $state
+            PS> Get-ACMETermsOfService -State $state
     #>
     [CmdletBinding()]
     param(
@@ -3198,7 +3212,7 @@ function Get-TermsOfService {
     }
 }
 
-function Get-State {
+function Get-ACMEState {
     <#
         .SYNOPSIS
             Initializes state from saved date.
@@ -3229,7 +3243,7 @@ function Get-State {
     return [AcmeDiskPersistedState]::new($paths, $false, $true);
 }
 
-function New-State {
+function New-ACMEState {
     <#
         .SYNOPSIS
             Initializes a new state object.
@@ -3243,7 +3257,7 @@ function New-State {
             Directory where the state will be persisted.
 
         .EXAMPLE
-            PS> New-State
+            PS> New-ACMEState
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -3265,7 +3279,7 @@ function New-State {
     }
 }
 
-function Invoke-SignedWebRequest {
+function Invoke-ACMESignedWebRequest {
     <#
         .SYNOPSIS
             Sends a POST request to the given URL.
@@ -3296,8 +3310,8 @@ function Invoke-SignedWebRequest {
 
 
         .EXAMPLE
-            PS (POST-as-GET)> Invoke-SignedWebRequest "https://acme.service/" $myState
-            PS (POST-as-GET)> Invoke-SignedWebRequest -Url "https://acme.service/" -State $myState -Payload $myPayload
+            PS (POST-as-GET)> Invoke-ACMESignedWebRequest "https://acme.service/" $myState
+            PS (POST-as-GET)> Invoke-ACMESignedWebRequest -Url "https://acme.service/" -State $myState -Payload $myPayload
     #>
     [CmdletBinding()]
     [OutputType("AcmeHttpResponse")]
@@ -3335,7 +3349,7 @@ function Invoke-SignedWebRequest {
 
             if($response.IsError -and -not $SkipRetryOnNonceError) {
                 if($response.Content.Type -eq "urn:ietf:params:acme:error:badNonce") {
-                    return Invoke-SignedWebRequest -Url $Url -State $State -Payload $Payload -SuppressKeyId:$SuppressKeyId.IsPresent -SkipRetryOnNonceError;
+                    return Invoke-ACMESignedWebRequest -Url $Url -State $State -Payload $Payload -SuppressKeyId:$SuppressKeyId.IsPresent -SkipRetryOnNonceError;
                 }
             }
         }

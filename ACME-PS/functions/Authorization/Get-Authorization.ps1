@@ -1,4 +1,4 @@
-function Get-Authorization {
+function Get-ACMEAuthorization {
     <#
         .SYNOPSIS
             Fetches authorizations from acme service.
@@ -19,10 +19,10 @@ function Get-Authorization {
 
 
         .EXAMPLE
-            PS> Get-Authorization $myOrder $myState
+            PS> Get-ACMEAuthorization $myOrder $myState
 
         .EXAMPLE
-            PS> Get-Authorization https://acme.server/authz/1243 $myState
+            PS> Get-ACMEAuthorization https://acme.server/authz/1243 $myState
     #>
     [CmdletBinding()]
     param(
@@ -46,10 +46,10 @@ function Get-Authorization {
     process {
         switch ($PSCmdlet.ParameterSetName) {
             "FromOrder" {
-                $Order.AuthorizationUrls | ForEach-Object { Get-Authorization -Url $_ $State }
+                $Order.AuthorizationUrls | ForEach-Object { Get-ACMEAuthorization -Url $_ $State }
             }
             Default {
-                $response = Invoke-SignedWebRequest -Url $Url -State $State
+                $response = Invoke-ACMESignedWebRequest -Url $Url -State $State
                 return [AcmeAuthorization]::new($response);
             }
         }

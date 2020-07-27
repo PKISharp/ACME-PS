@@ -1,4 +1,4 @@
-function Get-State {
+function Get-ACMEState {
     <#
         .SYNOPSIS
             Initializes state from saved date.

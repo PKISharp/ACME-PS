@@ -1,4 +1,4 @@
-function New-CertificateKey {
+function New-ACMECertificateKey {
     <#
         .SYNOPSIS
             Creates a new certificate key, that can will used to sign ACME operations.
@@ -35,13 +35,13 @@ function New-CertificateKey {
 
 
         .EXAMPLE
-            PS> New-CertificateKey -Path C:\myKeyExport.xml -AutomaticCertificateKeyHandling
+            PS> New-ACMECertificateKey -Path C:\myKeyExport.xml -AutomaticCertificateKeyHandling
 
         .EXAMPLE
-            PS> New-CertificateKey -Path C:\myKeyExport.json -RSA -HashSize 512
+            PS> New-ACMECertificateKey -Path C:\myKeyExport.json -RSA -HashSize 512
 
         .EXAMPLE
-            PS> New-CertificateKey -ECDsa -HashSize 384 -SkipKeyExport
+            PS> New-ACMECertificateKey -ECDsa -HashSize 384 -SkipKeyExport
     #>
     [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
     [OutputType("ICertificateKey")]
@@ -103,7 +103,7 @@ function New-CertificateKey {
     }
 
     if($PSCmdlet.ShouldProcess("CertificateKey", "Store created key to $Path and reload it from there")) {
-        Export-CertificateKey -CertificateKey $certificateKey -Path $Path -ErrorAction 'Stop' | Out-Null
-        return Import-CertificateKey -Path $Path -ErrorAction 'Stop'
+        Export-ACMECertificateKey -CertificateKey $certificateKey -Path $Path -ErrorAction 'Stop' | Out-Null
+        return Import-ACMECertificateKey -Path $Path -ErrorAction 'Stop'
     }
 }

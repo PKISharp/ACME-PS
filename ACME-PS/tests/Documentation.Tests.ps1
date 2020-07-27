@@ -11,7 +11,7 @@ InModuleScope ACME-PS {
         foreach($cmdName in $module.ExportedCommands.Keys) {
             $cmd = $module.ExportedCommands[$cmdName];
 
-            Context "$($cmd.Name) documentation should be complete" {
+            Context "$($cmd.Name) documentation should be exhaustive" {
                 $cmdParameters = $cmd.Parameters.Keys | Where-Object { $_ -NotIn $defaultParameters }
 
                 $cmdHelp = Get-Help $cmd;

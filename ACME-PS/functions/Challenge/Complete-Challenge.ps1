@@ -1,4 +1,4 @@
-function Complete-Challenge {
+function Complete-ACMEChallenge {
     <#
         .SYNOPSIS
             Signals a challenge to be checked by the ACME service.
@@ -20,7 +20,7 @@ function Complete-Challenge {
             PS> Complete-Challange $myState $myChallange
 
         .EXAMPLE
-            PS> $myChallenge | Complete-Challenge $myState
+            PS> $myChallenge | Complete-ACMEChallenge $myState
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -40,7 +40,7 @@ function Complete-Challenge {
         $payload = @{};
 
         if($PSCmdlet.ShouldProcess("Challenge", "Complete challenge by submitting completion to ACME service")) {
-            $response = Invoke-SignedWebRequest -Url $Challenge.Url -State $State -Payload $payload;
+            $response = Invoke-ACMESignedWebRequest -Url $Challenge.Url -State $State -Payload $payload;
 
             return [AcmeChallenge]::new($response, $Challenge.Identifier);
         }

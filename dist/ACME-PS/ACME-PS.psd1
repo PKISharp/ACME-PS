@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.2.4'
+	ModuleVersion = '1.3.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -21,49 +21,49 @@
 		'System.Net.Http'
 	)
 
-	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
-		"Disable-Account",
-		"Find-Account",
-		"Get-Account",
-		"New-Account",
-		"Set-Account",
+		"Disable-ACMEAccount",
+		"Find-ACMEAccount",
+		"Get-ACMEAccount",
+		"New-ACMEAccount",
+		"Set-ACMEAccount",
 
-		"Export-AccountKey",
-		"Import-AccountKey",
-		"New-AccountKey",
+		"Export-ACMEAccountKey",
+		"Import-ACMEAccountKey",
+		"New-ACMEAccountKey",
 
-		"Get-Authorization",
-		"Get-AuthorizationError",
+		"Get-ACMEAuthorization",
+		"Get-ACMEAuthorizationError",
 
-		"Export-Certificate",
-		"Revoke-Certificate",
+		"Export-ACMECertificate",
+		"Revoke-ACMECertificate",
 
-		"Export-CertificateKey",
-		"Import-CertificateKey",
-		"New-CertificateKey",
+		"Export-ACMECertificateKey",
+		"Import-ACMECertificateKey",
+		"New-ACMECertificateKey",
 
-		"Complete-Challenge",
-		"Get-Challenge",
-		"Initialize-Challenge",
+		"Complete-ACMEChallenge",
+		"Get-ACMEChallenge",
+		"Initialize-ACMEChallenge",
 
-		"Get-Nonce",
-		"New-Nonce",
+		"Get-ACMENonce",
+		"New-ACMENonce",
 
-		"Complete-Order",
-		"Find-Order",
-		"Get-Order",
-		"New-Identifier",
-		"New-Order",
-		"Update-Order"
+		"New-ACMEIdentifier",
 
-		"Get-ServiceDirectory",
-		"Get-TermsOfService",
+		"Find-ACMEOrder",
+		"Get-ACMEOrder",
+		"New-ACMEOrder",
+		"Update-ACMEOrder"
+		"Complete-ACMEOrder",
 
-		"Get-State",
-		"New-State",
+		"Get-ACMEServiceDirectory",
+		"Get-ACMETermsOfService",
 
-		"Invoke-SignedWebRequest"
+		"Get-ACMEState",
+		"New-ACMEState",
+
+		"Invoke-ACMESignedWebRequest"
 	)
 
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
@@ -73,7 +73,7 @@
 			Tags = @('pki','ssl','tls','security','certificates','letsencrypt','acme','powershell','acmesharp')
 
 			# License for this module.
-			License = './LICENSE'
+			LicenseUri = 'https://github.com/PKISharp/ACME-PS/raw/master/LICENSE'
 
 			# A URL to the main website for this project.
 			ProjectUri = 'https://github.com/PKISharp/ACME-PS'

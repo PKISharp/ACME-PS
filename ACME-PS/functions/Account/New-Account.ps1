@@ -1,4 +1,4 @@
-function New-Account {
+function New-ACMEAccount {
     <#
         .SYNOPSIS
             Registers your account key with a new ACME-Account.
@@ -27,10 +27,10 @@ function New-Account {
 
 
         .EXAMPLE
-            PS> New-Account -AcceptTOS -EmailAddresses "mail@example.com" -AutomaticAccountHandling
+            PS> New-ACMEAccount -AcceptTOS -EmailAddresses "mail@example.com" -AutomaticAccountHandling
 
         .EXAMPLE
-            PS> New-Account $myServiceDirectory $myAccountKey $myNonce -AcceptTos -EmailAddresses @(...) -ExistingAccountIsError
+            PS> New-ACMEAccount $myServiceDirectory $myAccountKey $myNonce -AcceptTos -EmailAddresses @(...) -ExistingAccountIsError
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -65,8 +65,8 @@ function New-Account {
 
     $url = $State.GetServiceDirectory().NewAccount;
 
-    if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
-        $response = Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SuppressKeyId -ErrorAction 'Stop'
+    if($PSCmdlet.ShouldProcess("New-ACMEAccount", "Sending account registration to ACME Server $Url")) {
+        $response = Invoke-ACMESignedWebRequest -Url $url -State $State -Payload $payload -SuppressKeyId -ErrorAction 'Stop'
 
         if($response.StatusCode -eq 200) {
             if(-not $ExistingAccountIsError) {
@@ -74,7 +74,7 @@ function New-Account {
 
                 $keyId = $response.Headers["Location"][0];
 
-                return Get-Account -AccountUrl $keyId -KeyId $keyId -State $State -PassThru:$PassThru
+                return Get-ACMEAccount -AccountUrl $keyId -KeyId $keyId -State $State -PassThru:$PassThru
             } else {
                 Write-Error "JWK had already been registiered for an account."
                 return;

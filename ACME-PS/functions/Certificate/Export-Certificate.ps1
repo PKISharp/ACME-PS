@@ -1,4 +1,4 @@
-function Export-Certificate {
+function Export-ACMECertificate {
     <#
         .SYNOPSIS
             Exports an issued certificate as pfx with private and public key.
@@ -37,8 +37,12 @@ function Export-Certificate {
             The downloaded public certificate will not be stored with the order.
             This will make revocation impossible.
 
+        .PARAMETER AdditionalChainCertificates
+            Certificates in this Paramter will be appended to the certificate chain during export.
+            Provide in PEM form (-----BEGIN CERTIFICATE----- [CertContent] -----END CERTIFICATE-----).
+
         .EXAMPLE
-            PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
+            PS> Export-ACMECertificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -80,7 +84,11 @@ function Export-Certificate {
 
         [Parameter()]
         [switch]
-        $DisablePEMStorage
+        $DisablePEMStorage,
+
+        [Parameter()]
+        [string[]]
+        $AdditionalChainCertificates
     )
 
     $ErrorActionPreference = 'Stop'
@@ -104,7 +112,7 @@ function Export-Certificate {
     }
 
     if($null -eq $certificate) {
-        $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
+        $response = Invoke-ACMESignedWebRequest -Url $Order.CertificateUrl -State $State;
         $certificate = $response.Content;
 
         if(-not $DisablePEMStorage) {
@@ -115,9 +123,15 @@ function Export-Certificate {
     if($ExcludeChain) {
         Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
     } else {
-        $certBoundary = "-----END CERTIFICATE-----";
-
         $pemString = [System.Text.Encoding]::UTF8.GetString($certificate);
+
+        if($null -ne $AdditionalChainCertificates) {
+            foreach($chainCert in $AdditionalChainCertificates) {
+                $pemString = $pemString + "`n$chainCert";
+            }
+        }
+
+        $certBoundary = "-----END CERTIFICATE-----";
         $certificates = [System.Collections.ArrayList]::new();
         foreach($pem in $pemString.Split(@($certBoundary), [System.StringSplitOptions]::RemoveEmptyEntries)) {
             if(-not $pem -or -not $pem.Trim()) { continue; }
