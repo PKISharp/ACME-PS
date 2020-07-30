@@ -5,7 +5,7 @@ InModuleScope ACME-PS {
             AuthorizationUrl = "https://service.acme/Order1/AuthZ";
             FinalizeUrl = "https://service.acme/Order1/Finalize";
         };
-        
+
         Mock Invoke-AcmeWebRequest {
             $mockResult = [AcmeHttpResponse]::new();
             $mockResult.NextNonce = "NextNonce";
@@ -23,7 +23,7 @@ InModuleScope ACME-PS {
         $state.Set($simpleState.GetAccountKey());
         $state.Set($simpleState.GetAccount());
 
-        $order = [AcmeOrder]::new([PSCustomObject]@{
+        $orderData = [PSCustomObject]@{
             Status = "ready";
             Expires  = [DateTime]::Now.AddDays(1);
 
@@ -39,12 +39,22 @@ InModuleScope ACME-PS {
             CSROptions = [AcmeCsrOptions]::new([PSCustomObject]@{
                 DistinguishedName = "CN=CommonName";
             });
-        });
-        
-        $certificateKey = New-CertificateKey -RSA -SkipKeyExport -WarningAction 'SilentlyContinue';
+        };
+
 
         Context 'CustomKey parameter set' {
+            $order = [AcmeOrder]::new($orderData);
+            $certificateKey = New-CertificateKey -RSA -SkipKeyExport -WarningAction 'SilentlyContinue';
             Complete-Order -State $state -Order $order -CertificateKey $certificateKey;
+
+            It 'called ACME service to finalize the order' {
+                Assert-VerifiableMock
+            }
+        }
+
+        Context 'GenerateKey paraeter set' {
+            $order = [AcmeOrder]::new($orderData);
+            Complete-Order -State $state -Order $order -GenerateCertificateKey;
 
             It 'called ACME service to finalize the order' {
                 Assert-VerifiableMock
