@@ -4,3 +4,4 @@
 /ACME-PS/internal/AllClasses.ps1
 /ACME-PS/internal/AllFunctions.ps1
 /ACME-PS/AllFunctions.ps1
+/ACME-PS/tests/states/simple/.acme-ps-state
