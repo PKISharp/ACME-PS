@@ -1,4 +1,4 @@
-function Export-ACMECertificateKey {
+function Export-CertificateKey {
     <#
         .SYNOPSIS
             Stores an certificate key to the given path.
@@ -15,7 +15,7 @@ function Export-ACMECertificateKey {
 
 
         .EXAMPLE
-            PS> Export-ACMECertificateKey -Path "C:\myExportPath.xml" -CertificateKey $myCertificateKey
+            PS> Export-CertificateKey -Path "C:\myExportPath.xml" -CertificateKey $myCertificateKey
     #>
     [CmdletBinding()]
     param(

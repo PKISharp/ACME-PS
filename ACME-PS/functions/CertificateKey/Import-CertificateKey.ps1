@@ -1,10 +1,10 @@
-function Import-ACMECertificateKey {
+function Import-CertificateKey {
     <#
         .SYNOPSIS
             Imports an exported certificate key.
 
         .DESCRIPTION
-            Imports an certificate key that has been exported with Export-ACMECertificateKey. If requested, the key is registered for automatic key handling.
+            Imports an certificate key that has been exported with Export-CertificateKey. If requested, the key is registered for automatic key handling.
 
 
         .PARAMETER Path
@@ -12,7 +12,7 @@ function Import-ACMECertificateKey {
 
 
         .EXAMPLE
-            PS> Import-ACMECertificateKey -Path C:\AcmeCertKeys\example.key.xml;
+            PS> Import-CertificateKey -Path C:\AcmeCertKeys\example.key.xml;
     #>
     param(
         # Specifies a path to one or more locations.

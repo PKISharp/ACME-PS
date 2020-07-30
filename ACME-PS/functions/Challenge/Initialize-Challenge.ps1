@@ -1,4 +1,4 @@
-function Initialize-ACMEChallenge {
+function Initialize-Challenge {
     <#
         .SYNOPSIS
             Prepares a challange with the data explaining how to complete it.
@@ -46,7 +46,7 @@ function Initialize-ACMEChallenge {
 
     process {
         if($PSCmdlet.ParameterSetName -eq "ByAuthorization") {
-            return ($Authorization.challenges | Initialize-ACMEChallenge $State -PassThru:$PassThru);
+            return ($Authorization.challenges | Initialize-Challenge $State -PassThru:$PassThru);
         }
 
         $accountKey = $State.GetAccountKey();

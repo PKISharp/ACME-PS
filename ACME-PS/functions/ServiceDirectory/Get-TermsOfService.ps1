@@ -1,4 +1,4 @@
-function Get-ACMETermsOfService {
+function Get-TermsOfService {
     <#
         .SYNOPSIS
             Show the ACME service TOS
@@ -13,7 +13,7 @@ function Get-ACMETermsOfService {
 
 
         .EXAMPLE
-            PS> Get-ACMETermsOfService -State $state
+            PS> Get-TermsOfService -State $state
     #>
     [CmdletBinding()]
     param(

@@ -1,4 +1,4 @@
-function New-ACMEAccountKey {
+function New-AccountKey {
     <#
         .SYNOPSIS
             Creates a new account key, that will be used to sign ACME operations.
@@ -43,13 +43,13 @@ function New-ACMEAccountKey {
             existing account key.
 
         .EXAMPLE
-            PS> New-ACMEAccountKey -State $myState
+            PS> New-AccountKey -State $myState
 
         .EXAMPLE
-            PS> New-ACMEAccountKey -State $myState -RSA -HashSize 512
+            PS> New-AccountKey -State $myState -RSA -HashSize 512
 
         .EXAMPLE
-            PS> New-ACMEAccountKey -ECDsa -HashSize 384
+            PS> New-AccountKey -ECDsa -HashSize 384
     #>
     [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
     [OutputType("IAccountKey")]

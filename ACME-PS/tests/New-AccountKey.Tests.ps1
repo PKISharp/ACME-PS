@@ -1,5 +1,5 @@
 InModuleScope ACME-PS {
-    Describe "UnitTesting New-ACMEAccountKey" -Tag "UnitTest" {
+    Describe "UnitTesting New-AccountKey" -Tag "UnitTest" {
         Context "Key-Creation" {
             It "Creates RSA Keys" {
                 $key = New-ACMEAccountKey
@@ -23,7 +23,7 @@ InModuleScope ACME-PS {
         }
 
         Context "Key-Creation with state" {
-            $state = New-ACMEState -WarningAction 'SilentlyContinue';
+            $state = New-State -WarningAction 'SilentlyContinue';
 
             It "Creates and stores Key the key to state" {
                 $key = New-ACMEAccountKey -State $state -PassThru -WarningAction 'SilentlyContinue' -Force

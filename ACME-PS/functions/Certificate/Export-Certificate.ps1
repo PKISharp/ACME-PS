@@ -1,4 +1,4 @@
-function Export-ACMECertificate {
+function Export-Certificate {
     <#
         .SYNOPSIS
             Exports an issued certificate as pfx with private and public key.
@@ -42,7 +42,7 @@ function Export-ACMECertificate {
             Provide in PEM form (-----BEGIN CERTIFICATE----- [CertContent] -----END CERTIFICATE-----).
 
         .EXAMPLE
-            PS> Export-ACMECertificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
+            PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -112,7 +112,7 @@ function Export-ACMECertificate {
     }
 
     if($null -eq $certificate) {
-        $response = Invoke-ACMESignedWebRequest -Url $Order.CertificateUrl -State $State;
+        $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
         $certificate = $response.Content;
 
         if(-not $DisablePEMStorage) {

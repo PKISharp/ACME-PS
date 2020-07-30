@@ -1,4 +1,4 @@
-function Get-ACMEAuthorizationError {
+function Get-AuthorizationError {
     <#
         .SYNOPSIS
             Fetches authorizations erros from acme service.
@@ -16,7 +16,7 @@ function Get-ACMEAuthorizationError {
 
 
         .EXAMPLE
-            PS> Get-ACMEAuthorizationError $myOrder $myState
+            PS> Get-AuthorizationError $myOrder $myState
     #>
     [CmdletBinding()]
     param(
@@ -33,13 +33,13 @@ function Get-ACMEAuthorizationError {
     )
 
     process {
-        $Order = Update-ACMEOrder -State $state -Order $Order -PassThru
+        $Order = Update-Order -State $state -Order $Order -PassThru
 
         if ($Order.Status -ine "invalid") {
             return;
         }
 
-        $authorizations = $Order.AuthorizationUrls | ForEach-Object { Get-ACMEAuthorization -Url $_ $State }
+        $authorizations = $Order.AuthorizationUrls | ForEach-Object { Get-Authorization -Url $_ $State }
         $invalidAuthorizations = $authorizations | Where-Object { $_.Status -ieq "invalid" };
         $invalidAuthorizations | ForEach-Object { $_.Challenges | Where-Object { $_.Status -ieq "invalid" } }
     }

@@ -1,10 +1,10 @@
-function Import-ACMEAccountKey {
+function Import-AccountKey {
     <#
         .SYNOPSIS
             Imports an exported account key.
 
         .DESCRIPTION
-            Imports an account key that has been exported with Export-ACMEAccountKey. If requested, the key is registered for automatic key handling.
+            Imports an account key that has been exported with Export-AccountKey. If requested, the key is registered for automatic key handling.
 
 
         .PARAMETER Path
@@ -19,7 +19,7 @@ function Import-ACMEAccountKey {
 
 
         .EXAMPLE
-            PS> Import-ACMEAccountKey -State $myState -Path C:\AcmeTemp\AccountKey.xml
+            PS> Import-AccountKey -State $myState -Path C:\AcmeTemp\AccountKey.xml
     #>
     param(
         # Specifies a path to one or more locations.

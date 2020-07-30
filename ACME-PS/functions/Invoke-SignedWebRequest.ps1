@@ -1,4 +1,4 @@
-function Invoke-ACMESignedWebRequest {
+function Invoke-SignedWebRequest {
     <#
         .SYNOPSIS
             Sends a POST request to the given URL.
@@ -29,8 +29,8 @@ function Invoke-ACMESignedWebRequest {
 
 
         .EXAMPLE
-            PS (POST-as-GET)> Invoke-ACMESignedWebRequest "https://acme.service/" $myState
-            PS (POST-as-GET)> Invoke-ACMESignedWebRequest -Url "https://acme.service/" -State $myState -Payload $myPayload
+            PS (POST-as-GET)> Invoke-SignedWebRequest "https://acme.service/" $myState
+            PS (POST-as-GET)> Invoke-SignedWebRequest -Url "https://acme.service/" -State $myState -Payload $myPayload
     #>
     [CmdletBinding()]
     [OutputType("AcmeHttpResponse")]
@@ -68,7 +68,7 @@ function Invoke-ACMESignedWebRequest {
 
             if($response.IsError -and -not $SkipRetryOnNonceError) {
                 if($response.Content.Type -eq "urn:ietf:params:acme:error:badNonce") {
-                    return Invoke-ACMESignedWebRequest -Url $Url -State $State -Payload $Payload -SuppressKeyId:$SuppressKeyId.IsPresent -SkipRetryOnNonceError;
+                    return Invoke-SignedWebRequest -Url $Url -State $State -Payload $Payload -SuppressKeyId:$SuppressKeyId.IsPresent -SkipRetryOnNonceError;
                 }
             }
         }

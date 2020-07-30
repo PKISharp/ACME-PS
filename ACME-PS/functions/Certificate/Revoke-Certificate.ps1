@@ -1,4 +1,4 @@
-function Revoke-ACMECertificate {
+function Revoke-Certificate {
     <#
         .SYNOPSIS
             Revokes the certificate associated with the order.
@@ -15,7 +15,7 @@ function Revoke-ACMECertificate {
             The order which contains the issued certificate.
 
         .EXAMPLE
-            PS> Revoke-ACMECertificate -State $myState -Order $myOrder
+            PS> Revoke-Certificate -State $myState -Order $myOrder
     #>
     [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='High')]
     param(
@@ -42,6 +42,6 @@ function Revoke-ACMECertificate {
     $payload = @{ "certificate" = $base64Certificate };
 
     if($PSCmdlet.ShouldProcess("Certificate", "Revoking certificate.")) {
-        Invoke-ACMESignedWebRequest -Url $url -State $State -Payload $payload;
+        Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;
     }
 }

@@ -98,7 +98,7 @@ class AcmeDiskPersistedState : AcmeState {
         $fileName = $this.Filenames.AccountKey;
 
         if(Test-Path $fileName) {
-            $result = Import-ACMEAccountKey -Path $fileName;
+            $result = Import-AccountKey -Path $fileName;
             return $result;
         }
 
@@ -138,7 +138,7 @@ class AcmeDiskPersistedState : AcmeState {
         $fileName = $this.Filenames.AccountKey;
 
         Write-Debug "Storing the account key to $fileName";
-        $value | Export-ACMEAccountKey $fileName -Force;
+        $value | Export-AccountKey $fileName -Force;
     }
 
     [void] Set([AcmeAccount] $value) {
@@ -225,7 +225,7 @@ class AcmeDiskPersistedState : AcmeState {
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
 
         if(Test-Path $certKeyFilename) {
-            return (Import-ACMECertificateKey -Path $certKeyFilename);
+            return (Import-CertificateKey -Path $certKeyFilename);
         }
 
         return $null;
@@ -235,7 +235,7 @@ class AcmeDiskPersistedState : AcmeState {
         $orderHash = $order.GetHashString();
         $certKeyFilename = $this.Filenames.GetOrderCertificateKeyFilename($orderHash);
 
-        $certificateKey | Export-ACMECertificateKey -Path $certKeyFilename
+        $certificateKey | Export-CertificateKey -Path $certKeyFilename
     }
 
     [byte[]] GetOrderCertificate([AcmeOrder] $order) {

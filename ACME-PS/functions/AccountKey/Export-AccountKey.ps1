@@ -1,4 +1,4 @@
-function Export-ACMEAccountKey {
+function Export-AccountKey {
     <#
         .SYNOPSIS
             Stores an account key to the given path.
@@ -18,7 +18,7 @@ function Export-ACMEAccountKey {
 
 
         .EXAMPLE
-            PS> Export-ACMEAccountKey -Path "C:\myExportPath.xml" -AccountKey $myAccountKey
+            PS> Export-AccountKey -Path "C:\myExportPath.xml" -AccountKey $myAccountKey
     #>
     [CmdletBinding()]
     param(

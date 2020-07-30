@@ -21,49 +21,49 @@
 		'System.Net.Http'
 	)
 
+	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
-		"Disable-ACMEAccount",
-		"Find-ACMEAccount",
-		"Get-ACMEAccount",
-		"New-ACMEAccount",
-		"Set-ACMEAccount",
+		"Disable-Account",
+		"Find-Account",
+		"Get-Account",
+		"New-Account",
+		"Set-Account",
 
-		"Export-ACMEAccountKey",
-		"Import-ACMEAccountKey",
-		"New-ACMEAccountKey",
+		"Export-AccountKey",
+		"Import-AccountKey",
+		"New-AccountKey",
 
-		"Get-ACMEAuthorization",
-		"Get-ACMEAuthorizationError",
+		"Get-Authorization",
+		"Get-AuthorizationError",
 
-		"Export-ACMECertificate",
-		"Revoke-ACMECertificate",
+		"Export-Certificate",
+		"Revoke-Certificate",
 
-		"Export-ACMECertificateKey",
-		"Import-ACMECertificateKey",
-		"New-ACMECertificateKey",
+		"Export-CertificateKey",
+		"Import-CertificateKey",
+		"New-CertificateKey",
 
-		"Complete-ACMEChallenge",
-		"Get-ACMEChallenge",
-		"Initialize-ACMEChallenge",
+		"Complete-Challenge",
+		"Get-Challenge",
+		"Initialize-Challenge",
 
-		"Get-ACMENonce",
-		"New-ACMENonce",
+		"Get-Nonce",
+		"New-Nonce",
 
-		"New-ACMEIdentifier",
+		"Complete-Order",
+		"Find-Order",
+		"Get-Order",
+		"New-Identifier",
+		"New-Order",
+		"Update-Order"
 
-		"Find-ACMEOrder",
-		"Get-ACMEOrder",
-		"New-ACMEOrder",
-		"Update-ACMEOrder"
-		"Complete-ACMEOrder",
+		"Get-ServiceDirectory",
+		"Get-TermsOfService",
 
-		"Get-ACMEServiceDirectory",
-		"Get-ACMETermsOfService",
+		"Get-State",
+		"New-State",
 
-		"Get-ACMEState",
-		"New-ACMEState",
-
-		"Invoke-ACMESignedWebRequest"
+		"Invoke-SignedWebRequest"
 	)
 
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.

@@ -1,4 +1,4 @@
-function Get-ACMEAccount {
+function Get-Account {
     <#
         .SYNOPSIS
             Loads account data from the ACME service.
@@ -20,10 +20,10 @@ function Get-ACMEAccount {
 
 
         .EXAMPLE
-            PS> Get-ACMEAccount -State $myState -PassThru
+            PS> Get-Account -State $myState -PassThru
 
         .EXAMPLE
-            PS> Get-ACMEAccount -State $myState -KeyId 12345
+            PS> Get-Account -State $myState -KeyId 12345
     #>
     [CmdletBinding(DefaultParameterSetName = "FindAccount")]
     param(
@@ -45,7 +45,7 @@ function Get-ACMEAccount {
     if($PSCmdlet.ParameterSetName -eq "FindAccount") {
         $requestUrl = $State.GetServiceDirectory().NewAccount;
         $payload = @{"onlyReturnExisting" = $true};
-        $response = Invoke-ACMESignedWebRequest -Url $requestUrl -State $State -Payload $payload
+        $response = Invoke-SignedWebRequest -Url $requestUrl -State $State -Payload $payload
 
         if($response.StatusCode -eq 200) {
             $KeyId = $response.Headers["Location"][0];
@@ -57,7 +57,7 @@ function Get-ACMEAccount {
         }
     }
 
-    $response = Invoke-ACMESignedWebRequest -Url $AccountUrl -State $State -Payload @{}
+    $response = Invoke-SignedWebRequest -Url $AccountUrl -State $State -Payload @{}
     $result = [AcmeAccount]::new($response, $KeyId);
 
     return $result;

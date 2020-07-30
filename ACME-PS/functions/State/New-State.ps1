@@ -1,4 +1,4 @@
-function New-ACMEState {
+function New-State {
     <#
         .SYNOPSIS
             Initializes a new state object.
@@ -12,7 +12,7 @@ function New-ACMEState {
             Directory where the state will be persisted.
 
         .EXAMPLE
-            PS> New-ACMEState
+            PS> New-State
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
