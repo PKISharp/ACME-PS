@@ -59,8 +59,8 @@ function New-Account {
     $Contacts = @($EmailAddresses | ForEach-Object { if($_.StartsWith("mailto:")) { $_ } else { "mailto:$_" } });
 
     $payload = @{
-        "TermsOfServiceAgreed"=$AcceptTOS.IsPresent;
-        "Contact"=$Contacts;
+        "termsOfServiceAgreed"=$AcceptTOS.IsPresent;
+        "contact"=$Contacts;
     }
 
     $url = $State.GetServiceDirectory().NewAccount;
