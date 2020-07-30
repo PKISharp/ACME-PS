@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.3.0'
+	ModuleVersion = '1.2.5'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -21,6 +21,7 @@
 		'System.Net.Http'
 	)
 
+	DefaultCommandPrefix = 'ACME'
 	FunctionsToExport = @(
 		"Disable-Account",
 		"Find-Account",
