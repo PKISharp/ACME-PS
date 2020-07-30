@@ -70,11 +70,13 @@ function Complete-Order {
         $ErrorActionPreference = 'Stop';
 
         if($GenerateCertificateKey) {
-            $CertificateKey = $State.GetOrderCertificateKey($Order);
+            $OrderCertificateKey = $State.GetOrderCertificateKey($Order);
 
-            if($null -eq $CertificateKey) {
+            if($null -eq $OrderCertificateKey) {
                 $SaveCertificateKey = $true;
                 $CertificateKey = New-CertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue';
+            } else {
+                $CertificateKey = $OrderCertificateKey;
             }
         }
 

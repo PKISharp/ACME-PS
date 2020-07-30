@@ -920,6 +920,7 @@ class AcmeInMemoryState : AcmeState {
     [ValidateNotNull()] hidden [AcmeAccount] $Account;
 
     hidden [hashtable] $Orders = @{};
+    hidden [hashtable] $CertKeys = @{}
 
     AcmeInMemoryState() {
     }
@@ -947,6 +948,20 @@ class AcmeInMemoryState : AcmeState {
     [void] RemoveOrder([AcmeOrder] $order) {
         $orderHash = $order.GetHashString();
         $this.Orders.Remove($orderHash);
+    }
+
+    [ICertificateKey] GetOrderCertificateKey([AcmeOrder] $order) {
+        $orderHash = $order.GetHashString();
+        if ($this.CertKeys.ContainsKey($orderHash)) {
+            return $this.CertKeys[$orderHash];
+        }
+
+        return $null;
+    }
+
+    [void] SetOrderCertificateKey([AcmeOrder] $order, [ICertificateKey] $certificateKey) {
+        $orderHash = $order.GetHashString();
+        $this.CertKeys[$orderHash] = $certificateKey;
     }
 }
 
@@ -2760,11 +2775,13 @@ function Complete-Order {
         $ErrorActionPreference = 'Stop';
 
         if($GenerateCertificateKey) {
-            $CertificateKey = $State.GetOrderCertificateKey($Order);
+            $OrderCertificateKey = $State.GetOrderCertificateKey($Order);
 
-            if($null -eq $CertificateKey) {
+            if($null -eq $OrderCertificateKey) {
                 $SaveCertificateKey = $true;
                 $CertificateKey = New-CertificateKey -SkipKeyExport -WarningAction 'SilentlyContinue';
+            } else {
+                $CertificateKey = $OrderCertificateKey;
             }
         }
 
