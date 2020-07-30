@@ -103,13 +103,12 @@ process {
 
     Write-Information "Finished building - running tests";
     
-    if ($null -ne (Get-Module PSScriptAnalyzer -ListAvailable)) {
-        & Invoke-ScriptAnalyzer -Path $ModuleOutFile;
-    }
-
     <# Run tests #>
     & Invoke-Command -ScriptBlock {
         Import-Module "$ModuleOutPath\ACME-PS.psd1" -ErrorAction 'Stop'
-        Invoke-Pester -Path "$ModuleSourcePath\tests"
+        if ($null -ne (Get-Module PSScriptAnalyzer -ListAvailable)) {
+            & Invoke-ScriptAnalyzer -Path $ModuleOutFile;
+        }
+        & Invoke-Pester -Path "$ModuleSourcePath\tests"
     }
 }
