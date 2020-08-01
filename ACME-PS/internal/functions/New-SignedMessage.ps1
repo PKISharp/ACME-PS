@@ -55,13 +55,15 @@ function New-SignedMessage {
 
     $signedPayload = @{};
 
-    $signedPayload.add("header", $null);
+    $signedPayload.add("header", $null); # TODO what does this line exist?
     $signedPayload.add("protected", (ConvertTo-UrlBase64 -InputText $jsonHeaders));
+
     if($null -eq $messagePayload -or $messagePayload.Length -eq 0) {
         $signedPayload.add("payload", "");
     } else {
         $signedPayload.add("payload", (ConvertTo-UrlBase64 -InputText $messagePayload));
     }
+
     $signedPayload.add("signature", (ConvertTo-UrlBase64 -InputBytes $SigningKey.Sign("$($signedPayload.Protected).$($signedPayload.Payload)")));
 
     $result = $signedPayload | ConvertTo-Json;
