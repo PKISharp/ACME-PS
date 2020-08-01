@@ -29,9 +29,11 @@ class AcmeDirectoryMeta {
         $this.CaaIdentites = $obj.CaaIdentities;
         $this.TermsOfService = $obj.TermsOfService;
         $this.Website = $obj.Website;
+        $this.ExternalAccountRequired = $obj.ExternalAccountRequired;
     }
 
     [string[]] $CaaIdentites;
     [string] $TermsOfService;
     [string] $Website;
+    [bool] $ExternalAccountRequired;
 }
