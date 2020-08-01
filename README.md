@@ -9,11 +9,6 @@ Download the Module via Powershell-Gallery <https://www.powershellgallery.com/pa
 
 This is a list of breaking changes, that occured during ongoing development of the module
 
-### Version 1.3
-
-Version 1.3 will remove the DefaultCommandPrefix from the module and prefix all Cmdlets statically with "ACME".  
-This will not affect you, if you did not specifically load the module with `Import-Module -Prefix myPrefix`.
-
 ### Version 1.2
 
 Version 1.2 now automatically includes chain certificates, if they are issued by the CA.  
