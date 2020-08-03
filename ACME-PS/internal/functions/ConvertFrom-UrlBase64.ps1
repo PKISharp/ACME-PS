@@ -7,7 +7,7 @@ function ConvertFrom-UrlBase64 {
 
     process {
         $base64 = $InputText.Replace('-','+');
-        $base64 = $base64.Replace('/', '_');
+        $base64 = $base64.Replace('_', '/');
 
         while($base64.Length % 4 -ne 0) {
             $base64 += '='
