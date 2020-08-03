@@ -34,8 +34,8 @@ function New-ExternalAccountPayload {
             "alg" = $ExternalAccountAlgorithm;
             "kid" = $ExternalAccountKID;
             "url" = $url;
-        } | ConvertTo-Json -Compress
-        $eaPayload = $State.GetAccountKey().ExportPublicJwk() | ConvertTo-Json -Compress;
+        } | ConvertTo-Json -Compress | ConvertTo-UrlBase64
+        $eaPayload = $State.GetAccountKey().ExportPublicJwk() | ConvertTo-Json -Compress | ConvertTo-UrlBase64;
 
         $eaHashContent = [Text.Encoding]::ASCII.GetBytes("$($eaHeader).$($eaPayload)");
         $eaSignature = (ConvertTo-UrlBase64 -InputBytes $macAlgorithm.ComputeHash($eaHashContent));
