@@ -1231,7 +1231,7 @@ function ConvertFrom-UrlBase64 {
 
     process {
         $base64 = $InputText.Replace('-','+');
-        $base64 = $base64.Replace('/', '_');
+        $base64 = $base64.Replace('_', '/');
 
         while($base64.Length % 4 -ne 0) {
             $base64 += '='
@@ -1457,8 +1457,8 @@ function New-ExternalAccountPayload {
             "alg" = $ExternalAccountAlgorithm;
             "kid" = $ExternalAccountKID;
             "url" = $url;
-        } | ConvertTo-Json -Compress
-        $eaPayload = $State.GetAccountKey().ExportPublicJwk() | ConvertTo-Json -Compress;
+        } | ConvertTo-Json -Compress | ConvertTo-UrlBase64
+        $eaPayload = $State.GetAccountKey().ExportPublicJwk() | ConvertTo-Json -Compress | ConvertTo-UrlBase64;
 
         $eaHashContent = [Text.Encoding]::ASCII.GetBytes("$($eaHeader).$($eaPayload)");
         $eaSignature = (ConvertTo-UrlBase64 -InputBytes $macAlgorithm.ComputeHash($eaHashContent));
@@ -1671,7 +1671,7 @@ function New-Account {
             The algorithm to be used to hash the external account binding.
 
         .PARAMETER ExternalAccountMACKey
-            The key to hash the external account binding object.
+            The key to hash the external account binding object (needs to be base64 or base64url encoded)
 
 
         .EXAMPLE
