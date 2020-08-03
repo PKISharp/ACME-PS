@@ -610,11 +610,13 @@ class AcmeDirectoryMeta {
         $this.CaaIdentites = $obj.CaaIdentities;
         $this.TermsOfService = $obj.TermsOfService;
         $this.Website = $obj.Website;
+        $this.ExternalAccountRequired = $obj.ExternalAccountRequired;
     }
 
     [string[]] $CaaIdentites;
     [string] $TermsOfService;
     [string] $Website;
+    [bool] $ExternalAccountRequired;
 }
 
 class AcmeAccount {
@@ -1220,6 +1222,25 @@ class AcmeDiskPersistedState : AcmeState {
     }
 }
 
+function ConvertFrom-UrlBase64 {
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [ValidateNotNull()]
+        [string] $InputText
+    )
+
+    process {
+        $base64 = $InputText.Replace('-','+');
+        $base64 = $base64.Replace('_', '/');
+
+        while($base64.Length % 4 -ne 0) {
+            $base64 += '='
+        }
+
+        return [Convert]::FromBase64String($base64);
+    }
+}
+
 function ConvertTo-OriginalType {
     param(
         [Parameter(Mandatory=$true, Position=0, ValueFromPipeline=$true)]
@@ -1400,6 +1421,58 @@ function Invoke-ACMEWebRequest {
     return $result;
 }
 
+function New-ExternalAccountPayload {
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNull()]
+        [ValidateScript({$_.AccountKeyExists()})]
+        [AcmeState]
+        $State,
+
+        [Parameter(ParameterSetName = "ExternalAccountBinding", Mandatory = $true)]
+        [ValidateNotNull()]
+        [string]
+        $ExternalAccountKID,
+
+        [Parameter(ParameterSetName = "ExternalAccountBinding")]
+        [ValidateSet('HS256','HS384','HS512')]
+        [string]
+        $ExternalAccountAlgorithm = 'HS256',
+
+        [Parameter(ParameterSetName = "ExternalAccountBinding", Mandatory = $true)]
+        [ValidateNotNull()]
+        [string]
+        $ExternalAccountMACKey
+    )
+
+    process {
+        $macKeyBytes = ConvertFrom-UrlBase64 $ExternalAccountMACKey;
+        $macAlgorithm = switch ($ExternalAccountAlgorithm) {
+            "HS256" { [Security.Cryptography.HMACSHA256]::new($macKeyBytes); break; }
+            "HS384" { [Security.Cryptography.HMACSHA384]::new($macKeyBytes); break; }
+            "HS512" { [Security.Cryptography.HMACSHA512]::new($macKeyBytes); break; }
+        }
+
+        $eaHeader = @{
+            "alg" = $ExternalAccountAlgorithm;
+            "kid" = $ExternalAccountKID;
+            "url" = $url;
+        } | ConvertTo-Json -Compress | ConvertTo-UrlBase64
+        $eaPayload = $State.GetAccountKey().ExportPublicJwk() | ConvertTo-Json -Compress | ConvertTo-UrlBase64;
+
+        $eaHashContent = [Text.Encoding]::ASCII.GetBytes("$($eaHeader).$($eaPayload)");
+        $eaSignature = (ConvertTo-UrlBase64 -InputBytes $macAlgorithm.ComputeHash($eaHashContent));
+
+        $externalAccountBinding = @{
+            "protected" = $eaHeader;
+            "payload" = $eaPayload;
+            "signature" = $eaSignature;
+        };
+
+        return $externalAccountBinding;
+    }
+}
+
 function New-SignedMessage {
     [CmdletBinding(SupportsShouldProcess=$false)]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
@@ -1457,13 +1530,15 @@ function New-SignedMessage {
 
     $signedPayload = @{};
 
-    $signedPayload.add("header", $null);
+    $signedPayload.add("header", $null); # TODO what does this line exist?
     $signedPayload.add("protected", (ConvertTo-UrlBase64 -InputText $jsonHeaders));
+
     if($null -eq $messagePayload -or $messagePayload.Length -eq 0) {
         $signedPayload.add("payload", "");
     } else {
         $signedPayload.add("payload", (ConvertTo-UrlBase64 -InputText $messagePayload));
     }
+
     $signedPayload.add("signature", (ConvertTo-UrlBase64 -InputBytes $SigningKey.Sign("$($signedPayload.Protected).$($signedPayload.Payload)")));
 
     $result = $signedPayload | ConvertTo-Json;
@@ -1589,6 +1664,15 @@ function New-Account {
         .PARAMETER EmailAddresses
             Contact adresses for certificate expiration mails and similar.
 
+        .PARAMETER ExternalAccountKID
+            The account KID assigned by the external account verification.
+
+        .PARAMETER ExternalAccountAlgorithm
+            The algorithm to be used to hash the external account binding.
+
+        .PARAMETER ExternalAccountMACKey
+            The key to hash the external account binding object (needs to be base64 or base64url encoded)
+
 
         .EXAMPLE
             PS> New-Account -AcceptTOS -EmailAddresses "mail@example.com" -AutomaticAccountHandling
@@ -1617,17 +1701,42 @@ function New-Account {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string[]]
-        $EmailAddresses
+        $EmailAddresses,
+
+        [Parameter(ParameterSetName = "ExternalAccountBinding", Mandatory = $true)]
+        [ValidateNotNull()]
+        [string]
+        $ExternalAccountKID,
+
+        [Parameter(ParameterSetName = "ExternalAccountBinding")]
+        [ValidateSet('HS256','HS384','HS512')]
+        [string]
+        $ExternalAccountAlgorithm = 'HS256',
+
+        [Parameter(ParameterSetName = "ExternalAccountBinding", Mandatory = $true)]
+        [ValidateNotNull()]
+        [string]
+        $ExternalAccountMACKey
     )
 
-    $Contacts = @($EmailAddresses | ForEach-Object { if($_.StartsWith("mailto:")) { $_ } else { "mailto:$_" } });
+    $contacts = @($EmailAddresses | ForEach-Object { if($_.StartsWith("mailto:")) { $_ } else { "mailto:$_" } });
 
     $payload = @{
         "termsOfServiceAgreed"=$AcceptTOS.IsPresent;
-        "contact"=$Contacts;
+        "contact"=$contacts;
     }
 
-    $url = $State.GetServiceDirectory().NewAccount;
+    $serviceDirectory = $State.GetServiceDirectory();
+    $url = $serviceDirectory.NewAccount;
+
+    if($PSCmdlet.ParameterSetName -ne "ExternalAccountBinding" -and $serviceDirectory.Meta.ExternalAccountRequired) {
+        throw "The ACME service requires an external account to create a new ACME account. Provide `-ExternalAccount*` Parameters."
+    }
+
+    if($PSCmdlet.ParameterSetName -eq  "ExternalAccountBinding") {
+        $externalAccountBinding = New-ExternalAccountPayload -State $State -ExternalAccountKID $ExternalAccountKID -ExternalAccountMACKey $ExternalAccountMACKey -ExternalAccountAlgorithm $ExternalAccountAlgorithm;
+        $payload.Add("externalAccountBinding", $externalAccountBinding);
+    }
 
     if($PSCmdlet.ShouldProcess("New-Account", "Sending account registration to ACME Server $Url")) {
         $response = Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SuppressKeyId -ErrorAction 'Stop'
