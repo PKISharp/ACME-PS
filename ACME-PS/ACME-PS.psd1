@@ -85,7 +85,7 @@
 			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACME-PS/releases'
 
 			# Prerelase
-			Prerelease = 'beta2'
+			# Prerelease = 'beta4'
 		} # End of PSData hashtable
 
 	} # End of PrivateData hashtable
