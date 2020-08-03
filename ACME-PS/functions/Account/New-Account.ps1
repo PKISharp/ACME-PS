@@ -32,7 +32,7 @@ function New-Account {
             The algorithm to be used to hash the external account binding.
 
         .PARAMETER ExternalAccountMACKey
-            The key to hash the external account binding object.
+            The key to hash the external account binding object (needs to be base64 or base64url encoded)
 
 
         .EXAMPLE
