@@ -1680,7 +1680,7 @@ function New-Account {
         .EXAMPLE
             PS> New-Account $myServiceDirectory $myAccountKey $myNonce -AcceptTos -EmailAddresses @(...) -ExistingAccountIsError
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess=$true, DefaultParameterSetName="Default")]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
