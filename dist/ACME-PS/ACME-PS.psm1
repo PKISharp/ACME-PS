@@ -1397,28 +1397,43 @@ function Invoke-ACMEWebRequest {
         $Method
     )
 
-    $httpRequest = [System.Net.Http.HttpRequestMessage]::new($Method, $Uri);
-    Write-Verbose "Sending HttpRequest ($Method) to $Uri";
+    Begin {
+        $script:SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol;
 
-    if($Method -in @("POST", "PUT")) {
-        $httpRequest.Content = [System.Net.Http.StringContent]::new($JsonBody, [System.Text.Encoding]::UTF8);
-        $httpRequest.Content.Headers.ContentType = "application/jose+json";
-
-        Write-Debug "The content of the request is $JsonBody";
+        if($script:SecurityProtocol -ne [Net.SecurityProtocolType]::SystemDefault) {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol `
+                -bor [Net.SecurityProtocolType]::Tls11 `
+                -bor [Net.SecurityProtocolType]::Tls12;
+        }
+    }
+    End {
+        [Net.ServicePointManager]::SecurityProtocol = $script:SecurityProtocol;
     }
 
-    try {
-        $httpClient = [System.Net.Http.HttpClient]::new();
-        $httpResponse = $httpClient.SendAsync($httpRequest).GetAwaiter().GetResult();
-        $result = [AcmeHttpResponse]::new($httpResponse);
-    } catch {
-        $result = [AcmeHttpResponse]::new();
-        $result.IsError = $true;
-        $result.ErrorMessage = $_.Exception.Message;
-        $result.Content = $_.Exception;
-    }
+    Process {
+        $httpRequest = [System.Net.Http.HttpRequestMessage]::new($Method, $Uri);
+        Write-Verbose "Sending HttpRequest ($Method) to $Uri";
 
-    return $result;
+        if($Method -in @("POST", "PUT")) {
+            $httpRequest.Content = [System.Net.Http.StringContent]::new($JsonBody, [System.Text.Encoding]::UTF8);
+            $httpRequest.Content.Headers.ContentType = "application/jose+json";
+
+            Write-Debug "The content of the request is $JsonBody";
+        }
+
+        try {
+            $httpClient = [System.Net.Http.HttpClient]::new();
+            $httpResponse = $httpClient.SendAsync($httpRequest).GetAwaiter().GetResult();
+            $result = [AcmeHttpResponse]::new($httpResponse);
+        } catch {
+            $result = [AcmeHttpResponse]::new();
+            $result.IsError = $true;
+            $result.ErrorMessage = $_.Exception.Message;
+            $result.Content = $_.Exception;
+        }
+
+        return $result;
+    }
 }
 
 function New-ExternalAccountPayload {
