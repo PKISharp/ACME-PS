@@ -60,14 +60,23 @@ function Get-ServiceDirectory {
         $PassThru
     )
 
-    begin {
+    Begin {
         $KnownEndpoints = @{
             "LetsEncrypt-Staging"="https://acme-staging-v02.api.letsencrypt.org";
             "LetsEncrypt"="https://acme-v02.api.letsencrypt.org"
         }
+
+        if($script:SecurityProtocol -ne [Net.SecurityProtocolType]::SystemDefault) {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol `
+                -bor [Net.SecurityProtocolType]::Tls11 `
+                -bor [Net.SecurityProtocolType]::Tls12;
+        }
+    }
+    End {
+        [Net.ServicePointManager]::SecurityProtocol = $script:SecurityProtocol;
     }
 
-    process {
+    Process {
         $ErrorActionPreference = 'Stop';
 
         if($PSCmdlet.ParameterSetName -in @("FromName", "FromUrl")) {
