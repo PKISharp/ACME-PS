@@ -3284,6 +3284,7 @@ function Get-ServiceDirectory {
             "LetsEncrypt"="https://acme-v02.api.letsencrypt.org"
         }
 
+        $script:SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol;
         if($script:SecurityProtocol -ne [Net.SecurityProtocolType]::SystemDefault) {
             [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol `
                 -bor [Net.SecurityProtocolType]::Tls11 `
