@@ -39,6 +39,10 @@ function Get-Challenge {
 
     process {
         $challange = $Authorization.Challenges | Where-Object { $_.Type -eq $Type } | Select-Object -First 1
+        if(-not $challange) {
+            throw "Cannot find challange of type $Type";
+        }
+
         if(-not $challange.Data) {
             $challange | Initialize-Challenge $State
         }
