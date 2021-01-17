@@ -2390,7 +2390,7 @@ function Revoke-Certificate {
 
         [Parameter(Mandatory = $true, ParameterSetName = "ByPFXFile")]
         [string]
-        $PFXCertificatePassword,
+        $PFXCertificatePassword
     )
 
     if($PSCmdlet.ParameterSetName -eq "ByPFXFile") {
