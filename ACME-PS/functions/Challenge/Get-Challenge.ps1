@@ -38,11 +38,15 @@ function Get-Challenge {
     )
 
     process {
-        $challange = $Authorization.Challenges | Where-Object { $_.Type -eq $Type } | Select-Object -First 1
-        if(-not $challange.Data) {
-            $challange | Initialize-Challenge $State
+        $challenge = $Authorization.Challenges | Where-Object { $_.Type -eq $Type } | Select-Object -First 1
+        if(-not $challenge) {
+            throw "Could not find challenge of Type $Type";
         }
 
-        return $challange;
+        if(-not $challenge.Data) {
+            $challenge | Initialize-Challenge $State
+        }
+
+        return $challenge;
     }
 }
