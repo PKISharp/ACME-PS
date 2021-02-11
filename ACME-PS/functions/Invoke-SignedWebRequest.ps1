@@ -51,16 +51,60 @@ function Invoke-SignedWebRequest {
         [switch] $SuppressKeyId,
 
         [Parameter()]
-        [switch] $SkipRetryOnNonceError
+        [switch] $SkipRetryOnNonceError,
+
+        [Parameter(ParameterSetName = "X509Cert")]
+        [ValidateNotNull()]
+        [System.Security.Cryptography.X509Certificates.X509Certificate2]$X509Cert,
+
+        [Parameter(ParameterSetName = "X509Cert")]
+        [ValidateNotNull()]
+        [int]$HashSize = 256
     )
 
     process {
-        $accountKey = $State.GetAccountKey();
-        $account = $State.GetAccount();
-        $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
         $nonce = $State.GetNonce();
+        if($PsCmdlet.ParameterSetName -eq "X509Cert") {
+            if(-not $X509Cert.HasPrivateKey) {
+                throw "Using a X509 Certificate to sign a message, requires the private key to be available.";
+            }
 
-        $requestBody = New-SignedMessage -Url $Url -SigningKey $accountKey -KeyId $keyId -Nonce $nonce -Payload $Payload
+            if($X509Cert.PrivateKey -is [System.Security.Cryptography.RSA]) {
+                $rsaParams = $this.RSA.ExportParameters($true);
+
+                $keyExport = [RSAKeyExport]::new();
+                $keyExport.D = $rsaParams.D;
+                $keyExport.DP = $rsaParams.DP;
+                $keyExport.DQ = $rsaParams.DQ;
+                $keyExport.Exponent = $rsaParams.Exponent;
+                $keyExport.InverseQ = $rsaParams.InverseQ;
+                $keyExport.Modulus = $rsaParams.Modulus;
+                $keyExport.P = $rsaParams.P;
+                $keyExport.Q = $rsaParams.Q;
+
+                $keyExport.HashSize = $HashSize;
+            }
+            elseif($X509Cert.PrivateKey -is [System.Security.Cryptography.ECDsa]) {
+                $ecParams = $this.ECDsa.ExportParameters($true);
+                $keyExport = [ECDsaKeyExport]::new();
+        
+                $keyExport.D = $ecParams.D;
+                $keyExport.X = $ecParams.Q.X;
+                $keyExport.Y = $ecParams.Q.Y;
+        
+                $keyExport.HashSize = $HashSize;
+            }
+            else {
+                throw new "Unsupported X509 certificate key type ($($X509Cert.PrivateKey.GetType())).";
+            }
+            $signingKey = [KeyFactory]::CreateAccountKey($keyExport);
+        } else {
+            $signingKey = $State.GetAccountKey();
+            $account = $State.GetAccount();
+            $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
+        }
+
+        $requestBody = New-SignedMessage -Url $Url -SigningKey $signingKey -KeyId $keyId -Nonce $nonce -Payload $Payload
         $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST -ErrorAction 'Continue'
 
         if($response.NextNonce) {
