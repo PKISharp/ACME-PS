@@ -23,7 +23,7 @@ function Revoke-Certificate {
             The pfx file path containing the certificate to be revoked.
 
         .PARAMETER X509Certificate
-            The X509Certificate to be revoked.
+            The X509Certificate to be revoked, if it contains a private key, it will be used to sign the revocation request.
 
         .EXAMPLE
             PS> Revoke-Certificate -State $myState -Order $myOrder
@@ -41,6 +41,14 @@ function Revoke-Certificate {
 
         [Parameter(Mandatory = $true, ParameterSetName = "ByCert")]
         $CertificatePublicKey,
+
+        [Paremeter(ParameterSetName = "ByCert")]
+        [ISigningKey] 
+        $SigningKey,
+
+        [Parameter(ParameterSetName = "ByCert")]
+        [ValidateSet(256, 384, 512)]
+        [int] $HashSize,
 
         [Parameter(Mandatory = $true, ParameterSetName = "ByOrder")]
         [ValidateNotNull()]
@@ -75,8 +83,44 @@ function Revoke-Certificate {
 
     if($PSCmdlet.ParameterSetName -eq "ByX509") {
         $certBytes = $X509Certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert);
-        Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
+
+        if($X509Certificate.HasPrivateKey) {
+            if($X509Cert.PrivateKey -is [System.Security.Cryptography.RSA]) {
+                $rsaParams = $this.RSA.ExportParameters($true);
+
+                $keyExport = [RSAKeyExport]::new();
+                $keyExport.D = $rsaParams.D;
+                $keyExport.DP = $rsaParams.DP;
+                $keyExport.DQ = $rsaParams.DQ;
+                $keyExport.Exponent = $rsaParams.Exponent;
+                $keyExport.InverseQ = $rsaParams.InverseQ;
+                $keyExport.Modulus = $rsaParams.Modulus;
+                $keyExport.P = $rsaParams.P;
+                $keyExport.Q = $rsaParams.Q;
+
+                $keyExport.HashSize = $HashSize;
+            }
+            elseif($X509Cert.PrivateKey -is [System.Security.Cryptography.ECDsa]) {
+                $ecParams = $this.ECDsa.ExportParameters($true);
+                $keyExport = [ECDsaKeyExport]::new();
         
+                $keyExport.D = $ecParams.D;
+                $keyExport.X = $ecParams.Q.X;
+                $keyExport.Y = $ecParams.Q.Y;
+        
+                $keyExport.HashSize = $HashSize;
+            }
+            else {
+                throw new "Unsupported X509 certificate key type ($($X509Cert.PrivateKey.GetType())).";
+            }
+
+            $signingKey = [KeyFactory]::CreateAccountKey($keyExport);
+
+            Revoke-Certificate -State $State -CertificatePublicKey $certBytes -SigningKey $signingKey;
+        }
+        else {
+            Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
+        }
         return;
     }
 
@@ -100,7 +144,7 @@ function Revoke-Certificate {
         };
         
         $url = $State.GetServiceDirectory().RevokeCert;
-        $payload = @{ "certificate" = $base64Certificate };
+        $payload = @{ "certificate" = $base64Certificate; "reason" = 1 };
 
         if($PSCmdlet.ShouldProcess("Certificate", "Revoking certificate.")) {
             Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;

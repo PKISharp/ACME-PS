@@ -32,7 +32,7 @@ function Invoke-SignedWebRequest {
             PS (POST-as-GET)> Invoke-SignedWebRequest "https://acme.service/" $myState
             PS (POST-as-GET)> Invoke-SignedWebRequest -Url "https://acme.service/" -State $myState -Payload $myPayload
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Default")]
     [OutputType("AcmeHttpResponse")]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -53,52 +53,14 @@ function Invoke-SignedWebRequest {
         [Parameter()]
         [switch] $SkipRetryOnNonceError,
 
-        [Parameter(ParameterSetName = "X509Cert")]
+        [Parameter(ParameterSetName = "HasSigningKey")]
         [ValidateNotNull()]
-        [System.Security.Cryptography.X509Certificates.X509Certificate2]$X509Cert,
-
-        [Parameter(ParameterSetName = "X509Cert")]
-        [ValidateNotNull()]
-        [int]$HashSize = 256
+        [ISigningKey] $SigningKey
     )
 
     process {
         $nonce = $State.GetNonce();
-        if($PsCmdlet.ParameterSetName -eq "X509Cert") {
-            if(-not $X509Cert.HasPrivateKey) {
-                throw "Using a X509 Certificate to sign a message, requires the private key to be available.";
-            }
-
-            if($X509Cert.PrivateKey -is [System.Security.Cryptography.RSA]) {
-                $rsaParams = $this.RSA.ExportParameters($true);
-
-                $keyExport = [RSAKeyExport]::new();
-                $keyExport.D = $rsaParams.D;
-                $keyExport.DP = $rsaParams.DP;
-                $keyExport.DQ = $rsaParams.DQ;
-                $keyExport.Exponent = $rsaParams.Exponent;
-                $keyExport.InverseQ = $rsaParams.InverseQ;
-                $keyExport.Modulus = $rsaParams.Modulus;
-                $keyExport.P = $rsaParams.P;
-                $keyExport.Q = $rsaParams.Q;
-
-                $keyExport.HashSize = $HashSize;
-            }
-            elseif($X509Cert.PrivateKey -is [System.Security.Cryptography.ECDsa]) {
-                $ecParams = $this.ECDsa.ExportParameters($true);
-                $keyExport = [ECDsaKeyExport]::new();
-        
-                $keyExport.D = $ecParams.D;
-                $keyExport.X = $ecParams.Q.X;
-                $keyExport.Y = $ecParams.Q.Y;
-        
-                $keyExport.HashSize = $HashSize;
-            }
-            else {
-                throw new "Unsupported X509 certificate key type ($($X509Cert.PrivateKey.GetType())).";
-            }
-            $signingKey = [KeyFactory]::CreateAccountKey($keyExport);
-        } else {
+        if($PsCmdlet.ParameterSetName -ne "HasSigningKey") {
             $signingKey = $State.GetAccountKey();
             $account = $State.GetAccount();
             $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
