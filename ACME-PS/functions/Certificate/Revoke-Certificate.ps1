@@ -42,7 +42,7 @@ function Revoke-Certificate {
         [Parameter(Mandatory = $true, ParameterSetName = "ByCert")]
         $CertificatePublicKey,
 
-        [Paremeter(ParameterSetName = "ByCert")]
+        [Parameter(ParameterSetName = "ByCert")]
         [ISigningKey] 
         $SigningKey,
 
