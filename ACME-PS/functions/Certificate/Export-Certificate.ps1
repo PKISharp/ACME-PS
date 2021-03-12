@@ -15,6 +15,9 @@ function Export-Certificate {
         .PARAMETER Order
             The order which contains the issued certificate.
 
+        .PARAMETER UseAlternateChain
+            Let's Encrypt provides certificates with alternate chains. Currently theres only one named, this switch will make it use the alternate.
+
         .PARAMETER CertificateKey
             The key which was used to create the orders CSR.
 
@@ -57,6 +60,10 @@ function Export-Certificate {
         $Order,
 
         [Parameter()]
+        [switch]
+        $UseAlternateChain,
+
+        [Parameter()]
         [ICertificateKey]
         $CertificateKey,
 
@@ -97,7 +104,7 @@ function Export-Certificate {
         $CertificateKey = $State.GetOrderCertificateKey($Order);
 
         if($null -eq $CertificateKey) {
-            throw 'Need $CertificateKey to be provided or present in $Order and $State respectively'
+            throw 'Need $CertificateKey to be provided or present in $Order.'
         }
     }
 
@@ -113,6 +120,19 @@ function Export-Certificate {
 
     if($null -eq $certificate) {
         $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
+
+        if($UseAlternateChain) {
+            $alternateUrlMatch = ($response.Headers.Link | Select-String -Pattern '<(.*)>;rel="alternate"' | Select-Object -First 1)
+
+            if($null -eq $alternateUrlMatch) {
+                Write-Warning "Could not find alternate chain. Using available chain.";
+            } 
+            else {
+                $alternateUrl = $alternateUrlMatch.Matches[0].Groups[1].Value;
+                $response = Invoke-SignedWebRequest -Url $alternateUrl -State $State;
+            }
+        }
+
         $certificate = $response.Content;
 
         if(-not $DisablePEMStorage) {
