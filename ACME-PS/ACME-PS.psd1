@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.3.4'
+	ModuleVersion = '1.3.5'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -85,7 +85,7 @@
 			ReleaseNotes = 'Please see the release notes from the release distribution page: https://github.com/PKISharp/ACME-PS/releases'
 
 			# Prerelase
-			# Prerelease = 'beta'
+			Prerelease = 'beta'
 		} # End of PSData hashtable
 
 	} # End of PrivateData hashtable
