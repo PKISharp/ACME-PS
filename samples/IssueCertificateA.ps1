@@ -20,7 +20,7 @@ if ($null -eq $order) { # Will fetch the order
 # Wait a little bit and update the order, until we see the status 'ready' or 'invalid'
 while($order.Status -notin ("ready","invalid")) {
     Start-Sleep -Seconds 10;
-    $order | Update-ACMEOrder -State $acmeStatePath -PassThru;
+    $order | Update-ACMEOrder -State $acmeStateDir -PassThru;
 }
 
 if($order.Status -eq "invalid") {
