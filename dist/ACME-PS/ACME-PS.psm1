@@ -2219,11 +2219,10 @@ function Export-Certificate {
             Allows the operation to override existing a certificate.
 
         .PARAMETER ForceCertificateReload
-            Forces the operation to reload the certificate from the acme service.
+            DEPRECATED - The cmdlet will always try to reload the certificate from the acme service.
 
         .PARAMETER DisablePEMStorage
             The downloaded public certificate will not be stored with the order.
-            This will make revocation impossible.
 
         .PARAMETER AdditionalChainCertificates
             Certificates in this Paramter will be appended to the certificate chain during export.
@@ -2289,40 +2288,34 @@ function Export-Certificate {
         $CertificateKey = $State.GetOrderCertificateKey($Order);
 
         if($null -eq $CertificateKey) {
-            throw 'Need $CertificateKey to be provided or present in $Order.'
+            throw 'Need $CertificateKey to be provided or present in $Order.';
         }
     }
 
     if(Test-Path $Path) {
         if(!$Force) {
-            throw "$Path does already exist."
+            throw "$Path does already exist. Use -Force to overwrite file.";
         }
     }
 
-    if(-not $ForceCertificateReload) {
-        $certificate = $State.GetOrderCertificate($Order);
+    $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
+
+    if($UseAlternateChain) {
+        $alternateUrlMatch = ($response.Headers.Link | Select-String -Pattern '<(.*)>;rel="alternate"' | Select-Object -First 1);
+
+        if($null -eq $alternateUrlMatch) {
+            Write-Warning "Could not find alternate chain. Using available chain.";
+        } 
+        else {
+            $alternateUrl = $alternateUrlMatch.Matches[0].Groups[1].Value;
+            $response = Invoke-SignedWebRequest -Url $alternateUrl -State $State;
+        }
     }
 
-    if($null -eq $certificate) {
-        $response = Invoke-SignedWebRequest -Url $Order.CertificateUrl -State $State;
+    $certificate = $response.Content;
 
-        if($UseAlternateChain) {
-            $alternateUrlMatch = ($response.Headers.Link | Select-String -Pattern '<(.*)>;rel="alternate"' | Select-Object -First 1)
-
-            if($null -eq $alternateUrlMatch) {
-                Write-Warning "Could not find alternate chain. Using available chain.";
-            } 
-            else {
-                $alternateUrl = $alternateUrlMatch.Matches[0].Groups[1].Value;
-                $response = Invoke-SignedWebRequest -Url $alternateUrl -State $State;
-            }
-        }
-
-        $certificate = $response.Content;
-
-        if(-not $DisablePEMStorage) {
-            $State.SetOrderCertificate($Order, $certificate);
-        }
+    if(-not $DisablePEMStorage) {
+        $State.SetOrderCertificate($Order, $certificate);
     }
 
     if($ExcludeChain) {
@@ -3524,6 +3517,7 @@ function Invoke-SignedWebRequest {
 
             if($response.IsError -and -not $SkipRetryOnNonceError) {
                 if($response.Content.Type -eq "urn:ietf:params:acme:error:badNonce") {
+                    Write-Verbose "Response indicated bad nonce. Trying again with new nonce.";
                     return Invoke-SignedWebRequest -Url $Url -State $State -Payload $Payload -SuppressKeyId:$SuppressKeyId.IsPresent -SkipRetryOnNonceError;
                 }
             }
