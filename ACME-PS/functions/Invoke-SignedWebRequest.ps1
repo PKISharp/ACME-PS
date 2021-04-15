@@ -74,6 +74,7 @@ function Invoke-SignedWebRequest {
 
             if($response.IsError -and -not $SkipRetryOnNonceError) {
                 if($response.Content.Type -eq "urn:ietf:params:acme:error:badNonce") {
+                    Write-Verbose "Response indicated bad nonce. Trying again with new nonce.";
                     return Invoke-SignedWebRequest -Url $Url -State $State -Payload $Payload -SuppressKeyId:$SuppressKeyId.IsPresent -SkipRetryOnNonceError;
                 }
             }
