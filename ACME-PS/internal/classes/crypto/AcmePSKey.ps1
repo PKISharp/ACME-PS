@@ -19,7 +19,7 @@ class AcmePSKey {
         $algo = $null;
         $hashSize = $keySource.HashSize;
         
-        if($keySource.TypeName -eq "RSAKeyExport" -or $keySource.TypeName -eq "RSA") {
+        if($keySource.TypeName -iin @("RSA","RSAKeyExport")) {
             $keyParameters = [System.Security.Cryptography.RSAParameters]::new();
 
             $keyParameters.D = $keySource.D;
@@ -33,7 +33,7 @@ class AcmePSKey {
      
             $algo = [Security.Cryptography.RSA]::Create($keyParameters);
         }
-        elseif($keySource.TypeName -eq "ECDsaKeyExport" -or $keySource.TypeName -eq "ECDsa") {
+        elseif($keySource.TypeName -iin @("ECDsa","ECDsaKeyExport")) {
             $keyParameters = [System.Security.Cryptography.ECParameters]::new();
 
             $keyParameters.Curve = GetECDsaCurve($hashSize);
@@ -44,7 +44,7 @@ class AcmePSKey {
             $algo = [Security.Cryptography.ECDsa]::Create($keyParameters);
         }
         else {
-            throw "Unkown Key Export type $($keySource.TypeName)";
+            throw "Unkown Key Export type '$($keySource.TypeName)'";
         }
 
         Initialize($algo, $hashSize);

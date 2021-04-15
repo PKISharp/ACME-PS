@@ -25,11 +25,11 @@ function Import-CertificateKey {
     $ErrorActionPreference = 'Stop'
 
     if($Path -like "*.json") {
-        $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertTo-OriginalType;
+        $imported = Get-Content $Path -Raw | ConvertFrom-Json;
     } else {
-        $imported = Import-Clixml $Path | ConvertTo-OriginalType
+        $imported = Import-Clixml $Path;
     }
 
-    $certificateKey = [KeyFactory]::CreateCertificateKey($imported);
+    $certificateKey = [AcmePSKey]::new($imported);
     return $certificateKey;
 }

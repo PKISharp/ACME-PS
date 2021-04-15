@@ -39,11 +39,11 @@ function Import-AccountKey {
     )
 
     process {
-        $ErrorActionPreference = 'Stop'
+        $ErrorActionPreference = 'Stop';
 
-        $imported = Import-AcmeObject $Path
+        $imported = Import-AcmeObject $Path -AsPSCustomObject;
 
-        $accountKey = [KeyFactory]::CreateAccountKey($imported);
+        $accountKey = [AcmePSKey]::new($imported);
         if($State) {
             $State.Set($accountKey);
         }
