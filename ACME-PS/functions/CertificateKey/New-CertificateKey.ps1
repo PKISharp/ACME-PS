@@ -86,14 +86,16 @@ function New-CertificateKey {
     }
 
     if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
-        $certificateKey = [AcmePSKey]([ECDsaCertificateKey]::new($ECDsaHashSize));
+        $ecdsa = [Security.Cryptography.ECDsa]::Create([AcmePSKey]::GetECDsaCurve($ECDsaHashSize));
+        $certificateKey = [AcmePSKey]::new($ecdsa, $ECDsaHashSize);
         Write-Verbose "Created new ECDsa certificate key with hash size $ECDsaHashSize";
     } elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
         if($RSAKeySize -lt 2048 -or $RSAKeySize -gt 4096 -or ($RSAKeySize%8) -ne 0) {
             throw "The RSAKeySize must be between 2048 and 4096 and must be divisible by 8";
         }
 
-        $certificateKey = [AcmePSKey]([RSACertificateKey]::new($RSAHashSize, $RSAKeySize));
+        $rsa = [Security.Cryptography.RSA]::Create($RSAKeySize);
+        $certificateKey = [AcmePSKey]::new($rsa, $RSAHashSize);
         Write-Verbose "Created new RSA certificate key with hash size $RSAHashSize and key size $RSAKeySize";
     }
 

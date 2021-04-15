@@ -36,7 +36,7 @@ class AcmePSKey {
         elseif($keySource.TypeName -iin @("ECDsa","ECDsaKeyExport")) {
             $keyParameters = [System.Security.Cryptography.ECParameters]::new();
 
-            $keyParameters.Curve = GetECDsaCurve($hashSize);
+            $keyParameters.Curve = [AcmePSKey]::GetECDsaCurve($hashSize);
             $keyParameters.D = $keySource.D;
             $keyParameters.Q.X = $keySource.X;
             $keyParameters.Q.Y = $keySource.Y;
@@ -52,7 +52,7 @@ class AcmePSKey {
 
     hidden Initialize([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize) {
         $this._HashSize = $hashSize;
-        $this._HashName = $this.GetHashName($hashSize);
+        $this._HashName = [AcmePSKey]::GetHashName($hashSize);
 
         $this._Algorithm = $algorithm;
 
@@ -81,7 +81,7 @@ class AcmePSKey {
         throw "Cannot use hash size to get hash name. Allowed sizes: 256, 348, 512";
     }
 
-    hidden static [Security.Cryptography.ECCurve] GetECDsaCurve($hashSize) {
+    static [Security.Cryptography.ECCurve] GetECDsaCurve($hashSize) {
         switch ($hashSize) {
             256 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP256; }
             384 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP384; }
