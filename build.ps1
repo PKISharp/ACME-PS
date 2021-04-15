@@ -47,7 +47,6 @@ process {
     <# Publish the module #>
     $ContentFiles = @(
         "$ModuleSourcePath/ACME-PS.psd1",
-        "$ModuleSourcePath/TypeDefinitions.ps1",
         "$ModuleSourcePath/Prerequisites.ps1",
         "$ModuleSourcePath/ACME-PS.png",
         "$ModuleSourcePath/../LICENSE"
@@ -56,13 +55,8 @@ process {
     # Class files are sequence sensitive
     $ClassPath = [System.IO.Path]::Combine($ModuleSourcePath, "./internal/classes");
     $ClassFiles = @(
-        "crypto/KeyExport",
-        "crypto/KeyBase",
         "crypto/Certificate",
-        "crypto/RSAKey",
-        "crypto/ECDsaKey",
-        "crypto/KeyAuthorization",
-        "crypto/AlgorithmFactory",
+        "crypto/AcmePSKey",
         "AcmeHttpResponse",
         "AcmeHttpException",
         "AcmeDirectory",
