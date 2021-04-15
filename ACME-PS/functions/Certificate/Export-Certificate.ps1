@@ -120,7 +120,7 @@ function Export-Certificate {
 
         if($null -eq $alternateUrlMatch) {
             Write-Warning "Could not find alternate chain. Using available chain.";
-        } 
+        }
         else {
             $alternateUrl = $alternateUrlMatch.Matches[0].Groups[1].Value;
             $response = Invoke-SignedWebRequest -Url $alternateUrl -State $State;
