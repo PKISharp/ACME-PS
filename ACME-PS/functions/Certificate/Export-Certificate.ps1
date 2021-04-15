@@ -63,7 +63,7 @@ function Export-Certificate {
         $UseAlternateChain,
 
         [Parameter()]
-        [ICertificateKey]
+        [AcmePSKey]
         $CertificateKey,
 
         [Parameter(Mandatory = $true)]

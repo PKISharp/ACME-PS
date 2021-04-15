@@ -50,7 +50,7 @@ function Complete-Order {
 
         [Parameter(Mandatory = $true, ParameterSetName="CustomKey")]
         [ValidateNotNull()]
-        [ICertificateKey]
+        [AcmePSKey]
         $CertificateKey,
 
         [Parameter(ParameterSetName="CustomKey")]

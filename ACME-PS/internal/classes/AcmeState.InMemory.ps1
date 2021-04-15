@@ -1,7 +1,7 @@
 class AcmeInMemoryState : AcmeState {
     [ValidateNotNull()] hidden [AcmeDirectory] $ServiceDirectory;
     [ValidateNotNull()] hidden [string] $Nonce;
-    [ValidateNotNull()] hidden [IAccountKey] $AccountKey;
+    [ValidateNotNull()] hidden [AcmePSKey] $AccountKey;
     [ValidateNotNull()] hidden [AcmeAccount] $Account;
 
     hidden [hashtable] $Orders = @{};
@@ -12,12 +12,12 @@ class AcmeInMemoryState : AcmeState {
 
     [AcmeDirectory] GetServiceDirectory() { return $this.ServiceDirectory; }
     [string] GetNonce() { return $this.Nonce; }
-    [IAccountKey] GetAccountKey() { return $this.AccountKey; }
+    [AcmePSKey] GetAccountKey() { return $this.AccountKey; }
     [AcmeAccount] GetAccount() { return $this.Account; }
 
     [void] SetNonce([string] $value)   { $this.Nonce = $value; }
     [void] Set([AcmeDirectory] $value) { $this.ServiceDirectory = $value; }
-    [void] Set([IAccountKey] $value)   { $this.AccountKey = $value; }
+    [void] Set([AcmePSKey] $value)   { $this.AccountKey = $value; }
     [void] Set([AcmeAccount] $value)   { $this.Account = $value; }
 
 
@@ -35,7 +35,7 @@ class AcmeInMemoryState : AcmeState {
         $this.Orders.Remove($orderHash);
     }
 
-    [ICertificateKey] GetOrderCertificateKey([AcmeOrder] $order) {
+    [AcmePSKey] GetOrderCertificateKey([AcmeOrder] $order) {
         $orderHash = $order.GetHashString();
         if ($this.CertKeys.ContainsKey($orderHash)) {
             return $this.CertKeys[$orderHash];
@@ -44,7 +44,7 @@ class AcmeInMemoryState : AcmeState {
         return $null;
     }
 
-    [void] SetOrderCertificateKey([AcmeOrder] $order, [ICertificateKey] $certificateKey) {
+    [void] SetOrderCertificateKey([AcmeOrder] $order, [AcmePSKey] $certificateKey) {
         $orderHash = $order.GetHashString();
         $this.CertKeys[$orderHash] = $certificateKey;
     }
