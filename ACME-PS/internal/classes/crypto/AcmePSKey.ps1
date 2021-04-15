@@ -7,12 +7,12 @@ class AcmePSKey {
 
     AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm)
     {
-        Initialize($algorithm, 256);
+        $this.Initialize($algorithm, 256);
     }
 
     AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize) 
     {
-        Initialize($algorithm, $hashSize);
+        $this.Initialize($algorithm, $hashSize);
     }
 
     AcmePSKey([PSCustomObject]$keySource) {
@@ -47,7 +47,7 @@ class AcmePSKey {
             throw "Unkown Key Export type '$($keySource.TypeName)'";
         }
 
-        Initialize($algo, $hashSize);
+        $this.Initialize($algo, $hashSize);
     }
 
     hidden Initialize([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize) {
@@ -137,9 +137,9 @@ class AcmePSKey {
             JWK and are sorted in lexicographic order to produce a canonical form
         #>
         
-        if($this._AlgorithmType -eq "ECDsa") {
-            $keyParams = $this.ECDsa.ExportParameters($false);
+        $keyParams = $this._Algorithm.ExportParameters($false);
 
+        if($this._AlgorithmType -eq "ECDsa") {
             $result = [ordered]@{
                 "crv" = "P-$($this._HashSize)";
                 "kty" = "EC"; # https://tools.ietf.org/html/rfc7518#section-6.2
@@ -148,8 +148,6 @@ class AcmePSKey {
             }
         }
         elseif ($this._AlgorithmType -eq "RSA") {
-            $keyParams = $this.RSA.ExportParameters($false);
-
             $result = [ordered]@{
                 "e" = ConvertTo-UrlBase64 -InputBytes $keyParams.Exponent;
                 "kty" = "RSA"; # https://tools.ietf.org/html/rfc7518#section-6.3

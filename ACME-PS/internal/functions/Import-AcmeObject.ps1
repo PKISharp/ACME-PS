@@ -27,7 +27,7 @@ function Import-AcmeObject {
         }
 
         if($AsPSCustomObject.IsPresent) {
-            return $result;
+            return $imported;
         }
 
         if($TypeName) {
