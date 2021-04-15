@@ -1437,6 +1437,7 @@ function Invoke-ACMEWebRequest {
 }
 
 function New-ExternalAccountPayload {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "", Scope="Function", Target="*")]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
@@ -2305,7 +2306,7 @@ function Export-Certificate {
 
         if($null -eq $alternateUrlMatch) {
             Write-Warning "Could not find alternate chain. Using available chain.";
-        } 
+        }
         else {
             $alternateUrl = $alternateUrlMatch.Matches[0].Groups[1].Value;
             $response = Invoke-SignedWebRequest -Url $alternateUrl -State $State;
@@ -2360,14 +2361,23 @@ function Revoke-Certificate {
         .PARAMETER CertificatePublicKey
             The certificate to be revoked. Either as base64-string or byte[]. Needs to be DER encoded.
 
+        .PARAMETER SigningKey
+            The key to sign the revocation request. If you provide the X509Certificate or Order parameter, this will be set automatically.
+
+        .PARAMETER HashSize
+            The hash size used to sign the revocation request. If you provide the X509Certificate or Order parameter, this will be set automatically.
+
         .PARAMETER Order
             The order which contains the issued certificate.
+
+        .PARAMETER X509Certificate
+            The X509Certificate to be revoked, if it contains a private key, it will be used to sign the revocation request.
 
         .PARAMETER PFXCertificatePath
             The pfx file path containing the certificate to be revoked.
 
-        .PARAMETER X509Certificate
-            The X509Certificate to be revoked, if it contains a private key, it will be used to sign the revocation request.
+        .PARAMETER PFXCertificatePassword
+            The pfx file might need a password. Provide it here.
 
         .EXAMPLE
             PS> Revoke-Certificate -State $myState -Order $myOrder
@@ -2376,6 +2386,7 @@ function Revoke-Certificate {
             PS> Revoke-Certificate -State $myState -PFXCertificatePath C:\Temp\myCert.pfx
     #>
     [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='High')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingPlainTextForPassword", "", Scope="Function", Target="*")]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
@@ -2387,7 +2398,7 @@ function Revoke-Certificate {
         $CertificatePublicKey,
 
         [Parameter(ParameterSetName = "ByCert")]
-        [ISigningKey] 
+        [ISigningKey]
         $SigningKey,
 
         [Parameter(ParameterSetName = "ByCert")]
@@ -2409,7 +2420,7 @@ function Revoke-Certificate {
         [string]
         $PFXCertificatePath,
 
-        [Parameter(Mandatory = $true, ParameterSetName = "ByPFXFile")]
+        [Parameter(ParameterSetName = "ByPFXFile")]
         [string]
         $PFXCertificatePassword
     )
@@ -2429,7 +2440,7 @@ function Revoke-Certificate {
         $certBytes = $X509Certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert);
 
         if($X509Certificate.HasPrivateKey) {
-            if($X509Cert.PrivateKey -is [System.Security.Cryptography.RSA]) {
+            if($X509Certificate.PrivateKey -is [System.Security.Cryptography.RSA]) {
                 $rsaParams = $this.RSA.ExportParameters($true);
 
                 $keyExport = [RSAKeyExport]::new();
@@ -2444,18 +2455,18 @@ function Revoke-Certificate {
 
                 $keyExport.HashSize = $HashSize;
             }
-            elseif($X509Cert.PrivateKey -is [System.Security.Cryptography.ECDsa]) {
+            elseif($X509Certificate.PrivateKey -is [System.Security.Cryptography.ECDsa]) {
                 $ecParams = $this.ECDsa.ExportParameters($true);
                 $keyExport = [ECDsaKeyExport]::new();
-        
+
                 $keyExport.D = $ecParams.D;
                 $keyExport.X = $ecParams.Q.X;
                 $keyExport.Y = $ecParams.Q.Y;
-        
+
                 $keyExport.HashSize = $HashSize;
             }
             else {
-                throw new "Unsupported X509 certificate key type ($($X509Cert.PrivateKey.GetType())).";
+                throw "Unsupported X509 certificate key type ($($X509Certificate.PrivateKey.GetType())).";
             }
 
             $signingKey = [KeyFactory]::CreateAccountKey($keyExport);
@@ -2486,7 +2497,7 @@ function Revoke-Certificate {
         } else {
             throw "CertificatePublicKey either needs to be string or byte[]";
         };
-        
+
         $url = $State.GetServiceDirectory().RevokeCert;
         $payload = @{ "certificate" = $base64Certificate; "reason" = 1 };
 
@@ -3584,6 +3595,8 @@ function Invoke-SignedWebRequest {
         .PARAMETER SkipRetryOnNonceError
             Do not retry the request on nonce-errors.
 
+        .PARAMETER SigningKey
+            If present, it will be used to sign the web request, else the account key from the state object will be used.
 
         .EXAMPLE
             PS (POST-as-GET)> Invoke-SignedWebRequest "https://acme.service/" $myState
