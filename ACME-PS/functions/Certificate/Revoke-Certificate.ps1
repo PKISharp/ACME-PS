@@ -106,7 +106,9 @@ function Revoke-Certificate {
                 throw "Unsupported X509 certificate key type."
             }
 
-            Revoke-Certificate -State $State -CertificatePublicKey $certBytes -CertificatePrivateKey $privateKey;
+            $key = [AcmePSKey]::new($privateKey);
+
+            Revoke-Certificate -State $State -CertificatePublicKey $certBytes -SigningKey $key;
         }
         else {
             Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
