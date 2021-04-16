@@ -54,8 +54,8 @@ function Revoke-Certificate {
         $CertificatePublicKey,
 
         [Parameter(ParameterSetName = "ByPrivateKey")]
-        [ISigningKey]
-        $CertificatePrivateKey,
+        [AcmePSKey]
+        $SigningKey,
 
         [Parameter(ParameterSetName = "ByPrivateKey")]
         [ValidateSet(256, 384, 512)]
@@ -94,10 +94,10 @@ function Revoke-Certificate {
 
     if($PSCmdlet.ParameterSetName -eq "ByX509") {
         $certBytes = $X509Certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert);
-        
+
         if($X509Certificate.HasPrivateKey) {
             $privateKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($X509Certificate);
-            
+
             if($null -eq $privateKey) {
                 $privateKey = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::GetECDsaPrivateKey($X509Certificate);
             }

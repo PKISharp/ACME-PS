@@ -1,16 +1,18 @@
 class AcmePSKey {
     hidden [string] $_AlgorithmType;
     hidden [Security.Cryptography.AsymmetricAlgorithm] $_Algorithm;
-    
+
     hidden [int] $_HashSize;
-    hidden [System.Security.Cryptography.HashAlgorithmName] $_HashName;
+    hidden [Security.Cryptography.HashAlgorithmName] $_HashName;
+
+    [string] $KeyId;
 
     AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm)
     {
         $this.Initialize($algorithm, 256);
     }
 
-    AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize) 
+    AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize)
     {
         $this.Initialize($algorithm, $hashSize);
     }
@@ -18,7 +20,7 @@ class AcmePSKey {
     AcmePSKey([PSCustomObject]$keySource) {
         $algo = $null;
         $hashSize = $keySource.HashSize;
-        
+
         if($keySource.TypeName -iin @("RSA","RSAKeyExport")) {
             $keyParameters = [System.Security.Cryptography.RSAParameters]::new();
 
@@ -30,7 +32,7 @@ class AcmePSKey {
             $keyParameters.Modulus = $keySource.Modulus;
             $keyParameters.P = $keySource.P;
             $keyParameters.Q = $keySource.Q;
-     
+
             $algo = [Security.Cryptography.RSA]::Create($keyParameters);
         }
         elseif($keySource.TypeName -iin @("ECDsa","ECDsaKeyExport")) {
@@ -91,30 +93,37 @@ class AcmePSKey {
         throw "Cannot use hash size to create curve. Allowed sizes: 256, 348, 512";
     }
 
-    [object] ExportKey() {
+    [Security.Cryptography.AsymmetricAlgorithm] GetAlgorithm() {
+        return $this._Algorithm;
+    }
+
+    [Security.Cryptography.HashAlgorithmName] GetHashName() {
+        return $this._HashName;
+    }
+
+    [PSCustomObject] ExportKey() {
         $keyExport = @{
             TypeName = $this._AlgorithmType;
             HashSize = $this._HashSize;
         };
 
-        if($this._AlgorithmType -eq "ECDsa") {
-            $ecParams = $this.ECDsa.ExportParameters($true);
-            
-            $keyExport.D = $ecParams.D;
-            $keyExport.X = $ecParams.Q.X;
-            $keyExport.Y = $ecParams.Q.Y;
+        $keyParameters = $this._Algorithm.ExportParameters($true);
+        if($this._AlgorithmType -eq "ECDsa")
+        {
+            $keyExport.D = $keyParameters.D;
+            $keyExport.X = $keyParameters.Q.X;
+            $keyExport.Y = $keyParameters.Q.Y;
         }
-        elseif($this._AlgorithmType -eq "RSA") {
-            $rsaParams = $this.RSA.ExportParameters($true);
-            
-            $keyExport.D = $rsaParams.D;
-            $keyExport.DP = $rsaParams.DP;
-            $keyExport.DQ = $rsaParams.DQ;
-            $keyExport.Exponent = $rsaParams.Exponent;
-            $keyExport.InverseQ = $rsaParams.InverseQ;
-            $keyExport.Modulus = $rsaParams.Modulus;
-            $keyExport.P = $rsaParams.P;
-            $keyExport.Q = $rsaParams.Q;
+        elseif($this._AlgorithmType -eq "RSA")
+        {
+            $keyExport.D = $keyParameters.D;
+            $keyExport.DP = $keyParameters.DP;
+            $keyExport.DQ = $keyParameters.DQ;
+            $keyExport.Exponent = $keyParameters.Exponent;
+            $keyExport.InverseQ = $keyParameters.InverseQ;
+            $keyExport.Modulus = $keyParameters.Modulus;
+            $keyExport.P = $keyParameters.P;
+            $keyExport.Q = $keyParameters.Q;
         }
 
         return [PSCustomObject]$keyExport;
@@ -136,7 +145,7 @@ class AcmePSKey {
             As per RFC 7638 Section 3, these are the *required* elements of the
             JWK and are sorted in lexicographic order to produce a canonical form
         #>
-        
+
         $keyParams = $this._Algorithm.ExportParameters($false);
 
         if($this._AlgorithmType -eq "ECDsa") {
@@ -185,23 +194,6 @@ class AcmePSKey {
     [byte[]] Sign([string] $inputString)
     {
         return $this.Sign([System.Text.Encoding]::UTF8.GetBytes($inputString));
-    }
-
-    
-    <#
-        Certificate creation
-    #>
-
-    [byte[]] ExportPfx([byte[]] $acmeCertificate, [SecureString] $password) {
-        return [Certificate]::ExportPfx($acmeCertificate, $this._Algorithm, $password);
-    }
-
-    [byte[]] ExportPfxChain([byte[][]] $acmeCertificates, [SecureString] $password) {
-        return [Certificate]::ExportPfxChain($acmeCertificates, $this._Algorithm, $password);
-    }
-
-    [byte[]] GenerateCsr([string[]] $dnsNames, [string] $distinguishedName) {
-        return [Certificate]::GenerateCsr($dnsNames, $distinguishedName, $this._Algorithm, $this._HashName);
     }
 
 

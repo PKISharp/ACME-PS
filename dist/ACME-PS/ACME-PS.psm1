@@ -1,79 +1,91 @@
 class Certificate {
-    static [System.Security.Cryptography.X509Certificates.X509Certificate2] CreateX509WithKey([byte[]] $acmeCertificate, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
-        $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificate);
+    static [Security.Cryptography.X509Certificates.X509Certificate2] CreateX509WithKey([byte[]] $acmeCertificate, [Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
+        $certificate = [Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificate);
 
-        if($algorithm -is [System.Security.Cryptography.RSA]) {
-            $certificate = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
+        if($algorithm -is [Security.Cryptography.RSA]) {
+            $certificate = [Security.Cryptography.X509Certificates.RSACertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
         }
-        elseif($algorithm -is [System.Security.Cryptography.ECDsa]) {
-            $certificate = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
+        elseif($algorithm -is [Security.Cryptography.ECDsa]) {
+            $certificate = [Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::CopyWithPrivateKey($certificate, $algorithm);
         }
         else {
-            throw [System.InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to export pfx.");
+            throw [InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to export pfx.");
         }
 
         return $certificate
     }
 
-    static [byte[]] ExportPfx([byte[]] $acmeCertificate, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
+    static [byte[]] ExportPfxCertificate([byte[]] $acmeCertificate, [AcmePSKey] $key, [SecureString] $password) {
+        return [Certificate]::ExportPfxCertificate($acmeCertificate, $key.GetAlgorithm(), $password);
+    }
+
+    static [byte[]] ExportPfxCertificate([byte[]] $acmeCertificate, [Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
         $certificate = [Certificate]::CreateX509WithKey($acmeCertificate, $algorithm);
 
         if($password) {
-            return $certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $password);
+            return $certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $password);
         } else {
-            return $certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx);
+            return $certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Pfx);
         }
     }
 
-    static [byte[]] ExportPfxChain([byte[][]] $acmeCertificates, [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
+    static [byte[]] ExportPfxCertificateChain([byte[][]] $acmeCertificates, [AcmePSKey] $key, [SecureString] $password) {
+        return [Certificate]::ExportPfxCertificateChain($acmeCertificates, $key.GetAlgorithm(), $password);
+    }
+
+    static [byte[]] ExportPfxCertificateChain([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
         $leafCertificate = [Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm);
-        $certificateCollection = [System.Security.Cryptography.X509Certificates.X509Certificate2Collection]::new($leafCertificate);
+        $certificateCollection = [Security.Cryptography.X509Certificates.X509Certificate2Collection]::new($leafCertificate);
 
         for($i = 1; $i -lt $acmeCertificates.Length; $i++) {
-            $chainCert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i]);
+            $chainCert = [Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i]);
             $certificateCollection.Add($chainCert);
         }
 
         if($password) {
             $unprotectedPassword = [PSCredential]::new("ACME-PS", $password).GetNetworkCredential().Password;
 
-            return $certificateCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $unprotectedPassword);
+            return $certificateCollection.Export([Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $unprotectedPassword);
         } else {
-            return $certificateCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx);
+            return $certificateCollection.Export([Security.Cryptography.X509Certificates.X509ContentType]::Pfx);
         }
     }
 
+    static [byte[]] GenerateCsr([string[]] $dnsNames, [string]$distinguishedName, [AcmePSKey] $key) {
+        return [Certificate]::GenerateCsr($dnsNames, $distinguishedName, $key.GetAlgorithm(), $key.GetHashName());
+    }
+
     static [byte[]] GenerateCsr([string[]] $dnsNames, [string]$distinguishedName,
-        [System.Security.Cryptography.AsymmetricAlgorithm] $algorithm,
-        [System.Security.Cryptography.HashAlgorithmName] $hashName)
+        [Security.Cryptography.AsymmetricAlgorithm] $algorithm,
+        [Security.Cryptography.HashAlgorithmName] $hashName)
     {
         if(-not $dnsNames) {
-            throw [System.ArgumentException]::new("You need to provide at least one DNSName", "dnsNames");
+            throw [ArgumentException]::new("You need to provide at least one DNSName", "dnsNames");
         }
         if(-not $distinguishedName) {
-            thtow [System.ArgumentException]::new("Provide a distinguishedName for the Certificate")
+            thtow [ArgumentException]::new("Provide a distinguishedName for the Certificate")
         }
 
-        $sanBuilder = [System.Security.Cryptography.X509Certificates.SubjectAlternativeNameBuilder]::new();
+        $sanBuilder = [Security.Cryptography.X509Certificates.SubjectAlternativeNameBuilder]::new();
         foreach ($dnsName in $dnsNames) {
             $sanBuilder.AddDnsName($dnsName);
         }
 
         $certDN = [X500DistinguishedName]::new($distinguishedName);
 
-        [System.Security.Cryptography.X509Certificates.CertificateRequest]$certRequest = $null;
+        [Security.Cryptography.X509Certificates.CertificateRequest]$certRequest = $null;
 
-        if($algorithm -is [System.Security.Cryptography.RSA]) {
-            $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
-                    $certDN, $algorithm, $hashName, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1);
+        if($algorithm -is [Security.Cryptography.RSA]) {
+            $certRequest = [Security.Cryptography.X509Certificates.CertificateRequest]::new(
+                    $certDN, $algorithm, $hashName, [Security.Cryptography.RSASignaturePadding]::Pkcs1);
         }
-        elseif($algorithm -is [System.Security.Cryptography.ECDsa]) {
-            $certRequest = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
+        elseif($algorithm -is [Security.Cryptography.ECDsa]) {
+            $certRequest = [Security.Cryptography.X509Certificates.CertificateRequest]::new(
                 $certDN, $algorithm, $hashName);
 
         }
         else {
-            throw [System.InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to create CSR.");
+            throw [InvalidOperationException]::new("Cannot use $($algorithm.GetType().Name) to create CSR.");
         }
 
         $certRequest.CertificateExtensions.Add($sanBuilder.Build());
@@ -84,25 +96,27 @@ class Certificate {
 class AcmePSKey {
     hidden [string] $_AlgorithmType;
     hidden [Security.Cryptography.AsymmetricAlgorithm] $_Algorithm;
-    
+
     hidden [int] $_HashSize;
-    hidden [System.Security.Cryptography.HashAlgorithmName] $_HashName;
+    hidden [Security.Cryptography.HashAlgorithmName] $_HashName;
+
+    [string] $KeyId;
 
     AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm)
     {
-        Initialize($algorithm, 256);
+        $this.Initialize($algorithm, 256);
     }
 
-    AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize) 
+    AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize)
     {
-        Initialize($algorithm, $hashSize);
+        $this.Initialize($algorithm, $hashSize);
     }
 
     AcmePSKey([PSCustomObject]$keySource) {
         $algo = $null;
         $hashSize = $keySource.HashSize;
-        
-        if($keySource.TypeName -eq "RSAKeyExport" -or $keySource.TypeName -eq "RSA") {
+
+        if($keySource.TypeName -iin @("RSA","RSAKeyExport")) {
             $keyParameters = [System.Security.Cryptography.RSAParameters]::new();
 
             $keyParameters.D = $keySource.D;
@@ -113,13 +127,13 @@ class AcmePSKey {
             $keyParameters.Modulus = $keySource.Modulus;
             $keyParameters.P = $keySource.P;
             $keyParameters.Q = $keySource.Q;
-     
+
             $algo = [Security.Cryptography.RSA]::Create($keyParameters);
         }
-        elseif($keySource.TypeName -eq "ECDsaKeyExport" -or $keySource.TypeName -eq "ECDsa") {
+        elseif($keySource.TypeName -iin @("ECDsa","ECDsaKeyExport")) {
             $keyParameters = [System.Security.Cryptography.ECParameters]::new();
 
-            $keyParameters.Curve = GetECDsaCurve($hashSize);
+            $keyParameters.Curve = [AcmePSKey]::GetECDsaCurve($hashSize);
             $keyParameters.D = $keySource.D;
             $keyParameters.Q.X = $keySource.X;
             $keyParameters.Q.Y = $keySource.Y;
@@ -127,15 +141,15 @@ class AcmePSKey {
             $algo = [Security.Cryptography.ECDsa]::Create($keyParameters);
         }
         else {
-            throw "Unkown Key Export type $($keySource.TypeName)";
+            throw "Unkown Key Export type '$($keySource.TypeName)'";
         }
 
-        Initialize($algo, $hashSize);
+        $this.Initialize($algo, $hashSize);
     }
 
     hidden Initialize([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize) {
         $this._HashSize = $hashSize;
-        $this._HashName = $this.GetHashName($hashSize);
+        $this._HashName = [AcmePSKey]::GetHashName($hashSize);
 
         $this._Algorithm = $algorithm;
 
@@ -164,7 +178,7 @@ class AcmePSKey {
         throw "Cannot use hash size to get hash name. Allowed sizes: 256, 348, 512";
     }
 
-    hidden static [Security.Cryptography.ECCurve] GetECDsaCurve($hashSize) {
+    static [Security.Cryptography.ECCurve] GetECDsaCurve($hashSize) {
         switch ($hashSize) {
             256 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP256; }
             384 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP384; }
@@ -174,30 +188,37 @@ class AcmePSKey {
         throw "Cannot use hash size to create curve. Allowed sizes: 256, 348, 512";
     }
 
-    [object] ExportKey() {
+    [Security.Cryptography.AsymmetricAlgorithm] GetAlgorithm() {
+        return $this._Algorithm;
+    }
+
+    [Security.Cryptography.HashAlgorithmName] GetHashName() {
+        return $this._HashName;
+    }
+
+    [PSCustomObject] ExportKey() {
         $keyExport = @{
             TypeName = $this._AlgorithmType;
             HashSize = $this._HashSize;
         };
 
-        if($this._AlgorithmType -eq "ECDsa") {
-            $ecParams = $this.ECDsa.ExportParameters($true);
-            
-            $keyExport.D = $ecParams.D;
-            $keyExport.X = $ecParams.Q.X;
-            $keyExport.Y = $ecParams.Q.Y;
+        $keyParameters = $this._Algorithm.ExportParameters($true);
+        if($this._AlgorithmType -eq "ECDsa")
+        {
+            $keyExport.D = $keyParameters.D;
+            $keyExport.X = $keyParameters.Q.X;
+            $keyExport.Y = $keyParameters.Q.Y;
         }
-        elseif($this._AlgorithmType -eq "RSA") {
-            $rsaParams = $this.RSA.ExportParameters($true);
-            
-            $keyExport.D = $rsaParams.D;
-            $keyExport.DP = $rsaParams.DP;
-            $keyExport.DQ = $rsaParams.DQ;
-            $keyExport.Exponent = $rsaParams.Exponent;
-            $keyExport.InverseQ = $rsaParams.InverseQ;
-            $keyExport.Modulus = $rsaParams.Modulus;
-            $keyExport.P = $rsaParams.P;
-            $keyExport.Q = $rsaParams.Q;
+        elseif($this._AlgorithmType -eq "RSA")
+        {
+            $keyExport.D = $keyParameters.D;
+            $keyExport.DP = $keyParameters.DP;
+            $keyExport.DQ = $keyParameters.DQ;
+            $keyExport.Exponent = $keyParameters.Exponent;
+            $keyExport.InverseQ = $keyParameters.InverseQ;
+            $keyExport.Modulus = $keyParameters.Modulus;
+            $keyExport.P = $keyParameters.P;
+            $keyExport.Q = $keyParameters.Q;
         }
 
         return [PSCustomObject]$keyExport;
@@ -219,10 +240,10 @@ class AcmePSKey {
             As per RFC 7638 Section 3, these are the *required* elements of the
             JWK and are sorted in lexicographic order to produce a canonical form
         #>
-        
-        if($this._AlgorithmType -eq "ECDsa") {
-            $keyParams = $this.ECDsa.ExportParameters($false);
 
+        $keyParams = $this._Algorithm.ExportParameters($false);
+
+        if($this._AlgorithmType -eq "ECDsa") {
             $result = [ordered]@{
                 "crv" = "P-$($this._HashSize)";
                 "kty" = "EC"; # https://tools.ietf.org/html/rfc7518#section-6.2
@@ -231,8 +252,6 @@ class AcmePSKey {
             }
         }
         elseif ($this._AlgorithmType -eq "RSA") {
-            $keyParams = $this.RSA.ExportParameters($false);
-
             $result = [ordered]@{
                 "e" = ConvertTo-UrlBase64 -InputBytes $keyParams.Exponent;
                 "kty" = "RSA"; # https://tools.ietf.org/html/rfc7518#section-6.3
@@ -270,23 +289,6 @@ class AcmePSKey {
     [byte[]] Sign([string] $inputString)
     {
         return $this.Sign([System.Text.Encoding]::UTF8.GetBytes($inputString));
-    }
-
-    
-    <#
-        Certificate creation
-    #>
-
-    [byte[]] ExportPfx([byte[]] $acmeCertificate, [SecureString] $password) {
-        return [Certificate]::ExportPfx($acmeCertificate, $this._Algorithm, $password);
-    }
-
-    [byte[]] ExportPfxChain([byte[][]] $acmeCertificates, [SecureString] $password) {
-        return [Certificate]::ExportPfxChain($acmeCertificates, $this._Algorithm, $password);
-    }
-
-    [byte[]] GenerateCsr([string[]] $dnsNames, [string] $distinguishedName) {
-        return [Certificate]::GenerateCsr($dnsNames, $distinguishedName, $this._Algorithm, $this._HashName);
     }
 
 
@@ -1187,7 +1189,11 @@ function Import-AcmeObject {
 
         [Parameter()]
         [string]
-        $TypeName
+        $TypeName,
+
+        [Parameter()]
+        [switch]
+        $AsPSCustomObject
     )
 
     process {
@@ -1199,6 +1205,10 @@ function Import-AcmeObject {
         } else {
             Write-Verbose "Importing object from CLIXML file $Path"
             $imported = Import-Clixml $Path;
+        }
+
+        if($AsPSCustomObject.IsPresent) {
+            return $imported;
         }
 
         if($TypeName) {
@@ -1271,6 +1281,54 @@ function Invoke-ACMEWebRequest {
     }
 }
 
+function New-AcmePSKey {
+    [CmdletBinding(SupportsShouldProcess=$false)]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        "PSUseShouldProcessForStateChangingFunctions", "", Scope="Function", Target="*")]
+    param(
+        [Parameter(ParameterSetName="RSA")]
+        [switch]
+        $RSA,
+
+        [Parameter(ParameterSetName="RSA")]
+        [ValidateSet(256, 384, 512)]
+        [int]
+        $RSAHashSize = 256,
+
+        [Parameter(ParameterSetName="RSA")]
+        [ValidateSet(2048)]
+        [int]
+        $RSAKeySize = 2048,
+
+
+        [Parameter(ParameterSetName="ECDsa")]
+        [switch]
+        $ECDsa,
+
+        [Parameter(ParameterSetName="ECDsa")]
+        [ValidateSet(256, 384, 512)]
+        [int]
+        $ECDsaHashSize = 256
+    )
+
+    if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
+        $ecdsaKey = [Security.Cryptography.ECDsa]::Create([AcmePSKey]::GetECDsaCurve($ECDsaHashSize));
+        $acmepsKey = [AcmePSKey]::new($ecdsaKey, $ECDsaHashSize);
+        Write-Verbose "Created new ECDsa certificate key with hash size $ECDsaHashSize";
+    }
+    elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
+        if($RSAKeySize -lt 2048 -or $RSAKeySize -gt 4096 -or ($RSAKeySize % 8) -ne 0) {
+            throw "The RSAKeySize must be between 2048 and 4096 and must be divisible by 8";
+        }
+
+        $rsaKey = [Security.Cryptography.RSA]::Create($RSAKeySize);
+        $acmepsKey = [AcmePSKey]::new($rsaKey, $RSAHashSize);
+        Write-Verbose "Created new RSA certificate key with hash size $RSAHashSize and key size $RSAKeySize";
+    }
+
+    return $acmepsKey;
+}
+
 function New-ExternalAccountPayload {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "", Scope="Function", Target="*")]
     param(
@@ -1334,7 +1392,7 @@ function New-SignedMessage {
         [string] $Url,
 
         [Parameter(Mandatory = $true, Position = 1)]
-        [ISigningKey] $SigningKey,
+        [AcmePSKey] $SigningKey,
 
         [Parameter(Position = 2)]
         [string] $KeyId,
@@ -1782,11 +1840,11 @@ function Import-AccountKey {
     )
 
     process {
-        $ErrorActionPreference = 'Stop'
+        $ErrorActionPreference = 'Stop';
 
-        $imported = Import-AcmeObject $Path
+        $imported = Import-AcmeObject $Path -AsPSCustomObject;
 
-        $accountKey = [KeyFactory]::CreateAccountKey($imported);
+        $accountKey = [AcmePSKey]::new($imported);
         if($State) {
             $State.Set($accountKey);
         }
@@ -1891,12 +1949,11 @@ function New-AccountKey {
         $Force
     )
 
-    if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
-        $accountKey = [AcmePSKey]([ECDsaAccountKey]::new($ECDsaHashSize));
-        Write-Verbose "Created new ECDsa account key with hash size $ECDsaHashSize";
-    } elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
-        $accountKey = [AcmePSKey]([RSAAccountKey]::new($RSAHashSize, $RSAKeySize));
-        Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
+    if ($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
+        $accountKey = New-AcmePSKey -ECDsa -ECDsaHashSize $ECDsaHashSize;
+    }
+    elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
+        $accountKey = New-AcmePSKey -RSA -RSAHashSize $RSAHashSize -RSAKeySize $RSAKeySize;
     }
 
     if($State -and $PSCmdlet.ShouldProcess("AccountKey", "Add created account key to state.",
@@ -2067,6 +2124,8 @@ function Export-Certificate {
         .EXAMPLE
             PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        "PSAvoidOverwritingBuiltInCmdlets", "", Scope="Function", Target="*")]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
@@ -2155,7 +2214,7 @@ function Export-Certificate {
     }
 
     if($ExcludeChain) {
-        Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
+        $certContent = [Certificate]::ExportPfxCertificate($certificate, $CertificateKey, $Password)
     } else {
         $pemString = [System.Text.Encoding]::UTF8.GetString($certificate);
 
@@ -2174,8 +2233,10 @@ function Export-Certificate {
             $certificates.Add($certBytes) | Out-Null;
         }
 
-        Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfxChain($certificates, $Password);
+        $certContent = [Certificate]::ExportPfxCertificateChain($certificates, $CertificateKey, $Password)
     }
+
+    Set-ByteContent -Path $Path -Content $certContent;
 }
 
 function Revoke-Certificate {
@@ -2234,8 +2295,8 @@ function Revoke-Certificate {
         $CertificatePublicKey,
 
         [Parameter(ParameterSetName = "ByPrivateKey")]
-        [ISigningKey]
-        $CertificatePrivateKey,
+        [AcmePSKey]
+        $SigningKey,
 
         [Parameter(ParameterSetName = "ByPrivateKey")]
         [ValidateSet(256, 384, 512)]
@@ -2274,10 +2335,10 @@ function Revoke-Certificate {
 
     if($PSCmdlet.ParameterSetName -eq "ByX509") {
         $certBytes = $X509Certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert);
-        
+
         if($X509Certificate.HasPrivateKey) {
             $privateKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($X509Certificate);
-            
+
             if($null -eq $privateKey) {
                 $privateKey = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::GetECDsaPrivateKey($X509Certificate);
             }
@@ -2402,12 +2463,12 @@ function Import-CertificateKey {
     $ErrorActionPreference = 'Stop'
 
     if($Path -like "*.json") {
-        $imported = Get-Content $Path -Raw | ConvertFrom-Json | ConvertTo-OriginalType;
+        $imported = Get-Content $Path -Raw | ConvertFrom-Json;
     } else {
-        $imported = Import-Clixml $Path | ConvertTo-OriginalType
+        $imported = Import-Clixml $Path;
     }
 
-    $certificateKey = [KeyFactory]::CreateCertificateKey($imported);
+    $certificateKey = [AcmePSKey]::new($imported);
     return $certificateKey;
 }
 
@@ -2498,16 +2559,11 @@ function New-CertificateKey {
         }
     }
 
-    if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
-        $certificateKey = [AcmePSKey]([ECDsaCertificateKey]::new($ECDsaHashSize));
-        Write-Verbose "Created new ECDsa certificate key with hash size $ECDsaHashSize";
-    } elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
-        if($RSAKeySize -lt 2048 -or $RSAKeySize -gt 4096 -or ($RSAKeySize%8) -ne 0) {
-            throw "The RSAKeySize must be between 2048 and 4096 and must be divisible by 8";
-        }
-
-        $certificateKey = [AcmePSKey]([RSACertificateKey]::new($RSAHashSize, $RSAKeySize));
-        Write-Verbose "Created new RSA certificate key with hash size $RSAHashSize and key size $RSAKeySize";
+    if ($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
+        $certificateKey = New-AcmePSKey -ECDsa -ECDsaHashSize $ECDsaHashSize;
+    }
+    elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
+        $certificateKey = New-AcmePSKey -RSA -RSAHashSize $RSAHashSize -RSAKeySize $RSAKeySize;
     }
 
     if($SkipKeyExport) {
@@ -2879,7 +2935,7 @@ function Complete-Order {
             $certDN = "CN=$($Order.Identifiers[0].Value)";
         }
 
-        $csr = $CertificateKey.GenerateCsr($dnsNames, $certDN);
+        $csr = [Certificate]::GenerateCsr($dnsNames, $certDN, $CertificateKey);
         $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) };
 
         $requestUrl = $Order.FinalizeUrl;
@@ -3414,6 +3470,8 @@ function Invoke-SignedWebRequest {
         .PARAMETER SkipRetryOnNonceError
             Do not retry the request on nonce-errors.
 
+        .PARAMETER SigningKey
+            Will be used to sign the request to the acme server.
 
         .EXAMPLE
             PS (POST-as-GET)> Invoke-SignedWebRequest "https://acme.service/" $myState
@@ -3442,7 +3500,7 @@ function Invoke-SignedWebRequest {
 
         [Parameter(ParameterSetName = "HasSigningKey")]
         [ValidateNotNull()]
-        [ISigningKey] $SigningKey
+        [AcmePSKey] $SigningKey
     )
 
     process {
@@ -3451,6 +3509,9 @@ function Invoke-SignedWebRequest {
             $signingKey = $State.GetAccountKey();
             $account = $State.GetAccount();
             $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
+        }
+        else {
+            $keyId = $SigningKey.KeyId;
         }
 
         $requestBody = New-SignedMessage -Url $Url -SigningKey $signingKey -KeyId $keyId -Nonce $nonce -Payload $Payload

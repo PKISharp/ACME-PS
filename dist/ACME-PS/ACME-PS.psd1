@@ -13,8 +13,7 @@
 	Description = "PowerShell client module for the ACME protocol Version 2, which can be used to interoperate with the Let's Encrypt(TM) projects certificate servers and any other RFC 8555 compliant server."
 
 	NestedModules = @(
-		"./Prerequisites.ps1",
-		"./TypeDefinitions.ps1"
+		"./Prerequisites.ps1"
 	)
 
 	RequiredAssemblies = @(
