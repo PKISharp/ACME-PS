@@ -295,26 +295,25 @@ class AcmePSKey {
     <#
         Key authorization
     #>
+    hidden [string] GetKeyAuthorizationThumbprint([string] $token, [System.Security.Cryptography.HashAlgorithm] $hashAlgorithm)
+    {
+        $jwkJson = $this.ExportPublicJwk() | ConvertTo-Json -Compress;
+        $jwkBytes = [System.Text.Encoding]::UTF8.GetBytes($jwkJson);
+        $jwkHash = $hashAlgorithm.ComputeHash($jwkBytes);
+
+        $thumbprint = ConvertTo-UrlBase64 -InputBytes $jwkHash;
+        return "$token.$thumbprint";
+    }
 
     [string] GetKeyAuthorization([string] $token)
     {
         $sha256 = [System.Security.Cryptography.SHA256]::Create();
 
         try {
-            return GetKeyAuthorizationThumbprint($token, $sha256);
+            return $this.GetKeyAuthorizationThumbprint($token, $sha256);
         } finally {
             $sha256.Dispose();
         }
-    }
-
-    hidden [byte[]] GetKeyAuthorizationThumbprint([string] $token, [System.Security.Cryptography.HashAlgorithm] $hashAlgorithm)
-    {
-        $jwkJson = $this.ExportPublicJwk() | ConvertTo-Json -Compress;
-        $jwkBytes = [System.Text.Encoding]::UTF8.GetBytes($jwkJson);
-        $jwkHash = $hashAlgorithm.ComputeHash($jwkBytes);
-
-        $thumbprint =  = ConvertTo-UrlBase64 -InputBytes $jwkHash;
-        return "$token.$thumbprint";
     }
 
     [string] GetKeyAuthorizationDigest([string] $token)
@@ -322,7 +321,7 @@ class AcmePSKey {
         $sha256 = [System.Security.Cryptography.SHA256]::Create();
 
         try {
-            $keyAuthorization = GetKeyAuthorizationThumbprint($token, $sha256);
+            $keyAuthorization = $this.GetKeyAuthorizationThumbprint($token, $sha256);
             $keyAuthZBytes = [System.Text.Encoding]::UTF8.GetBytes($keyAuthorization);
 
             $digest = $sha256.ComputeHash($keyAuthZBytes);
@@ -2255,13 +2254,10 @@ function Revoke-Certificate {
             your account key, the associated account and the replay nonce.
 
         .PARAMETER CertificatePublicKey
-            The certificate to be revoked. Either as base64-string or byte[]. Needs to be DER encoded.
+            The certificate to be revoked. Either as base64url-string or byte[]. Needs to be DER encoded (vs. PEM - so no ---- Begin Certificate ----).
 
         .PARAMETER SigningKey
             The key to sign the revocation request. If you provide the X509Certificate or Order parameter, this will be set automatically.
-
-        .PARAMETER HashSize
-            The hash size used to sign the revocation request. If you provide the X509Certificate or Order parameter, this will be set automatically.
 
         .PARAMETER Order
             The order which contains the issued certificate.
@@ -2294,13 +2290,9 @@ function Revoke-Certificate {
         [Parameter(Mandatory = $true, ParameterSetName = "ByPrivateKey")]
         $CertificatePublicKey,
 
-        [Parameter(ParameterSetName = "ByPrivateKey")]
+        [Parameter(Mandatory = $true, ParameterSetName = "ByPrivateKey")]
         [AcmePSKey]
         $SigningKey,
-
-        [Parameter(ParameterSetName = "ByPrivateKey")]
-        [ValidateSet(256, 384, 512)]
-        [int] $HashSize,
 
         [Parameter(Mandatory = $true, ParameterSetName = "ByOrder")]
         [ValidateNotNull()]
@@ -2329,30 +2321,30 @@ function Revoke-Certificate {
             [Security.Cryptography.X509Certificates.X509Certificate2]::new($PFXCertificatePath, $PFXCertificatePassword);
         }
 
-        Revoke-Certificate -State $State -X509Certificate $x509Certificate;
-        return;
+        return Revoke-Certificate -State $State -X509Certificate $x509Certificate;
     }
 
     if($PSCmdlet.ParameterSetName -eq "ByX509") {
         $certBytes = $X509Certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert);
 
         if($X509Certificate.HasPrivateKey) {
-            $privateKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($X509Certificate);
+            $privateKey = [Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($X509Certificate);
 
             if($null -eq $privateKey) {
-                $privateKey = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::GetECDsaPrivateKey($X509Certificate);
+                $privateKey = [Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::GetECDsaPrivateKey($X509Certificate);
             }
 
             if($null -eq $privateKey) {
                 throw "Unsupported X509 certificate key type."
             }
 
-            Revoke-Certificate -State $State -CertificatePublicKey $certBytes -CertificatePrivateKey $privateKey;
+            $key = [AcmePSKey]::new($privateKey);
+
+            return Revoke-Certificate -State $State -CertificatePublicKey $certBytes -SigningKey $key;
         }
         else {
-            Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
+            return Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
         }
-        return;
     }
 
     if($PSCmdlet.ParameterSetName -eq "ByOrder") {
@@ -2361,27 +2353,33 @@ function Revoke-Certificate {
             throw "Cannot get certificate associated with order, revocation failed."
         }
 
-        Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
-        return;
+        $certBase64String = [Text.Encoding]::ASCII.GetString($certBytes) -split "-----" |
+            ForEach-Object { $_.Replace("`r","").Replace("`n","").Trim() } | Where-Object { $_ -like "MII*" } | Select-Object -First 1;
+
+        $derBytes = [System.Convert]::FromBase64String($certBase64String);
+
+        return Revoke-Certificate -State $State -CertificatePublicKey $derBytes;
     }
 
     if($PSCmdlet.ParameterSetName -in @("ByCert", "ByPrivateKey")) {
-        $base64Certificate = if([string] -eq $CertificatePublicKey.GetType()) {
-            $CertificatePublicKey;
-        } elseif ([byte[]] -eq $CertificatePublicKey.GetType()) {
-            [System.Convert]::ToBase64String($CertificatePublicKey);
-        } else {
+        if ($CertificatePublicKey -is [string]) {
+            $base64DERCertificate = $CertificatePublicKey;
+        }
+        elseif($CertificatePublicKey -is [byte[]]) {
+            $base64DERCertificate = ConvertTo-UrlBase64 -InputBytes $CertificatePublicKey;
+        }
+        else {
             throw "CertificatePublicKey either needs to be string or byte[]";
-        };
+        }
 
         $url = $State.GetServiceDirectory().RevokeCert;
-        $payload = @{ "certificate" = $base64Certificate; "reason" = 1 };
+        $payload = @{ "certificate" = $base64DERCertificate; "reason" = 1 };
 
         if($PSCmdlet.ShouldProcess("Certificate", "Revoking certificate.")) {
             if ($PSCmdlet.ParameterSetName -eq "ByCert") {
-                Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;
+                return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;
             } elseif ($PSCmdlet.ParameterSetName -eq "ByPrivateKey") {
-                Invoke-SignedWebRequest -Url $url -Payload $payload -PrivateKey $CertificatePrivateKey
+                return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SigningKey $SigningKey
             }
         }
     }
@@ -2737,7 +2735,7 @@ function Initialize-Challenge {
                 $fileName = $Challenge.Token;
                 $relativePath = "/.well-known/acme-challenge/$fileName"
                 $fqdn = "$($Challenge.Identifier.Value)$relativePath"
-                $content = [KeyAuthorization]::Compute($AccountKey, $Challenge.Token);
+                $content = $AccountKey.GetKeyAuthorization($Challenge.Token);
 
                 $Challenge.Data = [PSCustomObject]@{
                     "Type" = $Challenge.Type;
@@ -2751,7 +2749,7 @@ function Initialize-Challenge {
 
             "dns-01" {
                 $txtRecordName = "_acme-challenge.$($Challenge.Identifier.Value)";
-                $content = [KeyAuthorization]::ComputeDigest($AccountKey, $Challenge.Token);
+                $content = $AccountKey.GetKeyAuthorizationDigest($Challenge.Token);
 
                 $Challenge.Data =  [PSCustomObject]@{
                     "Type" = "dns-01";
@@ -2762,7 +2760,7 @@ function Initialize-Challenge {
             }
 
             "tls-alpn-01" {
-                $content = [KeyAuthorization]::Compute($AccountKey, $Challenge.Token);
+                $content = $AccountKey.GetKeyAuthorization($Challenge.Token);
 
                 $Challenge.Data =  [PSCustomObject]@{
                     "Type" = $Challenge.Type;
@@ -3509,9 +3507,6 @@ function Invoke-SignedWebRequest {
             $signingKey = $State.GetAccountKey();
             $account = $State.GetAccount();
             $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
-        }
-        else {
-            $keyId = $SigningKey.KeyId;
         }
 
         $requestBody = New-SignedMessage -Url $Url -SigningKey $signingKey -KeyId $keyId -Nonce $nonce -Payload $Payload

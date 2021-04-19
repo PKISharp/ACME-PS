@@ -67,9 +67,6 @@ function Invoke-SignedWebRequest {
             $account = $State.GetAccount();
             $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
         }
-        else {
-            $keyId = $SigningKey.KeyId;
-        }
 
         $requestBody = New-SignedMessage -Url $Url -SigningKey $signingKey -KeyId $keyId -Nonce $nonce -Payload $Payload
         $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST -ErrorAction 'Continue'

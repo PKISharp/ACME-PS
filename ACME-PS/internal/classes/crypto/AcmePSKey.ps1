@@ -200,26 +200,25 @@ class AcmePSKey {
     <#
         Key authorization
     #>
+    hidden [string] GetKeyAuthorizationThumbprint([string] $token, [System.Security.Cryptography.HashAlgorithm] $hashAlgorithm)
+    {
+        $jwkJson = $this.ExportPublicJwk() | ConvertTo-Json -Compress;
+        $jwkBytes = [System.Text.Encoding]::UTF8.GetBytes($jwkJson);
+        $jwkHash = $hashAlgorithm.ComputeHash($jwkBytes);
+
+        $thumbprint = ConvertTo-UrlBase64 -InputBytes $jwkHash;
+        return "$token.$thumbprint";
+    }
 
     [string] GetKeyAuthorization([string] $token)
     {
         $sha256 = [System.Security.Cryptography.SHA256]::Create();
 
         try {
-            return GetKeyAuthorizationThumbprint($token, $sha256);
+            return $this.GetKeyAuthorizationThumbprint($token, $sha256);
         } finally {
             $sha256.Dispose();
         }
-    }
-
-    hidden [byte[]] GetKeyAuthorizationThumbprint([string] $token, [System.Security.Cryptography.HashAlgorithm] $hashAlgorithm)
-    {
-        $jwkJson = $this.ExportPublicJwk() | ConvertTo-Json -Compress;
-        $jwkBytes = [System.Text.Encoding]::UTF8.GetBytes($jwkJson);
-        $jwkHash = $hashAlgorithm.ComputeHash($jwkBytes);
-
-        $thumbprint =  = ConvertTo-UrlBase64 -InputBytes $jwkHash;
-        return "$token.$thumbprint";
     }
 
     [string] GetKeyAuthorizationDigest([string] $token)
@@ -227,7 +226,7 @@ class AcmePSKey {
         $sha256 = [System.Security.Cryptography.SHA256]::Create();
 
         try {
-            $keyAuthorization = GetKeyAuthorizationThumbprint($token, $sha256);
+            $keyAuthorization = $this.GetKeyAuthorizationThumbprint($token, $sha256);
             $keyAuthZBytes = [System.Text.Encoding]::UTF8.GetBytes($keyAuthorization);
 
             $digest = $sha256.ComputeHash($keyAuthZBytes);

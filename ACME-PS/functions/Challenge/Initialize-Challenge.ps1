@@ -56,7 +56,7 @@ function Initialize-Challenge {
                 $fileName = $Challenge.Token;
                 $relativePath = "/.well-known/acme-challenge/$fileName"
                 $fqdn = "$($Challenge.Identifier.Value)$relativePath"
-                $content = [KeyAuthorization]::Compute($AccountKey, $Challenge.Token);
+                $content = $AccountKey.GetKeyAuthorization($Challenge.Token);
 
                 $Challenge.Data = [PSCustomObject]@{
                     "Type" = $Challenge.Type;
@@ -70,7 +70,7 @@ function Initialize-Challenge {
 
             "dns-01" {
                 $txtRecordName = "_acme-challenge.$($Challenge.Identifier.Value)";
-                $content = [KeyAuthorization]::ComputeDigest($AccountKey, $Challenge.Token);
+                $content = $AccountKey.GetKeyAuthorizationDigest($Challenge.Token);
 
                 $Challenge.Data =  [PSCustomObject]@{
                     "Type" = "dns-01";
@@ -81,7 +81,7 @@ function Initialize-Challenge {
             }
 
             "tls-alpn-01" {
-                $content = [KeyAuthorization]::Compute($AccountKey, $Challenge.Token);
+                $content = $AccountKey.GetKeyAuthorization($Challenge.Token);
 
                 $Challenge.Data =  [PSCustomObject]@{
                     "Type" = $Challenge.Type;
