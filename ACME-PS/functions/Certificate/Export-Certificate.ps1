@@ -46,6 +46,8 @@ function Export-Certificate {
         .EXAMPLE
             PS> Export-Certificate -Order $myOrder -CertficateKey $myKey -Path C:\AcmeCerts\example.com.pfx
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        "PSAvoidOverwritingBuiltInCmdlets", "", Scope="Function", Target="*")]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
@@ -63,7 +65,7 @@ function Export-Certificate {
         $UseAlternateChain,
 
         [Parameter()]
-        [ICertificateKey]
+        [AcmePSKey]
         $CertificateKey,
 
         [Parameter(Mandatory = $true)]
@@ -120,7 +122,7 @@ function Export-Certificate {
 
         if($null -eq $alternateUrlMatch) {
             Write-Warning "Could not find alternate chain. Using available chain.";
-        } 
+        }
         else {
             $alternateUrl = $alternateUrlMatch.Matches[0].Groups[1].Value;
             $response = Invoke-SignedWebRequest -Url $alternateUrl -State $State;
@@ -134,7 +136,7 @@ function Export-Certificate {
     }
 
     if($ExcludeChain) {
-        Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfx($certificate, $Password)
+        $certContent = [Certificate]::ExportPfxCertificate($certificate, $CertificateKey, $Password)
     } else {
         $pemString = [System.Text.Encoding]::UTF8.GetString($certificate);
 
@@ -153,6 +155,8 @@ function Export-Certificate {
             $certificates.Add($certBytes) | Out-Null;
         }
 
-        Set-ByteContent -Path $Path -Content $CertificateKey.ExportPfxChain($certificates, $Password);
+        $certContent = [Certificate]::ExportPfxCertificateChain($certificates, $CertificateKey, $Password)
     }
+
+    Set-ByteContent -Path $Path -Content $certContent;
 }

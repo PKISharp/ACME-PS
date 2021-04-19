@@ -44,7 +44,7 @@ function New-CertificateKey {
             PS> New-CertificateKey -ECDsa -HashSize 384 -SkipKeyExport
     #>
     [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
-    [OutputType("ICertificateKey")]
+    [OutputType("AcmePSKey")]
     param(
         [Parameter(ParameterSetName="RSA")]
         [switch]
@@ -85,16 +85,11 @@ function New-CertificateKey {
         }
     }
 
-    if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
-        $certificateKey = [ICertificateKey]([ECDsaCertificateKey]::new($ECDsaHashSize));
-        Write-Verbose "Created new ECDsa certificate key with hash size $ECDsaHashSize";
-    } elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
-        if($RSAKeySize -lt 2048 -or $RSAKeySize -gt 4096 -or ($RSAKeySize%8) -ne 0) {
-            throw "The RSAKeySize must be between 2048 and 4096 and must be divisible by 8";
-        }
-
-        $certificateKey = [ICertificateKey]([RSACertificateKey]::new($RSAHashSize, $RSAKeySize));
-        Write-Verbose "Created new RSA certificate key with hash size $RSAHashSize and key size $RSAKeySize";
+    if ($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
+        $certificateKey = New-AcmePSKey -ECDsa -ECDsaHashSize $ECDsaHashSize;
+    }
+    elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
+        $certificateKey = New-AcmePSKey -RSA -RSAHashSize $RSAHashSize -RSAKeySize $RSAKeySize;
     }
 
     if($SkipKeyExport) {

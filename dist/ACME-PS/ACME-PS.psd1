@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.3.5'
+	ModuleVersion = '1.5.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -13,8 +13,7 @@
 	Description = "PowerShell client module for the ACME protocol Version 2, which can be used to interoperate with the Let's Encrypt(TM) projects certificate servers and any other RFC 8555 compliant server."
 
 	NestedModules = @(
-		"./Prerequisites.ps1",
-		"./TypeDefinitions.ps1"
+		"./Prerequisites.ps1"
 	)
 
 	RequiredAssemblies = @(

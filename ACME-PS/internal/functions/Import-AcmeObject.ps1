@@ -8,7 +8,11 @@ function Import-AcmeObject {
 
         [Parameter()]
         [string]
-        $TypeName
+        $TypeName,
+
+        [Parameter()]
+        [switch]
+        $AsPSCustomObject
     )
 
     process {
@@ -20,6 +24,10 @@ function Import-AcmeObject {
         } else {
             Write-Verbose "Importing object from CLIXML file $Path"
             $imported = Import-Clixml $Path;
+        }
+
+        if($AsPSCustomObject.IsPresent) {
+            return $imported;
         }
 
         if($TypeName) {

@@ -26,7 +26,7 @@ function Export-CertificateKey {
 
         [Parameter(ValueFromPipeline=$true)]
         [ValidateNotNull()]
-        [ICertificateKey]
+        [AcmePSKey]
         $CertificateKey
     )
 

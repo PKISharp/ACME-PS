@@ -29,7 +29,7 @@ function Export-AccountKey {
 
         [Parameter(ValueFromPipeline=$true)]
         [ValidateNotNull()]
-        [IAccountKey]
+        [AcmePSKey]
         $AccountKey,
 
         [Parameter()]

@@ -50,7 +50,7 @@ function Complete-Order {
 
         [Parameter(Mandatory = $true, ParameterSetName="CustomKey")]
         [ValidateNotNull()]
-        [ICertificateKey]
+        [AcmePSKey]
         $CertificateKey,
 
         [Parameter(ParameterSetName="CustomKey")]
@@ -95,7 +95,7 @@ function Complete-Order {
             $certDN = "CN=$($Order.Identifiers[0].Value)";
         }
 
-        $csr = $CertificateKey.GenerateCsr($dnsNames, $certDN);
+        $csr = [Certificate]::GenerateCsr($dnsNames, $certDN, $CertificateKey);
         $payload = @{ "csr"= (ConvertTo-UrlBase64 -InputBytes $csr) };
 
         $requestUrl = $Order.FinalizeUrl;

@@ -27,12 +27,14 @@ function Invoke-SignedWebRequest {
         .PARAMETER SkipRetryOnNonceError
             Do not retry the request on nonce-errors.
 
+        .PARAMETER SigningKey
+            Will be used to sign the request to the acme server.
 
         .EXAMPLE
             PS (POST-as-GET)> Invoke-SignedWebRequest "https://acme.service/" $myState
             PS (POST-as-GET)> Invoke-SignedWebRequest -Url "https://acme.service/" -State $myState -Payload $myPayload
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Default")]
     [OutputType("AcmeHttpResponse")]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -51,16 +53,22 @@ function Invoke-SignedWebRequest {
         [switch] $SuppressKeyId,
 
         [Parameter()]
-        [switch] $SkipRetryOnNonceError
+        [switch] $SkipRetryOnNonceError,
+
+        [Parameter(ParameterSetName = "HasSigningKey")]
+        [ValidateNotNull()]
+        [AcmePSKey] $SigningKey
     )
 
     process {
-        $accountKey = $State.GetAccountKey();
-        $account = $State.GetAccount();
-        $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
         $nonce = $State.GetNonce();
+        if($PsCmdlet.ParameterSetName -ne "HasSigningKey") {
+            $signingKey = $State.GetAccountKey();
+            $account = $State.GetAccount();
+            $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
+        }
 
-        $requestBody = New-SignedMessage -Url $Url -SigningKey $accountKey -KeyId $keyId -Nonce $nonce -Payload $Payload
+        $requestBody = New-SignedMessage -Url $Url -SigningKey $signingKey -KeyId $keyId -Nonce $nonce -Payload $Payload
         $response = Invoke-AcmeWebRequest $Url $requestBody -Method POST -ErrorAction 'Continue'
 
         if($response.NextNonce) {
