@@ -55,8 +55,8 @@ process {
     # Class files are sequence sensitive
     $ClassPath = [System.IO.Path]::Combine($ModuleSourcePath, "./internal/classes");
     $ClassFiles = @(
-        "crypto/Certificate",
         "crypto/AcmePSKey",
+        "crypto/Certificate",
         "AcmeHttpResponse",
         "AcmeHttpException",
         "AcmeDirectory",
