@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.3.5'
+	ModuleVersion = '1.5.0'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
