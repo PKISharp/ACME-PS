@@ -52,7 +52,7 @@ function New-AccountKey {
             PS> New-AccountKey -ECDsa -HashSize 384
     #>
     [CmdletBinding(DefaultParameterSetName="RSA", SupportsShouldProcess=$true)]
-    [OutputType("IAccountKey")]
+    [OutputType("AcmePSKey")]
     param(
         [Parameter(ParameterSetName="RSA")]
         [switch]
@@ -92,12 +92,11 @@ function New-AccountKey {
         $Force
     )
 
-    if($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
-        $accountKey = [IAccountKey]([ECDsaAccountKey]::new($ECDsaHashSize));
-        Write-Verbose "Created new ECDsa account key with hash size $ECDsaHashSize";
-    } elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
-        $accountKey = [IAccountKey]([RSAAccountKey]::new($RSAHashSize, $RSAKeySize));
-        Write-Verbose "Created new RSA account key with hash size $RSAHashSize and key size $RSAKeySize";
+    if ($ECDsa.IsPresent -or $PSCmdlet.ParameterSetName -eq "ECDsa") {
+        $accountKey = New-AcmePSKey -ECDsa -ECDsaHashSize $ECDsaHashSize;
+    }
+    elseif ($RSA.IsPresent -or $PSCmdlet.ParameterSetName -eq "RSA") {
+        $accountKey = New-AcmePSKey -RSA -RSAHashSize $RSAHashSize -RSAKeySize $RSAKeySize;
     }
 
     if($State -and $PSCmdlet.ShouldProcess("AccountKey", "Add created account key to state.",

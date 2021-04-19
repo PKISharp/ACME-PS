@@ -14,13 +14,10 @@ function Revoke-Certificate {
             your account key, the associated account and the replay nonce.
 
         .PARAMETER CertificatePublicKey
-            The certificate to be revoked. Either as base64-string or byte[]. Needs to be DER encoded.
+            The certificate to be revoked. Either as base64url-string or byte[]. Needs to be DER encoded (vs. PEM - so no ---- Begin Certificate ----).
 
         .PARAMETER SigningKey
             The key to sign the revocation request. If you provide the X509Certificate or Order parameter, this will be set automatically.
-
-        .PARAMETER HashSize
-            The hash size used to sign the revocation request. If you provide the X509Certificate or Order parameter, this will be set automatically.
 
         .PARAMETER Order
             The order which contains the issued certificate.
@@ -53,13 +50,9 @@ function Revoke-Certificate {
         [Parameter(Mandatory = $true, ParameterSetName = "ByPrivateKey")]
         $CertificatePublicKey,
 
-        [Parameter(ParameterSetName = "ByPrivateKey")]
-        [ISigningKey]
-        $CertificatePrivateKey,
-
-        [Parameter(ParameterSetName = "ByPrivateKey")]
-        [ValidateSet(256, 384, 512)]
-        [int] $HashSize,
+        [Parameter(Mandatory = $true, ParameterSetName = "ByPrivateKey")]
+        [AcmePSKey]
+        $SigningKey,
 
         [Parameter(Mandatory = $true, ParameterSetName = "ByOrder")]
         [ValidateNotNull()]
@@ -88,30 +81,30 @@ function Revoke-Certificate {
             [Security.Cryptography.X509Certificates.X509Certificate2]::new($PFXCertificatePath, $PFXCertificatePassword);
         }
 
-        Revoke-Certificate -State $State -X509Certificate $x509Certificate;
-        return;
+        return Revoke-Certificate -State $State -X509Certificate $x509Certificate;
     }
 
     if($PSCmdlet.ParameterSetName -eq "ByX509") {
         $certBytes = $X509Certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert);
-        
+
         if($X509Certificate.HasPrivateKey) {
-            $privateKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($X509Certificate);
-            
+            $privateKey = [Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($X509Certificate);
+
             if($null -eq $privateKey) {
-                $privateKey = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::GetECDsaPrivateKey($X509Certificate);
+                $privateKey = [Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::GetECDsaPrivateKey($X509Certificate);
             }
 
             if($null -eq $privateKey) {
                 throw "Unsupported X509 certificate key type."
             }
 
-            Revoke-Certificate -State $State -CertificatePublicKey $certBytes -CertificatePrivateKey $privateKey;
+            $key = [AcmePSKey]::new($privateKey);
+
+            return Revoke-Certificate -State $State -CertificatePublicKey $certBytes -SigningKey $key;
         }
         else {
-            Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
+            return Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
         }
-        return;
     }
 
     if($PSCmdlet.ParameterSetName -eq "ByOrder") {
@@ -120,27 +113,33 @@ function Revoke-Certificate {
             throw "Cannot get certificate associated with order, revocation failed."
         }
 
-        Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
-        return;
+        $certBase64String = [Text.Encoding]::ASCII.GetString($certBytes) -split "-----" |
+            ForEach-Object { $_.Replace("`r","").Replace("`n","").Trim() } | Where-Object { $_ -like "MII*" } | Select-Object -First 1;
+
+        $derBytes = [System.Convert]::FromBase64String($certBase64String);
+
+        return Revoke-Certificate -State $State -CertificatePublicKey $derBytes;
     }
 
     if($PSCmdlet.ParameterSetName -in @("ByCert", "ByPrivateKey")) {
-        $base64Certificate = if([string] -eq $CertificatePublicKey.GetType()) {
-            $CertificatePublicKey;
-        } elseif ([byte[]] -eq $CertificatePublicKey.GetType()) {
-            [System.Convert]::ToBase64String($CertificatePublicKey);
-        } else {
+        if ($CertificatePublicKey -is [string]) {
+            $base64DERCertificate = $CertificatePublicKey;
+        }
+        elseif($CertificatePublicKey -is [byte[]]) {
+            $base64DERCertificate = ConvertTo-UrlBase64 -InputBytes $CertificatePublicKey;
+        }
+        else {
             throw "CertificatePublicKey either needs to be string or byte[]";
-        };
+        }
 
         $url = $State.GetServiceDirectory().RevokeCert;
-        $payload = @{ "certificate" = $base64Certificate; "reason" = 1 };
+        $payload = @{ "certificate" = $base64DERCertificate; "reason" = 1 };
 
         if($PSCmdlet.ShouldProcess("Certificate", "Revoking certificate.")) {
             if ($PSCmdlet.ParameterSetName -eq "ByCert") {
-                Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;
+                return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;
             } elseif ($PSCmdlet.ParameterSetName -eq "ByPrivateKey") {
-                Invoke-SignedWebRequest -Url $url -Payload $payload -PrivateKey $CertificatePrivateKey
+                return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SigningKey $SigningKey
             }
         }
     }

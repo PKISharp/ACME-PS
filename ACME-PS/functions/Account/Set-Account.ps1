@@ -35,7 +35,7 @@ function Set-Account {
         $PassThru,
 
         [Parameter(Mandatory = $true, ParameterSetName="NewAccountKey")]
-        [IAccountKey]
+        [AcmePSKey]
         $NewAccountKey,
 
         [Parameter(Mandatory = $true, ParameterSetName="DisableAccount")]

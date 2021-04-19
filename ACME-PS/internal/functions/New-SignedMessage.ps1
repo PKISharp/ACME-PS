@@ -8,7 +8,7 @@ function New-SignedMessage {
         [string] $Url,
 
         [Parameter(Mandatory = $true, Position = 1)]
-        [ISigningKey] $SigningKey,
+        [AcmePSKey] $SigningKey,
 
         [Parameter(Position = 2)]
         [string] $KeyId,

@@ -12,12 +12,12 @@
 
     <# abstract #> [string]        GetNonce()            { throw [System.NotImplementedException]::new(); }
     <# abstract #> [AcmeDirectory] GetServiceDirectory() { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [IAccountKey]   GetAccountKey()       { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmePSKey]   GetAccountKey()       { throw [System.NotImplementedException]::new(); }
     <# abstract #> [AcmeAccount]   GetAccount()          { throw [System.NotImplementedException]::new(); }
 
     <# abstract #> [void] SetNonce([string] $value)   { throw [System.NotImplementedException]::new(); }
     <# abstract #> [void] Set([AcmeDirectory] $value) { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] Set([IAccountKey] $value)   { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] Set([AcmePSKey] $value)   { throw [System.NotImplementedException]::new(); }
     <# abstract #> [void] Set([AcmeAccount] $value)   { throw [System.NotImplementedException]::new(); }
 
     <# abstract #> [AcmeOrder] FindOrder([string[]] $dnsNames)          { throw [System.NotImplementedException]::new(); }
@@ -27,8 +27,8 @@
     <# abstract #> [void] SetOrder([AcmeOrder] $order)    { throw [System.NotImplementedException]::new(); }
     <# abstract #> [void] RemoveOrder([AcmeOrder] $order) { throw [System.NotImplementedException]::new(); }
 
-    <# abstract #> [ICertificateKey] GetOrderCertificateKey([AcmeOrder] $order)                        { throw [System.NotImplementedException]::new(); }
-    <# abstract #> [void] SetOrderCertificateKey([AcmeOrder] $order, [ICertificateKey] $certifcateKey) { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [AcmePSKey] GetOrderCertificateKey([AcmeOrder] $order)                        { throw [System.NotImplementedException]::new(); }
+    <# abstract #> [void] SetOrderCertificateKey([AcmeOrder] $order, [AcmePSKey] $certifcateKey) { throw [System.NotImplementedException]::new(); }
 
     <# abstract #> [byte[]] GetOrderCertificate([AcmeOrder] $order)                      { throw [System.NotImplementedException]::new(); }
     <# abstract #> [void] SetOrderCertificate([AcmeOrder] $order, [byte[]] $certificate) { throw [System.NotImplementedException]::new(); }

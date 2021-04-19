@@ -1,25 +1,27 @@
 class AcmePSKey {
     hidden [string] $_AlgorithmType;
     hidden [Security.Cryptography.AsymmetricAlgorithm] $_Algorithm;
-    
+
     hidden [int] $_HashSize;
-    hidden [System.Security.Cryptography.HashAlgorithmName] $_HashName;
+    hidden [Security.Cryptography.HashAlgorithmName] $_HashName;
+
+    [string] $KeyId;
 
     AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm)
     {
-        Initialize($algorithm, 256);
+        $this.Initialize($algorithm, 256);
     }
 
-    AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize) 
+    AcmePSKey([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize)
     {
-        Initialize($algorithm, $hashSize);
+        $this.Initialize($algorithm, $hashSize);
     }
 
     AcmePSKey([PSCustomObject]$keySource) {
         $algo = $null;
         $hashSize = $keySource.HashSize;
-        
-        if($keySource.TypeName -eq "RSAKeyExport" -or $keySource.TypeName -eq "RSA") {
+
+        if($keySource.TypeName -iin @("RSA","RSAKeyExport")) {
             $keyParameters = [System.Security.Cryptography.RSAParameters]::new();
 
             $keyParameters.D = $keySource.D;
@@ -30,13 +32,13 @@ class AcmePSKey {
             $keyParameters.Modulus = $keySource.Modulus;
             $keyParameters.P = $keySource.P;
             $keyParameters.Q = $keySource.Q;
-     
+
             $algo = [Security.Cryptography.RSA]::Create($keyParameters);
         }
-        elseif($keySource.TypeName -eq "ECDsaKeyExport" -or $keySource.TypeName -eq "ECDsa") {
+        elseif($keySource.TypeName -iin @("ECDsa","ECDsaKeyExport")) {
             $keyParameters = [System.Security.Cryptography.ECParameters]::new();
 
-            $keyParameters.Curve = GetECDsaCurve($hashSize);
+            $keyParameters.Curve = [AcmePSKey]::GetECDsaCurve($hashSize);
             $keyParameters.D = $keySource.D;
             $keyParameters.Q.X = $keySource.X;
             $keyParameters.Q.Y = $keySource.Y;
@@ -44,15 +46,15 @@ class AcmePSKey {
             $algo = [Security.Cryptography.ECDsa]::Create($keyParameters);
         }
         else {
-            throw "Unkown Key Export type $($keySource.TypeName)";
+            throw "Unkown Key Export type '$($keySource.TypeName)'";
         }
 
-        Initialize($algo, $hashSize);
+        $this.Initialize($algo, $hashSize);
     }
 
     hidden Initialize([Security.Cryptography.AsymmetricAlgorithm] $algorithm, [int] $hashSize) {
         $this._HashSize = $hashSize;
-        $this._HashName = $this.GetHashName($hashSize);
+        $this._HashName = [AcmePSKey]::GetHashName($hashSize);
 
         $this._Algorithm = $algorithm;
 
@@ -81,7 +83,7 @@ class AcmePSKey {
         throw "Cannot use hash size to get hash name. Allowed sizes: 256, 348, 512";
     }
 
-    hidden static [Security.Cryptography.ECCurve] GetECDsaCurve($hashSize) {
+    static [Security.Cryptography.ECCurve] GetECDsaCurve($hashSize) {
         switch ($hashSize) {
             256 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP256; }
             384 { return [System.Security.Cryptography.ECCurve+NamedCurves]::nistP384; }
@@ -91,30 +93,37 @@ class AcmePSKey {
         throw "Cannot use hash size to create curve. Allowed sizes: 256, 348, 512";
     }
 
-    [object] ExportKey() {
+    [Security.Cryptography.AsymmetricAlgorithm] GetAlgorithm() {
+        return $this._Algorithm;
+    }
+
+    [Security.Cryptography.HashAlgorithmName] GetHashName() {
+        return $this._HashName;
+    }
+
+    [PSCustomObject] ExportKey() {
         $keyExport = @{
             TypeName = $this._AlgorithmType;
             HashSize = $this._HashSize;
         };
 
-        if($this._AlgorithmType -eq "ECDsa") {
-            $ecParams = $this.ECDsa.ExportParameters($true);
-            
-            $keyExport.D = $ecParams.D;
-            $keyExport.X = $ecParams.Q.X;
-            $keyExport.Y = $ecParams.Q.Y;
+        $keyParameters = $this._Algorithm.ExportParameters($true);
+        if($this._AlgorithmType -eq "ECDsa")
+        {
+            $keyExport.D = $keyParameters.D;
+            $keyExport.X = $keyParameters.Q.X;
+            $keyExport.Y = $keyParameters.Q.Y;
         }
-        elseif($this._AlgorithmType -eq "RSA") {
-            $rsaParams = $this.RSA.ExportParameters($true);
-            
-            $keyExport.D = $rsaParams.D;
-            $keyExport.DP = $rsaParams.DP;
-            $keyExport.DQ = $rsaParams.DQ;
-            $keyExport.Exponent = $rsaParams.Exponent;
-            $keyExport.InverseQ = $rsaParams.InverseQ;
-            $keyExport.Modulus = $rsaParams.Modulus;
-            $keyExport.P = $rsaParams.P;
-            $keyExport.Q = $rsaParams.Q;
+        elseif($this._AlgorithmType -eq "RSA")
+        {
+            $keyExport.D = $keyParameters.D;
+            $keyExport.DP = $keyParameters.DP;
+            $keyExport.DQ = $keyParameters.DQ;
+            $keyExport.Exponent = $keyParameters.Exponent;
+            $keyExport.InverseQ = $keyParameters.InverseQ;
+            $keyExport.Modulus = $keyParameters.Modulus;
+            $keyExport.P = $keyParameters.P;
+            $keyExport.Q = $keyParameters.Q;
         }
 
         return [PSCustomObject]$keyExport;
@@ -136,10 +145,10 @@ class AcmePSKey {
             As per RFC 7638 Section 3, these are the *required* elements of the
             JWK and are sorted in lexicographic order to produce a canonical form
         #>
-        
-        if($this._AlgorithmType -eq "ECDsa") {
-            $keyParams = $this.ECDsa.ExportParameters($false);
 
+        $keyParams = $this._Algorithm.ExportParameters($false);
+
+        if($this._AlgorithmType -eq "ECDsa") {
             $result = [ordered]@{
                 "crv" = "P-$($this._HashSize)";
                 "kty" = "EC"; # https://tools.ietf.org/html/rfc7518#section-6.2
@@ -148,8 +157,6 @@ class AcmePSKey {
             }
         }
         elseif ($this._AlgorithmType -eq "RSA") {
-            $keyParams = $this.RSA.ExportParameters($false);
-
             $result = [ordered]@{
                 "e" = ConvertTo-UrlBase64 -InputBytes $keyParams.Exponent;
                 "kty" = "RSA"; # https://tools.ietf.org/html/rfc7518#section-6.3
@@ -189,20 +196,43 @@ class AcmePSKey {
         return $this.Sign([System.Text.Encoding]::UTF8.GetBytes($inputString));
     }
 
-    
+
     <#
-        Certificate creation
+        Key authorization
     #>
+    hidden [string] GetKeyAuthorizationThumbprint([string] $token, [System.Security.Cryptography.HashAlgorithm] $hashAlgorithm)
+    {
+        $jwkJson = $this.ExportPublicJwk() | ConvertTo-Json -Compress;
+        $jwkBytes = [System.Text.Encoding]::UTF8.GetBytes($jwkJson);
+        $jwkHash = $hashAlgorithm.ComputeHash($jwkBytes);
 
-    [byte[]] ExportPfx([byte[]] $acmeCertificate, [SecureString] $password) {
-        return [Certificate]::ExportPfx($acmeCertificate, $this._Algorithm, $password);
+        $thumbprint = ConvertTo-UrlBase64 -InputBytes $jwkHash;
+        return "$token.$thumbprint";
     }
 
-    [byte[]] ExportPfxChain([byte[][]] $acmeCertificates, [SecureString] $password) {
-        return [Certificate]::ExportPfxChain($acmeCertificates, $this._Algorithm, $password);
+    [string] GetKeyAuthorization([string] $token)
+    {
+        $sha256 = [System.Security.Cryptography.SHA256]::Create();
+
+        try {
+            return $this.GetKeyAuthorizationThumbprint($token, $sha256);
+        } finally {
+            $sha256.Dispose();
+        }
     }
 
-    [byte[]] GenerateCsr([string[]] $dnsNames, [string] $distinguishedName) {
-        return [Certificate]::GenerateCsr($dnsNames, $distinguishedName, $this._Algorithm, $this._HashName);
+    [string] GetKeyAuthorizationDigest([string] $token)
+    {
+        $sha256 = [System.Security.Cryptography.SHA256]::Create();
+
+        try {
+            $keyAuthorization = $this.GetKeyAuthorizationThumbprint($token, $sha256);
+            $keyAuthZBytes = [System.Text.Encoding]::UTF8.GetBytes($keyAuthorization);
+
+            $digest = $sha256.ComputeHash($keyAuthZBytes);
+            return ConvertTo-UrlBase64 -InputBytes $digest;
+        } finally {
+            $sha256.Dispose();
+        }
     }
 }

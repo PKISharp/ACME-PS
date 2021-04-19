@@ -27,6 +27,8 @@ function Invoke-SignedWebRequest {
         .PARAMETER SkipRetryOnNonceError
             Do not retry the request on nonce-errors.
 
+        .PARAMETER SigningKey
+            Will be used to sign the request to the acme server.
 
         .EXAMPLE
             PS (POST-as-GET)> Invoke-SignedWebRequest "https://acme.service/" $myState
@@ -55,7 +57,7 @@ function Invoke-SignedWebRequest {
 
         [Parameter(ParameterSetName = "HasSigningKey")]
         [ValidateNotNull()]
-        [ISigningKey] $SigningKey
+        [AcmePSKey] $SigningKey
     )
 
     process {
