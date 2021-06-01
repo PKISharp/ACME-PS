@@ -2282,7 +2282,6 @@ function Revoke-Certificate {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
-        [ValidateScript({$_.AccountExists()})]
         [AcmeState]
         $State,
 
