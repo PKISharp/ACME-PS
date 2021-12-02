@@ -1295,7 +1295,7 @@ function New-AcmePSKey {
         $RSAHashSize = 256,
 
         [Parameter(ParameterSetName="RSA")]
-        [ValidateSet(2048)]
+        [ValidateSet(2048, 4096)]
         [int]
         $RSAKeySize = 2048,
 
