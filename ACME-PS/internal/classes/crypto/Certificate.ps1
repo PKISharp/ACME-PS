@@ -29,18 +29,51 @@ class Certificate {
         }
     }
 
+    static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([System.Collections.Generic.List[Security.Cryptography.X509Certificates.X509Certificate2]] $acmeCertificates) {
+        $result = [Security.Cryptography.X509Certificates.X509Certificate2Collection]::new();
+        $todo = [System.Collections.Generic.List[Security.Cryptography.X509Certificates.X509Certificate2]]::new();
+        # process any quick wins (i.e. where it's clear there's no dependency
+        foreach ($cert in $acmeCertificates) {
+            if ([string]::IsNullOrWhitespace($cert.Issuer) -or ($cert.Subject -eq $cert.Issuer)) {
+                $result.Add($cert); #| out-null
+            } else {
+                $todo.Add($cert);
+            }
+        }
+        # then work through the chains
+        while ($todoCount = $todo.Count) {
+            $circularLoop = $true;
+            $todoSubjects = $todo | Select-Object -ExpandProperty 'Subject';
+            for ($i = ($todoCount - 1); $i -ge 0; $i--) {
+                if ($todo[$i].Issuer -notin $todoSubjects) {
+                    $result.Add($todo[$i]); #| out-null
+                    $todo.RemoveAt($i);
+                    $circularLoop = $false;
+                }
+            }
+            if ($circularLoop) {
+                throw [System.ArgumentException]::new("There appears to be a circular loop in the given certificate's dependency chain"); # I don't think this would ever occur; but maybe it's a risk for some self signed cert scenarios?
+            }
+        }
+        return $result;
+    }
+
+    static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
+        [System.Collections.Generic.List[Security.Cryptography.X509Certificates.X509Certificate2]]$certs = [System.Collections.Generic.List[Security.Cryptography.X509Certificates.X509Certificate2]]::new();
+        $certs.Add([Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm));
+        for($i = 1; $i -lt $acmeCertificates.Length; $i++) {
+            $certs.Add([Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i]));
+        }
+        return [Certificate]::ConvertToCertificateCollection($certs);
+    }
+
     static [byte[]] ExportPfxCertificateChain([byte[][]] $acmeCertificates, [AcmePSKey] $key, [SecureString] $password) {
         return [Certificate]::ExportPfxCertificateChain($acmeCertificates, $key.GetAlgorithm(), $password);
     }
 
     static [byte[]] ExportPfxCertificateChain([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
-        $leafCertificate = [Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm);
-        $certificateCollection = [Security.Cryptography.X509Certificates.X509Certificate2Collection]::new($leafCertificate);
 
-        for($i = 1; $i -lt $acmeCertificates.Length; $i++) {
-            $chainCert = [Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i]);
-            $certificateCollection.Add($chainCert);
-        }
+        $certificateCollection = [Certificate]::ConvertToCertificateCollection($acmeCertificates, $algorithm);
 
         if($password) {
             $unprotectedPassword = [PSCredential]::new("ACME-PS", $password).GetNetworkCredential().Password;
