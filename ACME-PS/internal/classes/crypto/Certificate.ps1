@@ -29,25 +29,26 @@ class Certificate {
         }
     }
 
-    static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([System.Collections.Generic.List[Security.Cryptography.X509Certificates.X509Certificate2]] $acmeCertificates) {
+    # note: this returns issuers before the certs they've issued.  This is the opposite order to what's desired; but is the order that produces the correct output when combined with the X509Certificate2Collection's Export command
+    static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([Collections.ArrayList] $acmeCertificates) {
         $result = [Security.Cryptography.X509Certificates.X509Certificate2Collection]::new();
-        $todo = [System.Collections.Generic.List[Security.Cryptography.X509Certificates.X509Certificate2]]::new();
         # process any quick wins (i.e. where it's clear there's no dependency
-        foreach ($cert in $acmeCertificates) {
-            if ([string]::IsNullOrWhitespace($cert.Issuer) -or ($cert.Subject -eq $cert.Issuer)) {
-                $result.Add($cert); #| out-null
-            } else {
-                $todo.Add($cert);
+        $todoCount = $acmeCertificates.Count - 1;
+        for ($i = $todoCount; $i -ge 0; $i--) {
+            if ([string]::IsNullOrWhitespace($acmeCertificates[$i].Issuer) -or ($acmeCertificates[$i].Subject -eq $acmeCertificates[$i].Issuer)) {
+                $result.Add($acmeCertificates[$i]); #| out-null
+                $acmeCertificates.RemoveAt($i);
             }
         }
-        # then work through the chains
-        while ($todoCount = $todo.Count) {
+        # then work through the chains, returning all certificates whose issuers aren't in the unprocessed collection
+        $todoSubjects = [Collections.ArrayList]::new( ($acmeCertificates | Select-Object -ExpandProperty 'Subject') );
+        while ($todoCount = $acmeCertificates.Count) {
             $circularLoop = $true;
-            $todoSubjects = $todo | Select-Object -ExpandProperty 'Subject';
             for ($i = ($todoCount - 1); $i -ge 0; $i--) {
-                if ($todo[$i].Issuer -notin $todoSubjects) {
-                    $result.Add($todo[$i]); #| out-null
-                    $todo.RemoveAt($i);
+                if (!$todoSubjects.Contains($acmeCertificates[$i].Issuer)) {
+                    $result.Add($acmeCertificates[$i]); #| out-null
+                    $todoSubjects.Remove($acmeCertificates[$i].Subject);
+                    $acmeCertificates.RemoveAt($i);
                     $circularLoop = $false;
                 }
             }
@@ -59,7 +60,7 @@ class Certificate {
     }
 
     static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
-        [System.Collections.Generic.List[Security.Cryptography.X509Certificates.X509Certificate2]]$certs = [System.Collections.Generic.List[Security.Cryptography.X509Certificates.X509Certificate2]]::new();
+        $certs = [Collections.ArrayList]::new();
         $certs.Add([Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm));
         for($i = 1; $i -lt $acmeCertificates.Length; $i++) {
             $certs.Add([Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i]));
