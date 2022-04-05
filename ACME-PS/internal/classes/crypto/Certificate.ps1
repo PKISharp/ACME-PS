@@ -30,7 +30,7 @@ class Certificate {
     }
 
     # note: this returns issuers before the certs they've issued.  This is the opposite order to what's desired; but is the order that produces the correct output when combined with the X509Certificate2Collection's Export command
-    static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([Collections.ArrayList] $acmeCertificates) {
+    hidden static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([Collections.ArrayList] $acmeCertificates) {
         $result = [Security.Cryptography.X509Certificates.X509Certificate2Collection]::new();
         # process any quick wins (i.e. where it's clear there's no dependency
         $todoCount = $acmeCertificates.Count - 1;
@@ -59,7 +59,7 @@ class Certificate {
         return $result;
     }
 
-    static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
+    hidden static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
         $certs = [Collections.ArrayList]::new();
         $certs.Add([Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm));
         for($i = 1; $i -lt $acmeCertificates.Length; $i++) {
