@@ -29,34 +29,31 @@ class Certificate {
         }
     }
 
-    # note: this returns issuers before the certs they've issued.  This is the opposite order to what's desired; but is the order that produces the correct output when combined with the X509Certificate2Collection's Export command
+    # `X509Certificate2Collections.Export()` seems to iterate through the certificates in reverse order (LIFO)
     hidden static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([Collections.ArrayList] $acmeCertificates) {
         $result = [Security.Cryptography.X509Certificates.X509Certificate2Collection]::new();
-        
-        # process any quick wins (i.e. where it's clear there's no dependency
-        $todoCount = $acmeCertificates.Count - 1;
-        for ($i = $todoCount; $i -ge 0; $i--) {
-            if (!($acmeCertificates[$i].Issuer) -or ($acmeCertificates[$i].Subject -eq $acmeCertificates[$i].Issuer)) {
-                $result.Add($acmeCertificates[$i]); #| out-null
-                $acmeCertificates.RemoveAt($i);
+
+        #The method assumes that the input was a chain, so creating a map should work.
+        $map = @{};
+        foreach($cert in $acmeCertificates) {
+            if($cert.Issuer) {
+                $map.Add($cert.Issuer, $cert);
             }
         }
 
-        # then work through the chains, returning all certificates whose issuers aren't in the unprocessed collection
-        $todoSubjects = [Collections.ArrayList]::new( ($acmeCertificates | Select-Object -ExpandProperty 'Subject') );
-        while ($todoCount = $acmeCertificates.Count) {
-            $circularLoop = $true;
-            for ($i = ($todoCount - 1); $i -ge 0; $i--) {
-                if (!$todoSubjects.Contains($acmeCertificates[$i].Issuer)) {
-                    $result.Add($acmeCertificates[$i]); #| out-null
-                    $todoSubjects.Remove($acmeCertificates[$i].Subject);
-                    $acmeCertificates.RemoveAt($i);
-                    $circularLoop = $false;
-                }
-            }
-            if ($circularLoop) {
-                throw [System.ArgumentException]::new("There appears to be a circular loop in the given certificate's dependency chain"); # I don't think this would ever occur; but maybe it's a risk for some self signed cert scenarios?
-            }
+        # Find the root-most certificate
+        $currentCert = $acmeCertificates |
+            Where-Object { !$_.Issuer -or $_.Issuer -eq $_.Subject -or !$map.ContainsKey($_.Issuer) } |
+            Select-Object -First;
+
+        $result.Add($currentCert);
+
+        # Get the next certificate by reading it from the certificate map defined above.
+        while($map.ContainsKey($currentCert.Subject)) {
+            $currentCert = $map[$currentCert.Subject];
+            $map.Remove($currentCert.Subject);
+
+            $result.Add($currentCert);
         }
 
         return $result;
@@ -64,7 +61,7 @@ class Certificate {
 
     hidden static [Security.Cryptography.X509Certificates.X509Certificate2Collection] CreateCertificateCollection([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
         $certs = [Collections.ArrayList]::new();
-        
+
         $certs.Add([Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm));
 
         for($i = 1; $i -lt $acmeCertificates.Length; $i++) {
