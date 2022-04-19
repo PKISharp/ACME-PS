@@ -49,20 +49,19 @@ function Invoke-SignedWebRequest {
         [object] $Payload = "",
 
         [Parameter()]
-        [Alias("SupressKeyId")]
         [switch] $SuppressKeyId,
 
         [Parameter()]
         [switch] $SkipRetryOnNonceError,
 
-        [Parameter(ParameterSetName = "HasSigningKey")]
+        [Parameter(ParameterSetName = "ExistingSigningKey")]
         [ValidateNotNull()]
         [AcmePSKey] $SigningKey
     )
 
     process {
         $nonce = $State.GetNonce();
-        if($PsCmdlet.ParameterSetName -ne "HasSigningKey") {
+        if($PsCmdlet.ParameterSetName -ne "ExistingSigningKey") {
             $signingKey = $State.GetAccountKey();
             $account = $State.GetAccount();
             $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });

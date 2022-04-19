@@ -50,8 +50,9 @@ function Revoke-Certificate {
         $CertificatePublicKey,
 
         [Parameter(Mandatory = $true, ParameterSetName = "ByPrivateKey")]
+        [Alias("SigningKey")]
         [AcmePSKey]
-        $SigningKey,
+        $CertificatePrivateKey,
 
         [Parameter(Mandatory = $true, ParameterSetName = "ByOrder")]
         [ValidateNotNull()]
@@ -99,7 +100,7 @@ function Revoke-Certificate {
 
             $key = [AcmePSKey]::new($privateKey);
 
-            return Revoke-Certificate -State $State -CertificatePublicKey $certBytes -SigningKey $key;
+            return Revoke-Certificate -State $State -CertificatePublicKey $certBytes -CertificatePrivateKey $key;
         }
         else {
             return Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
@@ -138,7 +139,7 @@ function Revoke-Certificate {
             if ($PSCmdlet.ParameterSetName -eq "ByCert") {
                 return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;
             } elseif ($PSCmdlet.ParameterSetName -eq "ByPrivateKey") {
-                return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SigningKey $SigningKey
+                return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SigningKey $CertificatePrivateKey
             }
         }
     }
