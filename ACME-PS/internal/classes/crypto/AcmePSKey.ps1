@@ -37,10 +37,10 @@ class AcmePSKey {
         }
         elseif($keySource.TypeName -iin @("ECDsa","ECDsaKeyExport")) {
             $ecPoint = [System.Security.Cryptography.ECPoint]::new();
-            
+
             $ecPoint.X = $keySource.X;
             $ecPoint.Y = $keySource.Y;
-            
+
             $keyParameters = [System.Security.Cryptography.ECParameters]::new();
 
             $keyParameters.Curve = [AcmePSKey]::GetECDsaCurve($hashSize);
