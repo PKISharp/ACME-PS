@@ -16,7 +16,7 @@ function Revoke-Certificate {
         .PARAMETER CertificatePublicKey
             The certificate to be revoked. Either as base64url-string or byte[]. Needs to be DER encoded (vs. PEM - so no ---- Begin Certificate ----).
 
-        .PARAMETER SigningKey
+        .PARAMETER CertificatePrivateKey
             The key to sign the revocation request. If you provide the X509Certificate or Order parameter, this will be set automatically.
 
         .PARAMETER Order
