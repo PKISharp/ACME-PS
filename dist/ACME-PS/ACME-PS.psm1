@@ -36,12 +36,16 @@ class AcmePSKey {
             $algo = [Security.Cryptography.RSA]::Create($keyParameters);
         }
         elseif($keySource.TypeName -iin @("ECDsa","ECDsaKeyExport")) {
+            $ecPoint = [System.Security.Cryptography.ECPoint]::new();
+
+            $ecPoint.X = $keySource.X;
+            $ecPoint.Y = $keySource.Y;
+
             $keyParameters = [System.Security.Cryptography.ECParameters]::new();
 
             $keyParameters.Curve = [AcmePSKey]::GetECDsaCurve($hashSize);
             $keyParameters.D = $keySource.D;
-            $keyParameters.Q.X = $keySource.X;
-            $keyParameters.Q.Y = $keySource.Y;
+            $keyParameters.Q = $ecPoint;
 
             $algo = [Security.Cryptography.ECDsa]::Create($keyParameters);
         }
@@ -268,42 +272,45 @@ class Certificate {
         }
     }
 
-    # note: this returns issuers before the certs they've issued.  This is the opposite order to what's desired; but is the order that produces the correct output when combined with the X509Certificate2Collection's Export command
-    static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([Collections.ArrayList] $acmeCertificates) {
+    # `X509Certificate2Collections.Export()` seems to iterate through the certificates in reverse order (LIFO)
+    hidden static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([Collections.ArrayList] $acmeCertificates) {
         $result = [Security.Cryptography.X509Certificates.X509Certificate2Collection]::new();
-        # process any quick wins (i.e. where it's clear there's no dependency
-        $todoCount = $acmeCertificates.Count - 1;
-        for ($i = $todoCount; $i -ge 0; $i--) {
-            if ([string]::IsNullOrWhitespace($acmeCertificates[$i].Issuer) -or ($acmeCertificates[$i].Subject -eq $acmeCertificates[$i].Issuer)) {
-                $result.Add($acmeCertificates[$i]); #| out-null
-                $acmeCertificates.RemoveAt($i);
+
+        #The method assumes that the input was a chain, so creating a map should work.
+        $map = @{};
+        foreach($cert in $acmeCertificates) {
+            if($cert.Issuer) {
+                $map.Add($cert.Issuer, $cert);
             }
         }
-        # then work through the chains, returning all certificates whose issuers aren't in the unprocessed collection
-        $todoSubjects = [Collections.ArrayList]::new( ($acmeCertificates | Select-Object -ExpandProperty 'Subject') );
-        while ($todoCount = $acmeCertificates.Count) {
-            $circularLoop = $true;
-            for ($i = ($todoCount - 1); $i -ge 0; $i--) {
-                if (!$todoSubjects.Contains($acmeCertificates[$i].Issuer)) {
-                    $result.Add($acmeCertificates[$i]); #| out-null
-                    $todoSubjects.Remove($acmeCertificates[$i].Subject);
-                    $acmeCertificates.RemoveAt($i);
-                    $circularLoop = $false;
-                }
-            }
-            if ($circularLoop) {
-                throw [System.ArgumentException]::new("There appears to be a circular loop in the given certificate's dependency chain"); # I don't think this would ever occur; but maybe it's a risk for some self signed cert scenarios?
-            }
+
+        # Find the root-most certificate
+        $currentCert = $acmeCertificates |
+            Where-Object { !$_.Issuer -or $_.Issuer -eq $_.Subject -or !$map.ContainsKey($_.Issuer) } |
+            Select-Object -First;
+
+        $result.Add($currentCert);
+
+        # Get the next certificate by reading it from the certificate map defined above.
+        while($map.ContainsKey($currentCert.Subject)) {
+            $currentCert = $map[$currentCert.Subject];
+            $map.Remove($currentCert.Subject);
+
+            $result.Add($currentCert);
         }
+
         return $result;
     }
 
-    static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
+    hidden static [Security.Cryptography.X509Certificates.X509Certificate2Collection] CreateCertificateCollection([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
         $certs = [Collections.ArrayList]::new();
+
         $certs.Add([Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm));
+
         for($i = 1; $i -lt $acmeCertificates.Length; $i++) {
             $certs.Add([Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i]));
         }
+
         return [Certificate]::ConvertToCertificateCollection($certs);
     }
 
@@ -313,7 +320,7 @@ class Certificate {
 
     static [byte[]] ExportPfxCertificateChain([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm, [securestring] $password) {
 
-        $certificateCollection = [Certificate]::ConvertToCertificateCollection($acmeCertificates, $algorithm);
+        $certificateCollection = [Certificate]::CreateCertificateCollection($acmeCertificates, $algorithm);
 
         if($password) {
             $unprotectedPassword = [PSCredential]::new("ACME-PS", $password).GetNetworkCredential().Password;
@@ -2289,7 +2296,7 @@ function Revoke-Certificate {
         .PARAMETER CertificatePublicKey
             The certificate to be revoked. Either as base64url-string or byte[]. Needs to be DER encoded (vs. PEM - so no ---- Begin Certificate ----).
 
-        .PARAMETER SigningKey
+        .PARAMETER CertificatePrivateKey
             The key to sign the revocation request. If you provide the X509Certificate or Order parameter, this will be set automatically.
 
         .PARAMETER Order
@@ -2323,8 +2330,9 @@ function Revoke-Certificate {
         $CertificatePublicKey,
 
         [Parameter(Mandatory = $true, ParameterSetName = "ByPrivateKey")]
+        [Alias("SigningKey")]
         [AcmePSKey]
-        $SigningKey,
+        $CertificatePrivateKey,
 
         [Parameter(Mandatory = $true, ParameterSetName = "ByOrder")]
         [ValidateNotNull()]
@@ -2372,7 +2380,7 @@ function Revoke-Certificate {
 
             $key = [AcmePSKey]::new($privateKey);
 
-            return Revoke-Certificate -State $State -CertificatePublicKey $certBytes -SigningKey $key;
+            return Revoke-Certificate -State $State -CertificatePublicKey $certBytes -CertificatePrivateKey $key;
         }
         else {
             return Revoke-Certificate -State $State -CertificatePublicKey $certBytes;
@@ -2411,7 +2419,7 @@ function Revoke-Certificate {
             if ($PSCmdlet.ParameterSetName -eq "ByCert") {
                 return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload;
             } elseif ($PSCmdlet.ParameterSetName -eq "ByPrivateKey") {
-                return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SigningKey $SigningKey
+                return Invoke-SignedWebRequest -Url $url -State $State -Payload $payload -SigningKey $CertificatePrivateKey
             }
         }
     }
@@ -3522,20 +3530,19 @@ function Invoke-SignedWebRequest {
         [object] $Payload = "",
 
         [Parameter()]
-        [Alias("SupressKeyId")]
         [switch] $SuppressKeyId,
 
         [Parameter()]
         [switch] $SkipRetryOnNonceError,
 
-        [Parameter(ParameterSetName = "HasSigningKey")]
+        [Parameter(ParameterSetName = "ExistingSigningKey")]
         [ValidateNotNull()]
         [AcmePSKey] $SigningKey
     )
 
     process {
         $nonce = $State.GetNonce();
-        if($PsCmdlet.ParameterSetName -ne "HasSigningKey") {
+        if($PsCmdlet.ParameterSetName -ne "ExistingSigningKey") {
             $signingKey = $State.GetAccountKey();
             $account = $State.GetAccount();
             $keyId = $(if($account -and -not $SuppressKeyId) { $account.KeyId });
