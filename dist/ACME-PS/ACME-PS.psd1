@@ -1,6 +1,6 @@
 @{
 	RootModule = 'ACME-PS.psm1'
-	ModuleVersion = '1.5.3'
+	ModuleVersion = '1.5.6'
 	GUID = '2DBF7E3F-F830-403A-9300-78A11C7CD00C'
 
 	CompatiblePSEditions = @("Core", "Desktop")
@@ -64,6 +64,10 @@
 
 		"Invoke-SignedWebRequest"
 	)
+	CmdletsToExport = @()
+	VariablesToExport = @()
+	AliasesToExport = @()
+	DscResourcesToExport = @()
 
 	# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 	PrivateData = @{

@@ -44,7 +44,7 @@ class Certificate {
         # Find the root-most certificate
         $currentCert = $acmeCertificates |
             Where-Object { !$_.Issuer -or $_.Issuer -eq $_.Subject -or !$map.ContainsKey($_.Issuer) } |
-            Select-Object -First;
+            Select-Object -First 1;
 
         $result.Add($currentCert);
 
