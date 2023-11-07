@@ -29,9 +29,11 @@ class Certificate {
         }
     }
 
-    # `X509Certificate2Collections.Export()` seems to iterate through the certificates in reverse order (LIFO)
+    <# `X509Certificate2Collections.Export()` seems to iterate through the certificates in reverse order (LIFO)
     hidden static [Security.Cryptography.X509Certificates.X509Certificate2Collection] ConvertToCertificateCollection([Collections.ArrayList] $acmeCertificates) {
         $result = [Security.Cryptography.X509Certificates.X509Certificate2Collection]::new();
+
+        
 
         #The method assumes that the input was a chain, so creating a map should work.
         $map = @{};
@@ -57,18 +59,29 @@ class Certificate {
         }
 
         return $result;
-    }
+    }#>
 
     hidden static [Security.Cryptography.X509Certificates.X509Certificate2Collection] CreateCertificateCollection([byte[][]] $acmeCertificates, [Security.Cryptography.AsymmetricAlgorithm] $algorithm) {
-        $certs = [Collections.ArrayList]::new();
+        $result = [Security.Cryptography.X509Certificates.X509Certificate2Collection]::new();
+        
+        # `X509Certificate2Collections.Export()` seems to iterate through the certificates in LIFO order
+        # We assume the server sends the certificates in correct order - Leaf certificate first, then the issuer, then the next issuer, etc.
+        for($i = $acmeCertificates.Length - 1; $i -gt 1; $i--) {
+            $result.Add([Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i])) | Out-Null;
+        }
 
-        $certs.Add([Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm));
+        $result.Add([Certificate]::CreateX509WithKey($acmeCertificates[0], $algorithm)) | Out-Null
+        return $result;
+
+        <#
+        $certs.Add();
 
         for($i = 1; $i -lt $acmeCertificates.Length; $i++) {
-            $certs.Add([Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i]));
+            $certs.Add();
         }
 
         return [Certificate]::ConvertToCertificateCollection($certs);
+        #>
     }
 
     static [byte[]] ExportPfxCertificateChain([byte[][]] $acmeCertificates, [AcmePSKey] $key, [SecureString] $password) {
