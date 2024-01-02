@@ -1708,7 +1708,7 @@ function New-Account {
 
                 $keyId = $response.Headers["Location"][0];
 
-                return Get-Account -AccountUrl $keyId -KeyId $keyId -State $State -PassThru:$PassThru
+                return Get-Account -AccountUrl $keyId -KeyId $keyId -State $State
             } else {
                 Write-Error "JWK had already been registiered for an account."
                 return;
