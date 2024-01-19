@@ -66,7 +66,7 @@ class Certificate {
         
         # `X509Certificate2Collections.Export()` seems to iterate through the certificates in LIFO order
         # We assume the server sends the certificates in correct order - Leaf certificate first, then the issuer, then the next issuer, etc.
-        for($i = $acmeCertificates.Length - 1; $i -gt 1; $i--) {
+        for($i = $acmeCertificates.Length - 1; $i -gt 0; $i--) {
             $result.Add([Security.Cryptography.X509Certificates.X509Certificate2]::new($acmeCertificates[$i])) | Out-Null;
         }
 
