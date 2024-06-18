@@ -1,17 +1,17 @@
 [OutputType([string])]
 
-# requires -Modules ACME-PS, Azure, AzureRM.Websites
+# requires -Modules ACME-PS, Az, Az.Websites
 
 <# 
   Azure Runbooks seem to have problems with ACME-PS, if Az.Storage is used as well.
   To work-around the problems, it seems neccessary to explicitly import the azure cmdlets used
   before ACME-PS is imported
-  
-  Import-Module 'Azure';
-  Import-Module 'Az.Storage';
-  Import-Module 'AzureRM.Websites';
-  Import-Module 'ACME-PS';
 #>
+
+  Import-Module 'Az';
+  Import-Module 'Az.Storage';
+  Import-Module 'Az.Websites';
+  Import-Module 'ACME-PS';
 
 param(
     [Parameter()]
@@ -94,13 +94,13 @@ function EnableFirewall
         ApiVersion = "2018-02-01"
     }
 
-    $WebAppConfig = Get-AzureRmResource @p1
+    $WebAppConfig = Get-AzResource @p1
     $IpSecurityRestrictions = $WebAppConfig.properties.ipsecurityrestrictions
 
     $IpSecurityRestrictions = $IpSecurityRestrictions | ? { $_.ipAddress -ne "0.0.0.0/0" }
     $WebAppConfig.properties.ipSecurityRestrictions = $IpSecurityRestrictions
 
-    Set-AzureRmResource `
+    Set-AzResource `
         -ResourceId $WebAppConfig.ResourceId `
         -Properties $WebAppConfig.Properties `
         -ApiVersion 2018-02-01 `
@@ -126,7 +126,7 @@ function DisableFirewall
     }
 
     Write-Progress "Adding entry for $WebApp/web ..."
-    $WebAppConfig = Get-AzureRmResource @p1
+    $WebAppConfig = Get-AzResource @p1
     $IpSecurityRestrictions = $WebAppConfig.properties.ipsecurityrestrictions
 
     $restriction = @{}
@@ -140,7 +140,7 @@ function DisableFirewall
 
     $WebAppConfig.properties.ipSecurityRestrictions = $IpSecurityRestrictions
 
-    Set-AzureRmResource `
+    Set-AzResource `
         -ResourceId $WebAppConfig.ResourceId `
         -Properties $WebAppConfig.Properties `
         -ApiVersion 2018-02-01 `
@@ -148,15 +148,7 @@ function DisableFirewall
 }
 
 "Logging in to Azure ..."
-$RunAsConnection = Get-AutomationConnection -Name $AutomationConnectionName
-
-Add-AzureRmAccount `
-    -ServicePrincipal `
-    -TenantId $RunAsConnection.TenantId `
-    -ApplicationId $RunAsConnection.ApplicationId `
-    -CertificateThumbprint $RunAsConnection.CertificateThumbprint
-
-Select-AzureRmSubscription -SubscriptionId $RunAsConnection.SubscriptionID
+Connect-AzAccount -Identity
 
 Write-Progress "WARNING! Disable firewall via whitelist..."
 DisableFirewall -ResourceGroupName $ResourceGroupName -WebApp $WebApp
@@ -235,7 +227,7 @@ try
         $tempFile = New-TemporaryFile
         try
         {
-            $null = Get-AzureRmWebAppPublishingProfile  `
+            $null = Get-AzWebAppPublishingProfile  `
                 -ResourceGroupName $ResourceGroupName `
                 -Name $WebApp `
                 -OutputFile $tempFile
@@ -294,7 +286,7 @@ try
         -Password $securePassword
 
     "🚀 Wohoo! Apply new SSL Binding to $WebApp..."
-    New-AzureRmWebAppSSLBinding -ResourceGroupName $ResourceGroupName `
+    New-AzWebAppSSLBinding -ResourceGroupName $ResourceGroupName `
         -WebAppName $WebApp `
         -CertificateFilePath $certExportPath `
         -CertificatePassword "XXX" `
