@@ -6,16 +6,16 @@
   Azure Runbooks seem to have problems with ACME-PS, if Az.Storage is used as well.
   To work-around the problems, it seems neccessary to explicitly import the azure cmdlets used
   before ACME-PS is imported
-#>
 
   Import-Module 'Az';
   Import-Module 'Az.Storage';
   Import-Module 'Az.Websites';
   Import-Module 'ACME-PS';
+#>
 
 param(
     [Parameter()]
-    [String] $AutomationConnectionName = "AzureRunAsConnection",
+    [String] $Subscription = "",
 
     [Parameter()]
     [String] $Domain = "example.org",
@@ -31,17 +31,18 @@ param(
 )
 
 # Your email addresses, where acme services will send informations.
-$contactMailAddresses = @($RegistrationEmail, "second-mail@example.org");
+$contactMailAddresses = @($RegistrationEmail);
 
 # This directory is used to store your account key and service directory urls as well as orders and related data
-$acmeStateDir = "C:\Temp\AcmeState";
+$acmeStateDir = "C:\app\AcmeState";
 
 # This path will be used to export your certificate file.
-$certExportPath = "C:\Temp\certificates\certificate.pfx";
+$certExportPathParent = "C:\app\certificates\";
+$certExportPath = "C:\app\certificates\certificate.pfx";
 
 # ServiceName (valid names are LetsEncrypt and LetsEncrypt-Staging, use the latter one for testing your scripts).
-$acmeServiceName = "LetsEncrypt-Staging";
-#$acmeServiceName = "LetsEncrypt";
+# $acmeServiceName = "LetsEncrypt-Staging";
+$acmeServiceName = "LetsEncrypt";
 
 
 function PublishWebsiteFile
@@ -148,7 +149,7 @@ function DisableFirewall
 }
 
 "Logging in to Azure ..."
-Connect-AzAccount -Identity
+Connect-AzAccount -Identity -Subscription $Subscription
 
 Write-Progress "WARNING! Disable firewall via whitelist..."
 DisableFirewall -ResourceGroupName $ResourceGroupName -WebApp $WebApp
@@ -159,10 +160,21 @@ DisableFirewall -ResourceGroupName $ResourceGroupName -WebApp $WebApp
 
 # see https://github.com/PKISharp/ACMESharpCore-PowerShell/tree/master/samples
 
-#Import-Module 'ACME-PS';
+Import-Module 'ACME-PS';
+Import-Module 'Az';
+Import-Module 'Az.Storage';
+Import-Module 'Az.Websites';
 
 try
 {
+    "*** 0. Create temp folder"
+    If(!(test-path -PathType container $certExportPathParent))
+    {
+      New-Item -ItemType Directory -Path $certExportPathParent
+
+      "Temp folder created"
+    }
+
     ###
     ### 1. Create an new account
     ### https://github.com/PKISharp/ACMESharpCore-PowerShell/blob/master/samples/CreateAccount.ps1
@@ -271,11 +283,15 @@ try
 
     # Now we wait until the ACME service provides the certificate url
     while(-not $order.CertificateUrl) {
-        Start-Sleep -Seconds 15
+        Start-Sleep -Seconds 45
         $order | Update-ACMEOrder -State $acmeStateDir -PassThru
     }
 
     $securePassword = ConvertTo-SecureString "XXX" –asplaintext –force
+    Start-Sleep -Seconds 30
+    
+    "Checking Files in C:\Temp\certificates\"
+    Get-ChildItem $certExportPathParent
 
     "Exporting..."
 
@@ -284,6 +300,12 @@ try
         -Order $order `
         -Path $certExportPath `
         -Password $securePassword
+
+    Start-Sleep -Seconds 30
+    "Exporting completed..."
+
+    "Checking Files in C:\Temp\certificates\"
+    Get-ChildItem $certExportPathParent
 
     "🚀 Wohoo! Apply new SSL Binding to $WebApp..."
     New-AzWebAppSSLBinding -ResourceGroupName $ResourceGroupName `
@@ -300,5 +322,3 @@ catch {
     Write-Error -Message $_.Exception
     throw $_.Exception
 }
-
-
