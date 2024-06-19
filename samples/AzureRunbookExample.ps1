@@ -42,7 +42,7 @@ $certExportPath = "C:\app\certificates\certificate.pfx";
 
 # ServiceName (valid names are LetsEncrypt and LetsEncrypt-Staging, use the latter one for testing your scripts).
 $acmeServiceName = "LetsEncrypt-Staging";
-# $acmeServiceName = "LetsEncrypt";
+#$acmeServiceName = "LetsEncrypt";
 
 
 function PublishWebsiteFile
@@ -288,10 +288,6 @@ try
     }
 
     $securePassword = ConvertTo-SecureString "XXX" –asplaintext –force
-    Start-Sleep -Seconds 30
-    
-    "Checking Files in C:\Temp\certificates\"
-    Get-ChildItem $certExportPathParent
 
     "Exporting..."
 
@@ -301,12 +297,10 @@ try
         -Path $certExportPath `
         -Password $securePassword
 
-    Start-Sleep -Seconds 30
-    "Exporting completed..."
-
     "Checking Files in C:\Temp\certificates\"
     Get-ChildItem $certExportPathParent
 
+    "Exporting completed..."
     "🚀 Wohoo! Apply new SSL Binding to $WebApp..."
     New-AzWebAppSSLBinding -ResourceGroupName $ResourceGroupName `
         -WebAppName $WebApp `
