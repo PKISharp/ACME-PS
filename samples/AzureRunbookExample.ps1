@@ -31,7 +31,7 @@ param(
 )
 
 # Your email addresses, where acme services will send informations.
-$contactMailAddresses = @($RegistrationEmail);
+$contactMailAddresses = @($RegistrationEmail, "second-mail@example.org");
 
 # This directory is used to store your account key and service directory urls as well as orders and related data
 $acmeStateDir = "C:\app\AcmeState";
@@ -283,7 +283,7 @@ try
 
     # Now we wait until the ACME service provides the certificate url
     while(-not $order.CertificateUrl) {
-        Start-Sleep -Seconds 45
+        Start-Sleep -Seconds 15
         $order | Update-ACMEOrder -State $acmeStateDir -PassThru
     }
 
