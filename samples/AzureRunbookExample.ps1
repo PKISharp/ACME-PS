@@ -1,21 +1,21 @@
 [OutputType([string])]
 
-# requires -Modules ACME-PS, Azure, AzureRM.Websites
+# requires -Modules ACME-PS, Az, Az.Websites
 
 <# 
   Azure Runbooks seem to have problems with ACME-PS, if Az.Storage is used as well.
   To work-around the problems, it seems neccessary to explicitly import the azure cmdlets used
   before ACME-PS is imported
-  
-  Import-Module 'Azure';
+
+  Import-Module 'Az';
   Import-Module 'Az.Storage';
-  Import-Module 'AzureRM.Websites';
+  Import-Module 'Az.Websites';
   Import-Module 'ACME-PS';
 #>
 
 param(
     [Parameter()]
-    [String] $AutomationConnectionName = "AzureRunAsConnection",
+    [String] $Subscription = "",
 
     [Parameter()]
     [String] $Domain = "example.org",
@@ -34,10 +34,11 @@ param(
 $contactMailAddresses = @($RegistrationEmail, "second-mail@example.org");
 
 # This directory is used to store your account key and service directory urls as well as orders and related data
-$acmeStateDir = "C:\Temp\AcmeState";
+$acmeStateDir = "C:\app\AcmeState";
 
 # This path will be used to export your certificate file.
-$certExportPath = "C:\Temp\certificates\certificate.pfx";
+$certExportPathParent = "C:\app\certificates\";
+$certExportPath = "C:\app\certificates\certificate.pfx";
 
 # ServiceName (valid names are LetsEncrypt and LetsEncrypt-Staging, use the latter one for testing your scripts).
 $acmeServiceName = "LetsEncrypt-Staging";
@@ -94,13 +95,13 @@ function EnableFirewall
         ApiVersion = "2018-02-01"
     }
 
-    $WebAppConfig = Get-AzureRmResource @p1
+    $WebAppConfig = Get-AzResource @p1
     $IpSecurityRestrictions = $WebAppConfig.properties.ipsecurityrestrictions
 
     $IpSecurityRestrictions = $IpSecurityRestrictions | ? { $_.ipAddress -ne "0.0.0.0/0" }
     $WebAppConfig.properties.ipSecurityRestrictions = $IpSecurityRestrictions
 
-    Set-AzureRmResource `
+    Set-AzResource `
         -ResourceId $WebAppConfig.ResourceId `
         -Properties $WebAppConfig.Properties `
         -ApiVersion 2018-02-01 `
@@ -126,7 +127,7 @@ function DisableFirewall
     }
 
     Write-Progress "Adding entry for $WebApp/web ..."
-    $WebAppConfig = Get-AzureRmResource @p1
+    $WebAppConfig = Get-AzResource @p1
     $IpSecurityRestrictions = $WebAppConfig.properties.ipsecurityrestrictions
 
     $restriction = @{}
@@ -140,7 +141,7 @@ function DisableFirewall
 
     $WebAppConfig.properties.ipSecurityRestrictions = $IpSecurityRestrictions
 
-    Set-AzureRmResource `
+    Set-AzResource `
         -ResourceId $WebAppConfig.ResourceId `
         -Properties $WebAppConfig.Properties `
         -ApiVersion 2018-02-01 `
@@ -148,15 +149,7 @@ function DisableFirewall
 }
 
 "Logging in to Azure ..."
-$RunAsConnection = Get-AutomationConnection -Name $AutomationConnectionName
-
-Add-AzureRmAccount `
-    -ServicePrincipal `
-    -TenantId $RunAsConnection.TenantId `
-    -ApplicationId $RunAsConnection.ApplicationId `
-    -CertificateThumbprint $RunAsConnection.CertificateThumbprint
-
-Select-AzureRmSubscription -SubscriptionId $RunAsConnection.SubscriptionID
+Connect-AzAccount -Identity -Subscription $Subscription
 
 Write-Progress "WARNING! Disable firewall via whitelist..."
 DisableFirewall -ResourceGroupName $ResourceGroupName -WebApp $WebApp
@@ -167,10 +160,21 @@ DisableFirewall -ResourceGroupName $ResourceGroupName -WebApp $WebApp
 
 # see https://github.com/PKISharp/ACMESharpCore-PowerShell/tree/master/samples
 
-#Import-Module 'ACME-PS';
+Import-Module 'ACME-PS';
+Import-Module 'Az';
+Import-Module 'Az.Storage';
+Import-Module 'Az.Websites';
 
 try
 {
+    "*** 0. Create temp folder"
+    If(!(test-path -PathType container $certExportPathParent))
+    {
+      New-Item -ItemType Directory -Path $certExportPathParent
+
+      "Temp folder created"
+    }
+
     ###
     ### 1. Create an new account
     ### https://github.com/PKISharp/ACMESharpCore-PowerShell/blob/master/samples/CreateAccount.ps1
@@ -235,7 +239,7 @@ try
         $tempFile = New-TemporaryFile
         try
         {
-            $null = Get-AzureRmWebAppPublishingProfile  `
+            $null = Get-AzWebAppPublishingProfile  `
                 -ResourceGroupName $ResourceGroupName `
                 -Name $WebApp `
                 -OutputFile $tempFile
@@ -293,8 +297,12 @@ try
         -Path $certExportPath `
         -Password $securePassword
 
+    "Checking Files in C:\Temp\certificates\"
+    Get-ChildItem $certExportPathParent
+
+    "Exporting completed..."
     "🚀 Wohoo! Apply new SSL Binding to $WebApp..."
-    New-AzureRmWebAppSSLBinding -ResourceGroupName $ResourceGroupName `
+    New-AzWebAppSSLBinding -ResourceGroupName $ResourceGroupName `
         -WebAppName $WebApp `
         -CertificateFilePath $certExportPath `
         -CertificatePassword "XXX" `
@@ -308,5 +316,3 @@ catch {
     Write-Error -Message $_.Exception
     throw $_.Exception
 }
-
-
