@@ -578,7 +578,8 @@ class AcmeChallenge {
         $this.Type = $obj.type;
         $this.Url = $obj.url;
         $this.Token = $obj.token;
-
+        
+        $this.RawChallenge = $obj;
         $this.Identifier = $identifier;
 
         $this.Status = $obj.status;
@@ -594,6 +595,7 @@ class AcmeChallenge {
 
     [AcmeIdentifier] $Identifier;
 
+    [PSCustomObject] $RawChallenge;
     [PSCustomObject] $Data;
 }
 
