@@ -578,12 +578,13 @@ class AcmeChallenge {
         $this.Type = $obj.type;
         $this.Url = $obj.url;
         $this.Token = $obj.token;
-        
-        $this.RawChallenge = $obj;
+
         $this.Identifier = $identifier;
 
         $this.Status = $obj.status;
         $this.Error = $obj.error;
+
+        $this.RawChallenge = $obj;
     }
 
     [string] $Type;
@@ -2807,10 +2808,24 @@ function Initialize-Challenge {
                 $content = $AccountKey.GetKeyAuthorizationDigest($Challenge.Token);
 
                 $Challenge.Data =  [PSCustomObject]@{
-                    "Type" = "dns-01";
+                    "Type" = $Challenge.Type;
                     "Token" = $Challenge.Token;
                     "TxtRecordName" = $txtRecordName;
                     "Content" = $content;
+                }
+            }
+
+            "dns-persist-01" {
+                $validationDomainName = "_validation-persist.$($Challenge.Identifier.Value)";
+                $accountUri = $Challenge.RawChallenge.accountUri;
+                $issuerDomainNames = $Challenge.RawChallenge.issuerDomainNames;
+
+                $expectedContent = @($issuerDomainNames | ForEach-Object { "$_;accountUri=$accountUri" });
+
+                $Challenge.Data =  [PSCustomObject]@{
+                    "Type" = $Challenge.Type;
+                    "ValidationDomainName" = $validationDomainName;
+                    "ExpectedContent" = $expectedContent;
                 }
             }
 
@@ -2825,8 +2840,9 @@ function Initialize-Challenge {
                 }
             }
 
+            
             Default {
-                throw "Cannot show how to resolve challange of unknown type $($Challenge.Type)"
+                Write-Warning "Challenge type '$($Challenge.Type)' is not supported by this module. No data has been initialized for this challenge. But you can still use the data from the raw challenge to complete it manually.";
             }
         }
 

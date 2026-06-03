@@ -48,16 +48,16 @@ InModuleScope ACME-PS {
             Complete-Order -State $state -Order $order -CertificateKey $certificateKey;
 
             It 'called ACME service to finalize the order' {
-                Assert-VerifiableMock
+                Should -InvokeVerifiable
             }
         }
 
-        Context 'GenerateKey paraeter set' {
+        Context 'GenerateKey parameter set' {
             $order = [AcmeOrder]::new($orderData);
             Complete-Order -State $state -Order $order -GenerateCertificateKey;
 
             It 'called ACME service to finalize the order' {
-                Assert-VerifiableMock
+                Should -InvokeVerifiable
             }
         }
     }

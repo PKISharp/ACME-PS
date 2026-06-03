@@ -8,6 +8,8 @@ class AcmeChallenge {
 
         $this.Status = $obj.status;
         $this.Error = $obj.error;
+
+        $this.RawChallenge = $obj;
     }
 
     [string] $Type;
@@ -19,5 +21,6 @@ class AcmeChallenge {
 
     [AcmeIdentifier] $Identifier;
 
+    [PSCustomObject] $RawChallenge;
     [PSCustomObject] $Data;
 }
