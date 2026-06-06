@@ -25,7 +25,8 @@ function Invoke-ACMEWebRequest {
         if($script:SecurityProtocol -ne [Net.SecurityProtocolType]::SystemDefault) {
             [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol `
                 -bor [Net.SecurityProtocolType]::Tls11 `
-                -bor [Net.SecurityProtocolType]::Tls12;
+                -bor [Net.SecurityProtocolType]::Tls12 `
+                -bor [Net.SecurityProtocolType]::Tls13;
         }
     }
     End {

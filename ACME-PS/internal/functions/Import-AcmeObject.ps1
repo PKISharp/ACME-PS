@@ -1,3 +1,5 @@
+# TODO: Typename is not mandatory, but if it's not provided, the downstream convert function _will_ fail.
+# Also this function can be replaced by ctors in the ACMEOrder and ACMEAccount classes.
 function Import-AcmeObject {
     param(
         [Parameter(Mandatory = $true)]
@@ -31,8 +33,9 @@ function Import-AcmeObject {
         }
 
         if($TypeName) {
-            $result = $imported | ConvertTo-OriginalType -TypeName $TypeName
+            $result = $imported -as ([type]$TypeName)
         } else {
+            # TODO: Typename is mandatory, so this can probably be removed.
             $result = $imported | ConvertTo-OriginalType
         }
 
