@@ -1,32 +1,58 @@
 class AcmeIdentifier {
-    static [AcmeIdentifier] Parse([string] $textValue) {
-        if($textValue -contains ":") {
-            $_type, $_value = $textValue -split ":",2;
-            return [AcmeIdentifier]::new($_type, $_value);
+    [PSCustomObject] $AcmeObject = $null;
+
+    hidden [string] $_type;
+    hidden [string] $_value;
+
+
+    hidden static [hashtable[]] $_memberDefinitions = @(
+        @{MemberName = "Type"; Value = { if ($null -ne $this.AcmeObject) { $this.AcmeObject.type } else { $this._type } } },
+        @{MemberName = "Value"; Value = { if ($null -ne $this.AcmeObject) { $this.AcmeObject.value } else { $this._value } } }
+    );
+
+    static AcmeIdentifier() {
+        $TypeName = [AcmeIdentifier].Name
+        foreach ($definition in [AcmeIdentifier]::_memberDefinitions) {
+            Update-TypeData -TypeName $TypeName -MemberType 'ScriptProperty' @definition
         }
-
-        return [AcmeIdentifier]::new($textValue);
     }
-
+    
+    
     AcmeIdentifier([string] $value) {
-        $this.Type = "dns";
-        $this.Value = $value;
+        $this._type = "dns";
+        $this._value = $value;
     }
 
     AcmeIdentifier([string] $type, [string] $value) {
-        $this.Type = $type;
-        $this.Value = $value;
+        $this._type = $type;
+        $this._value = $value;
     }
 
     AcmeIdentifier([PsCustomObject] $obj) {
-        $this.type = $obj.type;
-        $this.value = $obj.Value;
+        $this.AcmeObject = $obj;
     }
 
-    [string] $Type;
-    [string] $Value;
 
     [string] ToString() {
-        return "$($this.Type.ToLower()):$($this.Value.ToLower())";
+        return "$($this.Type):$($this.Value)";
+    }
+
+    [string] ToJson() {
+        $hashtable = @{
+            Type = $this.Type;
+            Value = $this.Value;
+        }
+
+        return $hashtable | ConvertTo-Json -Depth 1;
+    }
+
+
+    static [AcmeIdentifier] Parse([string] $textValue) {
+        if ($textValue -like "*:*") {
+            $__type, $__value = $textValue -split ":",2;
+            return [AcmeIdentifier]::new($__type, $__value);
+        }
+
+        return [AcmeIdentifier]::new($textValue);
     }
 }

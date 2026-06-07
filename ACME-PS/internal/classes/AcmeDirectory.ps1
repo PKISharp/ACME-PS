@@ -1,39 +1,61 @@
 class AcmeDirectory {
-    AcmeDirectory([PSCustomObject] $obj) {
-        $this.ResourceUrl = $obj.ResourceUrl
+    [string] $ResourceUrl;
+    [PSCustomObject] $AcmeObject;
+    [AcmeDirectoryMeta] $Meta;
 
-        $this.NewAccount = $obj.NewAccount;
-        $this.NewAuthz = $obj.NewAuthz;
-        $this.NewNonce = $obj.NewNonce;
-        $this.NewOrder = $obj.NewOrder;
-        $this.KeyChange = $obj.KeyChange;
-        $this.RevokeCert = $obj.RevokeCert;
+    static hidden [hashtable[]] $_memberDefinitions = @(
+        @{MemberName = "NewAccount"; Value = { $this.AcmeObject.newAccount } },
+        @{MemberName = "NewAuthz"; Value = { $this.AcmeObject.newAuthz } },
+        @{MemberName = "NewNonce"; Value = { $this.AcmeObject.newNonce } },
+        @{MemberName = "NewOrder"; Value = { $this.AcmeObject.newOrder } },
+        @{MemberName = "KeyChange"; Value = { $this.AcmeObject.keyChange } },
+        @{MemberName = "RevokeCert"; Value = { $this.AcmeObject.revokeCert } }
+    );
 
-        $this.Meta = [AcmeDirectoryMeta]::new($obj.Meta);
+    static AcmeDirectory() {
+        $TypeName = [AcmeDirectory].Name
+        foreach ($definition in [AcmeDirectory]::_memberDefinitions) {
+            Update-TypeData -TypeName $TypeName -MemberType 'ScriptProperty' @definition
+        }
     }
 
-    [string] $ResourceUrl;
+    AcmeDirectory([PSCustomObject] $obj, [string] $ResourceUrl = $null) {
+        $this.ResourceUrl = if ($null -ne $ResourceUrl) { $ResourceUrl } else { $obj.ResourceUrl }
+        $this.AcmeObject = $obj;
 
-    [string] $NewAccount;
-    [string] $NewAuthz;
-    [string] $NewNonce;
-    [string] $NewOrder;
-    [string] $KeyChange;
-    [string] $RevokeCert;
+        $this.Meta = [AcmeDirectoryMeta]::new($obj.meta);
+    }
 
-    [AcmeDirectoryMeta] $Meta;
+    [string] ToJson() {
+        $hashtable = @{
+            ResourceUrl = $this.ResourceUrl
+        }
+        $this.AcmeObject.PSObject.Properties | ForEach-Object {
+            $hashtable[$_.Name] = $_.Value
+        }
+
+        return $hashtable | ConvertTo-Json -Depth 5;
+    }
 }
 
 class AcmeDirectoryMeta {
-    AcmeDirectoryMeta([PSCustomObject] $obj) {
-        $this.CaaIdentites = $obj.CaaIdentities;
-        $this.TermsOfService = $obj.TermsOfService;
-        $this.Website = $obj.Website;
-        $this.ExternalAccountRequired = $obj.ExternalAccountRequired;
+    [PSCustomObject] $AcmeObject;
+
+    static hidden [hashtable[]] $_memberDefinitions = @(
+        @{MemberName = "CaaIdentities"; Value = { $this.AcmeObject.caaIdentities } },
+        @{MemberName = "TermsOfService"; Value = { $this.AcmeObject.termsOfService } },
+        @{MemberName = "Website"; Value = { $this.AcmeObject.website } },
+        @{MemberName = "ExternalAccountRequired"; Value = { $this.AcmeObject.externalAccountRequired } }
+    );
+
+    static AcmeDirectoryMeta() {
+        $TypeName = [AcmeDirectoryMeta].Name
+        foreach ($definition in [AcmeDirectoryMeta]::_memberDefinitions) {
+            Update-TypeData -TypeName $TypeName -MemberType 'ScriptProperty' @definition
+        }
     }
 
-    [string[]] $CaaIdentites;
-    [string] $TermsOfService;
-    [string] $Website;
-    [bool] $ExternalAccountRequired;
+    AcmeDirectoryMeta([PSCustomObject] $obj) {
+        $this.AcmeObject = $obj;
+    }
 }
