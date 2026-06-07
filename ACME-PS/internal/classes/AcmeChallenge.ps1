@@ -1,26 +1,37 @@
 class AcmeChallenge {
-    AcmeChallenge([PSCustomObject] $obj, [AcmeIdentifier] $identifier) {
-        $this.Type = $obj.type;
-        $this.Url = $obj.url;
-        $this.Token = $obj.token;
+    [PSCustomObject] $AcmeObject;
+    [PSCustomObject] $Data;
 
-        $this.Identifier = $identifier;
+    static hidden [hashtable[]] $_memberDefinitions = @(
+        @{MemberName = "Type";   Value = { $this.AcmeObject.type } },
+        @{MemberName = "Url";    Value = { $this.AcmeObject.url } },
+        @{MemberName = "Token";  Value = { $this.AcmeObject.token } },
+        @{MemberName = "Status"; Value = { $this.AcmeObject.status } },
+        @{MemberName = "Error";  Value = { $this.AcmeObject.error } }
+    );
 
-        $this.Status = $obj.status;
-        $this.Error = $obj.error;
-
-        $this.RawChallenge = $obj;
+    static AcmeChallenge() {
+        $TypeName = [AcmeChallenge].Name
+        foreach ($definition in [AcmeChallenge]::_memberDefinitions) {
+            Update-TypeData -TypeName $TypeName -MemberType 'ScriptProperty' @definition
+        }
     }
 
-    [string] $Type;
-    [string] $Url;
-    [string] $Token;
 
-    [string] $Status;
-    [string] $Error;
+    AcmeChallenge([PSCustomObject] $acmeObject) {
+        $this.AcmeObject = $acmeObject;
+    }
 
-    [AcmeIdentifier] $Identifier;
+    [hashtable] ToHashtable() {
+        $hashtable = @{}
+        $this.AcmeObject.PSObject.Properties | ForEach-Object {
+            $hashtable[$_.Name] = $_.Value
+        }
 
-    [PSCustomObject] $RawChallenge;
-    [PSCustomObject] $Data;
+        return $hashtable;
+    }
+
+    [string] ToJson() {
+        return $this.ToHashtable() | ConvertTo-Json;
+    }
 }

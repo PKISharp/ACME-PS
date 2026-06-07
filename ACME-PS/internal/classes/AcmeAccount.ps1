@@ -1,30 +1,44 @@
 class AcmeAccount {
-    AcmeAccount() {}
+    [string] $ResourceUrl;
+    [PSCustomObject] $AcmeObject;
 
-    AcmeAccount([AcmeHttpResponse] $httpResponse, [string] $KeyId)
-    {
-        $this.KeyId = $KeyId;
-
-        $this.Status = $httpResponse.Content.Status;
-        $this.Id = $httpResponse.Content.Id;
-        $this.Contact = $httpResponse.Content.Contact;
-        $this.InitialIp = $httpResponse.Content.InitialIp;
-        $this.CreatedAt = $httpResponse.Content.CreatedAt;
-
-        $this.OrderListUrl = $httpResponse.Content.Orders;
-        $this.ResourceUrl = $KeyId;
+    static hidden [hashtable[]] $_memberDefinitions = @(
+        # Non RFC 8555 property    
+        @{MemberName = "KeyId";     Value = { $this.ResourceUrl } },
+        # Non RFC 8555 property
+        @{MemberName = "Id";        Value = { $this.AcmeObject.id } },
+        
+        @{MemberName = "Status";    Value = { $this.AcmeObject.status } },
+        @{MemberName = "Contact";   Value = { $this.AcmeObject.contact } },
+        @{MemberName = "ExternalAccountBinding"; Value = { $this.AcmeObject.externalAccountBinding } },
+        @{MemberName = "TermsOfServiceAgreed"; Value = { $this.AcmeObject.termsOfServiceAgreed } },
+        @{MemberName = "Orders";    Value = { $this.AcmeObject.orders } }
+    );
+    
+    static AcmeAccount() {
+        $TypeName = [AcmeAccount].Name
+        foreach ($definition in [AcmeAccount]::_memberDefinitions) {
+            Update-TypeData -TypeName $TypeName -MemberType 'ScriptProperty' @definition
+        }
     }
 
-    [string] $ResourceUrl;
+    AcmeAccount([PSCustomObject] $acmeObject, [string] $ResourceUrl = $null) {
+        $this.ResourceUrl = if ($null -ne $ResourceUrl) { $ResourceUrl } else { $acmeObject.ResourceUrl };
+        $this.AcmeObject = $acmeObject;
+    }
 
-    [string] $KeyId;
+    [hashtable] ToHashtable() {
+        $hashtable = @{
+            ResourceUrl = $this.ResourceUrl
+        }
+        $this.AcmeObject.PSObject.Properties | ForEach-Object {
+            $hashtable[$_.Name] = $_.Value
+        }
 
-    [string] $Status;
+        return $hashtable
+    }
 
-    [string] $Id;
-    [string[]] $Contact;
-    [string] $InitialIp;
-    [string] $CreatedAt;
-
-    [string] $OrderListUrl;
+    [string] ToJson() {
+        return $this.ToHashtable() | ConvertTo-Json;
+    }
 }

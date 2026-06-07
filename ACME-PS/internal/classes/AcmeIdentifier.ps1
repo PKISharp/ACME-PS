@@ -1,12 +1,12 @@
 class AcmeIdentifier {
-    [PSCustomObject] $AcmeObject = $null;
+    [PSCustomObject] $AcmeObject;
 
     hidden [string] $_type;
     hidden [string] $_value;
 
 
     hidden static [hashtable[]] $_memberDefinitions = @(
-        @{MemberName = "Type"; Value = { if ($null -ne $this.AcmeObject) { $this.AcmeObject.type } else { $this._type } } },
+        @{MemberName = "Type";  Value = { if ($null -ne $this.AcmeObject) { $this.AcmeObject.type } else { $this._type } } },
         @{MemberName = "Value"; Value = { if ($null -ne $this.AcmeObject) { $this.AcmeObject.value } else { $this._value } } }
     );
 
@@ -28,8 +28,8 @@ class AcmeIdentifier {
         $this._value = $value;
     }
 
-    AcmeIdentifier([PsCustomObject] $obj) {
-        $this.AcmeObject = $obj;
+    AcmeIdentifier([PsCustomObject] $acmeObject) {
+        $this.AcmeObject = $acmeObject;
     }
 
 
@@ -37,13 +37,15 @@ class AcmeIdentifier {
         return "$($this.Type):$($this.Value)";
     }
 
-    [string] ToJson() {
-        $hashtable = @{
+    [hashtable] ToHashtable() {
+        return @{
             Type = $this.Type;
             Value = $this.Value;
         }
+    }
 
-        return $hashtable | ConvertTo-Json -Depth 1;
+    [string] ToJson() {
+        return $this.ToHashtable() | ConvertTo-Json -Depth 1;
     }
 
 

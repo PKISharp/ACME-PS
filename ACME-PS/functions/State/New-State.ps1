@@ -14,18 +14,26 @@ function New-State {
         .EXAMPLE
             PS> New-State
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess=$true, DefaultParameterSetName="FileStored")]
     param(
-        [Parameter()]
-        [string]
-        $Path
+        [Parameter(ParameterSetName="FileStored")]
+        [ValidateNotNullOrEmpty()]
+        [IO.DirectoryInfo]
+        $Path = (Get-RuntimeDataPath),
+
+        [Parameter(ParameterSetName="InMemory")]
+        [switch]
+        $InMemory
     )
 
     process {
-        if(-not $Path) {
-            Write-Warning "You did not provide a persistency path. State will not be saved automatically."
+        if ($InMemory.IsPresent) 
+        {
+            Write-Warning "In-memory state will not be persisted to disk. Account keys and similar will not be saved automatically."
             return [AcmeInMemoryState]::new()
-        } else {
+        } 
+        else
+        {
             if($PSCmdlet.ShouldProcess("State", "Create new state and save it to $Path")) {
                 $paths = [AcmeStatePaths]::new($Path);
                 return [AcmeDiskPersistedState]::new($paths, $true, $true);

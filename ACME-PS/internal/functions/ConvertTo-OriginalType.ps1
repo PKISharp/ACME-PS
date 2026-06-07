@@ -1,3 +1,4 @@
+# TODO: This function should not be used anywhere in the codebase. It's a hack.
 function ConvertTo-OriginalType {
     param(
         [Parameter(Mandatory=$true, Position=0, ValueFromPipeline=$true)]

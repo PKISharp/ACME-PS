@@ -5,7 +5,6 @@ BeforeAll {
 Describe "AcmeChallenge" {
     Context 'Creating an instance of AcmeChallenge from Json' {
         BeforeAll {
-            $identifier = [AcmeIdentifier]::new("dns", "example.com")
             $obj = ConvertFrom-Json -InputObject '{
                 "type": "http-01",
                 "url": "https://example.com/acme/challenge/12345",
@@ -16,16 +15,13 @@ Describe "AcmeChallenge" {
         }
 
         It "should create an instance of AcmeChallenge" {
-            $challenge = [AcmeChallenge]::new($obj, $identifier)
+            $challenge = [AcmeChallenge]::new($obj)
 
             $challenge.Type | Should -Be "http-01"
             $challenge.Url | Should -Be "https://example.com/acme/challenge/12345"
             $challenge.Token | Should -Be "abcde12345"
             $challenge.Status | Should -Be "pending"
             $challenge.Error | Should -Be $null
-
-            $challenge.Identifier.Type | Should -Be "dns"
-            $challenge.Identifier.Value | Should -Be "example.com"
         }
     }
 }
