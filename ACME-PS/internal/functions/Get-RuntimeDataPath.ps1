@@ -1,11 +1,16 @@
 <#
 .SYNOPSIS
-    Returns the OS-appropriate runtime data directory.
+    Returns the content of $env:ACME_PS_RUNTIME_DATA_PATH if set, otherwise the OS-appropriate runtime data directory.
 .DESCRIPTION
+    - If $env:ACME_PS_RUNTIME_DATA_PATH is set, returns its value.
     - On Windows: returns $env:ProgramData
     - On Linux/macOS: returns /run if it exists, otherwise /var/run
 #>
 function Get-RuntimeDataPath {
+    if ($env:ACME_PS_RUNTIME_DATA_PATH) {
+        return $env:ACME_PS_RUNTIME_DATA_PATH
+    }
+
     try {
         if ($IsWindows) {
             return "$env:ProgramData\ACME-PS"

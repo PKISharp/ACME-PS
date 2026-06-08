@@ -2,6 +2,13 @@ BeforeAll {
     . "$PSScriptRoot\Get-RuntimeDataPath.ps1"
 }
 Describe 'Get-RuntimeDataPath' {
+    It 'returns the value of $env:ACME_PS_RUNTIME_DATA_PATH if set' {
+        $env:ACME_PS_RUNTIME_DATA_PATH = "C:\Custom\Path"
+        $path = Get-RuntimeDataPath
+        $path | Should -Be "C:\Custom\Path"
+        Remove-Item Env:ACME_PS_RUNTIME_DATA_PATH
+    }
+
     It 'returns the correct path on Windows' {
         if ($IsWindows) {
             $path = Get-RuntimeDataPath
