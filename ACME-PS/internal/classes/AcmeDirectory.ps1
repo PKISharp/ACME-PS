@@ -20,8 +20,8 @@ class AcmeDirectory {
     }
 
 
-    AcmeDirectory([PSCustomObject] $acmeObject, [string] $ResourceUrl = $null) {
-        $this.ResourceUrl = if ($null -ne $ResourceUrl) { $ResourceUrl } else { $acmeObject.ResourceUrl }
+    AcmeDirectory([PSCustomObject] $acmeObject, [string] $ResourceUrl) {
+        $this.ResourceUrl = if (-not $ResourceUrl) { $acmeObject.ResourceUrl } else { $ResourceUrl }
         $this.AcmeObject = $acmeObject;
 
         $this.Meta = [AcmeDirectoryMeta]::new($acmeObject.meta);
