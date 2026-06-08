@@ -7,22 +7,20 @@ function Get-TermsOfService {
             Show the ACME service TOS
 
 
-        .PARAMETER State
-            The state object, that is used in this module, to provide easy access to the ACME service directory,
+        .PARAMETER AcmeDirectory
+            The ACME directory object, that is used in this module, to provide easy access to the ACME service directory,
             your account key, the associated account and the replay nonce.
 
 
         .EXAMPLE
-            PS> Get-TermsOfService -State $state
+            PS> Get-TermsOfService -AcmeDirectory $acmeDirectory
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true, Position=0)]
-        [AcmeState]
-        $State
+        [Parameter(Position=0)]
+        [AcmeDirectory]
+        $AcmeDirectory = (Get-ServiceDirectory)
     )
 
-    process {
-        Start-Process $State.GetServiceDirectory().Meta.TermsOfService;
-    }
+    Start-Process $AcmeDirectory.Meta.TermsOfService;
 }
